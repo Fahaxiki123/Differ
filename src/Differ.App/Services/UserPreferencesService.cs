@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -24,6 +25,7 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
     private double _spreadsheetDetailHeight = 104;
     private bool _textDetailsExpanded;
     private bool _spreadsheetDetailsExpanded = true;
+    private bool _mergeShowBase;
 
     public UserPreferencesService(string? path = null)
     {
@@ -44,6 +46,7 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
     public double SpreadsheetDetailHeight { get => _spreadsheetDetailHeight; set => SetProperty(ref _spreadsheetDetailHeight, Clamp(value, 72, 1200, 104)); }
     public bool TextDetailsExpanded { get => _textDetailsExpanded; set => SetProperty(ref _textDetailsExpanded, value); }
     public bool SpreadsheetDetailsExpanded { get => _spreadsheetDetailsExpanded; set => SetProperty(ref _spreadsheetDetailsExpanded, value); }
+    public bool MergeShowBase { get => _mergeShowBase; private set => SetProperty(ref _mergeShowBase, value); }
 
     public void Dispose() => _gate.Dispose();
 
@@ -68,6 +71,7 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
             SpreadsheetDetailHeight = data.Layout.SpreadsheetDetailHeight;
             TextDetailsExpanded = data.Layout.TextDetailsExpanded;
             SpreadsheetDetailsExpanded = data.Layout.SpreadsheetDetailsExpanded;
+            MergeShowBase = data.MergeShowBase;
             _loaded = true;
         }
         finally
@@ -92,6 +96,14 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
             SpreadsheetDetailsExpanded = SpreadsheetDetailsExpanded
         };
         return UpdateAsync(data => data with { Layout = layout }, cancellationToken);
+    }
+
+    public async Task SetMergeShowBaseAsync(bool value, CancellationToken cancellationToken = default)
+    {
+        // Merge windows run independently of the ordinary comparison process. Only
+        // update this field; the latest disk layout and rules belong to their writers.
+        await UpdateAsync(data => data with { MergeShowBase = value }, cancellationToken);
+        MergeShowBase = value;
     }
 
     public async Task<DiffOptions?> LoadRulesAsync(string formatKey, CancellationToken cancellationToken = default)
@@ -135,9 +147,12 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var data = update(await ReadAsync(cancellationToken, forUpdate: true).ConfigureAwait(false));
             var directory = Path.GetDirectoryName(_path)!;
             Directory.CreateDirectory(directory);
+            // The instance semaphore alone cannot protect separate merge/diff processes.
+            // Keep this transient lock across the entire read/merge/replace transaction.
+            using var writeLock = await AcquireWriteLockAsync(cancellationToken).ConfigureAwait(false);
+            var data = update(await ReadAsync(cancellationToken, forUpdate: true).ConfigureAwait(false));
             var temporary = Path.Combine(directory, $".preferences-{Guid.NewGuid():N}.tmp");
             try
             {
@@ -157,6 +172,26 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
         finally
         {
             _gate.Release();
+        }
+    }
+
+    private async Task<FileStream> AcquireWriteLockAsync(CancellationToken cancellationToken)
+    {
+        var elapsed = Stopwatch.StartNew();
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                // DeleteOnClose also removes the lock after exceptions or process exit.
+                return new FileStream(_path + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                    FileShare.None, 1, FileOptions.DeleteOnClose);
+            }
+            catch (IOException exception) when ((exception.HResult & 0xffff) is 32 or 33
+                && elapsed.Elapsed < TimeSpan.FromSeconds(5))
+            {
+                await Task.Delay(25, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
@@ -244,6 +279,7 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
         public int SchemaVersion { get; init; } = 1;
         public LayoutData Layout { get; init; } = new();
         public Dictionary<string, DiffOptions> Rules { get; init; } = new(StringComparer.Ordinal);
+        public bool MergeShowBase { get; init; }
     }
 
     private sealed record LayoutData

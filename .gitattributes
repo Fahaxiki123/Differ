@@ -19,3 +19,11 @@
 *.docx binary
 *.xls binary
 *.xlsx binary
+# Release licence checks pin exact upstream bytes, including LF/mixed line endings.
+docs/third-party/Microsoft.Extensions-10.0.10-LICENSE.txt binary !eol
+docs/third-party/NPOI-2.7.4-LICENSE binary !eol
+docs/third-party/Microsoft.Web.WebView2-1.0.3537.50-LICENSE.txt binary !eol
+docs/third-party/Microsoft.Web.WebView2-1.0.3537.50-NOTICE.txt binary !eol
+docs/third-party/Monaco-0.52.2-LICENSE.txt binary !eol
+docs/third-party/SharpSvn-1.14005.390-LICENSE.txt binary !eol
+docs/third-party/Microsoft-Visual-Studio-2026-REDIST-LICENSE.txt binary !eol

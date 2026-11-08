@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="OpenCompare" xml:space="preserve"><value>比较两个文件…</value></data>
+  <data name="OpenMerge" xml:space="preserve"><value>三方文本合并…</value></data>
+  <data name="CompareTitle" xml:space="preserve"><value>选择要比较的文件</value></data>
+  <data name="MergeTitle" xml:space="preserve"><value>选择三方合并文件</value></data>
+  <data name="Base" xml:space="preserve"><value>共同基础</value></data>
+  <data name="Mine" xml:space="preserve"><value>我的文件</value></data>
+  <data name="Theirs" xml:space="preserve"><value>对方文件</value></data>
+  <data name="Output" xml:space="preserve"><value>结果文件</value></data>
+  <data name="Browse" xml:space="preserve"><value>浏览…</value></data>
+  <data name="Open" xml:space="preserve"><value>打开</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="SelectInput" xml:space="preserve"><value>选择输入文件</value></data>
+  <data name="SelectOutput" xml:space="preserve"><value>选择合并结果的保存位置</value></data>
+  <data name="AllFiles" xml:space="preserve"><value>所有文件 (*.*)|*.*</value></data>
+  <data name="MergeHint" xml:space="preserve"><value>三个来源只读。合并结果只有在你主动保存时才写入结果文件。</value></data>
+  <data name="CompareHint" xml:space="preserve"><value>左侧作为基础只读，右侧为当前文件。打开后可选择开启文本编辑。</value></data>
+  <data name="MissingPath" xml:space="preserve"><value>请填写全部文件路径。</value></data>
+  <data name="InputMissing" xml:space="preserve"><value>找不到输入文件，请检查所选路径。</value></data>
+  <data name="LaunchFailed" xml:space="preserve"><value>无法打开所选文件：</value></data>
+  <data name="MergeLaunchFailed" xml:space="preserve"><value>无法打开三方合并：</value></data>
+  <data name="UnsupportedMerge" xml:space="preserve"><value>三方合并仅支持代码和普通文本，Office、CSV 表格及二进制文件请继续使用各自的比较工具。</value></data>
+  <data name="MergeTemplateTitle" xml:space="preserve"><value>TortoiseSVN 合并调用模板（仅供复制）</value></data>
+  <data name="MergeTemplateHint" xml:space="preserve"><value>当前合并工具绑定保持不变。样板验收后，可在 TortoiseSVN 设置中使用此模板。</value></data>
+  <data name="MergeArgumentError" xml:space="preserve"><value>合并参数无效：</value></data>
+  <data name="MergeErrorTitle" xml:space="preserve"><value>Differ · 三方合并</value></data>
+</root>

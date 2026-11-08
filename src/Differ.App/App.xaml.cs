@@ -106,6 +106,25 @@ public partial class App : Application, IDisposable
         _serviceProvider = services.BuildServiceProvider();
         _serviceProvider.GetRequiredService<IThemeService>().InitializeFromSystem();
         await _serviceProvider.GetRequiredService<UserPreferencesService>().LoadAsync();
+        if (ExternalMergeArguments.IsMergeInvocation(e.Args))
+        {
+            var mergeArguments = ExternalMergeArguments.Parse(e.Args);
+            if (mergeArguments.Request is null)
+            {
+                var error = FormatArgumentError(new ExternalDiffArgumentResult
+                {
+                    Status = ExternalDiffArgumentStatus.Error,
+                    Error = mergeArguments.Error,
+                    ErrorArgument = mergeArguments.ErrorArgument
+                });
+                MessageBox.Show(FileOpenStrings.MergeArgumentError + error, FileOpenStrings.MergeErrorTitle,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(2);
+                return;
+            }
+            await ShowMergeAsync(mergeArguments.Request);
+            return;
+        }
         var parsedArguments = ExternalDiffArguments.Parse(e.Args);
 
         if (parsedArguments.Status == ExternalDiffArgumentStatus.Success
@@ -125,6 +144,61 @@ public partial class App : Application, IDisposable
     {
         Dispose();
         base.OnExit(e);
+    }
+
+    private async Task ShowMergeAsync(ExternalMergeRequest request)
+    {
+        using var cancellation = new CancellationTokenSource();
+        var loading = new Window
+        {
+            Title = FileOpenStrings.MergeErrorTitle,
+            Width = 480,
+            Height = 140,
+            ResizeMode = ResizeMode.NoResize,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Content = new System.Windows.Controls.TextBlock
+            {
+                Text = MergeStrings.Loading,
+                Margin = new Thickness(20),
+                TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center
+            }
+        };
+        loading.SetResourceReference(Window.BackgroundProperty, "PanelBrush");
+        loading.SetResourceReference(Window.ForegroundProperty, "InkBrush");
+        var handingOff = false;
+        loading.Closed += (_, _) => { if (!handingOff) cancellation.Cancel(); };
+        MainWindow = loading;
+        loading.Show();
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(request.OriginalFileName)) TextMergeSession.ValidateFileType(request.OriginalFileName);
+            // Merge owns its process until completion; do not use the diff IPC's early exit.
+            var session = await Task.Run(() => TextMergeSession.OpenAsync(request.BaseFilePath,
+                request.MineFilePath, request.TheirsFilePath, request.MergedFilePath, cancellation.Token), cancellation.Token);
+            cancellation.Token.ThrowIfCancellationRequested();
+            var viewModel = new TextMergeViewModel(session, request.MineDisplayName, request.BaseDisplayName,
+                request.TheirsDisplayName, request.MergedDisplayName);
+            var window = new MergeWindow(viewModel, _serviceProvider!.GetRequiredService<IThemeService>(),
+                _serviceProvider!.GetRequiredService<UserPreferencesService>());
+            MainWindow = window;
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            window.Closed += (_, _) => Shutdown(window.CompletionSucceeded ? 0 : 1);
+            window.Show();
+            handingOff = true;
+            loading.Close();
+            window.Activate();
+        }
+        catch (OperationCanceledException) { Shutdown(1); }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+            or ArgumentException or InvalidOperationException or NotSupportedException)
+        {
+            handingOff = true;
+            loading.Close();
+            MessageBox.Show(FileOpenStrings.MergeLaunchFailed + exception.Message, FileOpenStrings.MergeErrorTitle,
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(2);
+        }
     }
 
     public void Dispose()

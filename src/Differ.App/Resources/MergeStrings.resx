@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?><root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>2.0</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+<data name="Title" xml:space="preserve"><value>Differ · 三方文本合并</value></data>
+<data name="Loading" xml:space="preserve"><value>正在加载离线合并编辑器…</value></data>
+<data name="Mine" xml:space="preserve"><value>我的</value></data>
+<data name="Base" xml:space="preserve"><value>共同基础</value></data>
+<data name="Theirs" xml:space="preserve"><value>对方</value></data>
+<data name="Result" xml:space="preserve"><value>合并结果</value></data>
+<data name="ReadOnly" xml:space="preserve"><value>只读</value></data>
+<data name="Editable" xml:space="preserve"><value>可编辑</value></data>
+<data name="Previous" xml:space="preserve"><value>上一冲突</value></data>
+<data name="Next" xml:space="preserve"><value>下一冲突</value></data>
+<data name="TakeMine" xml:space="preserve"><value>采用我的</value></data>
+<data name="TakeBase" xml:space="preserve"><value>采用基础</value></data>
+<data name="TakeTheirs" xml:space="preserve"><value>采用对方</value></data>
+<data name="Confirm" xml:space="preserve"><value>确认已解决</value></data>
+<data name="Undo" xml:space="preserve"><value>撤销</value></data>
+<data name="Redo" xml:space="preserve"><value>重做</value></data>
+<data name="Save" xml:space="preserve"><value>保存</value></data>
+<data name="SaveAs" xml:space="preserve"><value>另存为</value></data>
+<data name="Finish" xml:space="preserve"><value>保存并完成</value></data>
+<data name="Find" xml:space="preserve"><value>查找</value></data>
+<data name="Theme" xml:space="preserve"><value>主题</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>缩小</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>放大</value></data>
+<data name="All" xml:space="preserve"><value>全部内容</value></data>
+<data name="Conflicts" xml:space="preserve"><value>冲突</value></data>
+<data name="CountFormat" xml:space="preserve"><value>待解决 {0} / 共 {1} 处冲突</value></data>
+<data name="NoConflicts" xml:space="preserve"><value>没有冲突 · 非冲突修改已自动合并</value></data>
+<data name="Conflict" xml:space="preserve"><value>待解决</value></data>
+<data name="Resolved" xml:space="preserve"><value>已解决</value></data>
+<data name="Automatic" xml:space="preserve"><value>自动合并</value></data>
+<data name="Manual" xml:space="preserve"><value>手工处理</value></data>
+<data name="Unsaved" xml:space="preserve"><value>未保存</value></data>
+<data name="Saved" xml:space="preserve"><value>已保存</value></data>
+<data name="Pending" xml:space="preserve"><value>正在同步编辑…</value></data>
+<data name="InitialHint" xml:space="preserve"><value>橙色区段需要处理；结果暂保留基础内容。选择来源或手工编辑后确认。</value></data>
+<data name="ReadyHint" xml:space="preserve"><value>全部冲突已处理，可保存结果。</value></data>
+<data name="ManualHint" xml:space="preserve"><value>编辑跨越多个冲突，请核对结果后逐个确认，或撤销以恢复块采纳。</value></data>
+<data name="Error" xml:space="preserve"><value>操作未完成</value></data>
+<data name="Stale" xml:space="preserve"><value>内容已变化，请重试当前操作。</value></data>
+<data name="ClosePrompt" xml:space="preserve"><value>合并结果尚未保存。是否保存后关闭？</value></data>
+<data name="UnresolvedClose" xml:space="preserve"><value>仍有未解决冲突。关闭将放弃当前合并结果，原始文件不受影响。是否关闭？</value></data>
+<data name="StartupFailed" xml:space="preserve"><value>离线合并编辑器无法启动，请检查 WebView2 Runtime。</value></data>
+<data name="SyncFailed" xml:space="preserve"><value>编辑器未能确认最新内容。请保留窗口并重试；结果尚未写入。</value></data>
+<data name="SaveFilter" xml:space="preserve"><value>文本文件|*.txt|所有文件|*.*</value></data>
+<data name="SelectSource" xml:space="preserve"><value>选择要查看的来源</value></data>
+<data name="Close" xml:space="preserve"><value>关闭</value></data>
+<data name="Warnings" xml:space="preserve"><value>提示</value></data>
+<data name="SavedTo" xml:space="preserve"><value>结果输出：</value></data>
+<data name="OnlyConflicts" xml:space="preserve"><value>仅显示待解决冲突标记</value></data>
+<data name="Resize" xml:space="preserve"><value>拖动调整来源与结果高度</value></data>
+<data name="Retry" xml:space="preserve"><value>重试</value></data>
+<data name="UnresolvedSave" xml:space="preserve"><value>请先处理所有冲突，再保存结果。</value></data>
+<data name="SearchHint" xml:space="preserve"><value>在当前文档中查找（Ctrl+F）</value></data>
+<data name="ConfirmHint" xml:space="preserve"><value>确认当前结果中的这一冲突已经手工处理</value></data>
+<data name="FinishHint" xml:space="preserve"><value>保存到指定输出文件并结束本次合并</value></data>
+<data name="ShowBase" xml:space="preserve"><value>显示基础</value></data>
+<data name="ShowBaseHint" xml:space="preserve"><value>显示共同基础；隐藏时仍参与三方比较</value></data>
+<data name="PreferencesWarning" xml:space="preserve"><value>显示设置未能保存，下次打开可能恢复原设置。</value></data>
+<data name="AutoAdvance" xml:space="preserve"><value>自动下一处</value></data>
+<data name="AutoAdvanceHint" xml:space="preserve"><value>首次解决当前冲突后，自动定位下一处待解决冲突；不自动保存</value></data>
+<data name="CurrentConflictFormat" xml:space="preserve"><value>当前 {0} / {1} · {2}</value></data>
+</root>

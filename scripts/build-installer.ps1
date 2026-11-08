@@ -102,6 +102,7 @@ try {
             'Differ.App.runtimeconfig.json', 'coreclr.dll', 'hostfxr.dll', 'hostpolicy.dll',
             'PresentationFramework.dll', 'THIRD-PARTY-NOTICES.txt', '新电脑安装与SVN说明.txt',
             'Editor\index.html', 'Editor\editor.js', 'Editor\editor.css', 'Editor\vs\loader.js',
+            'Editor\merge.html', 'Editor\merge.js', 'Editor\merge.css',
             'Editor\vs\editor\editor.main.js', 'Editor\vs\base\worker\workerMain.js',
             'Editor\vs\base\browser\ui\codicons\codicon\codicon.ttf',
             'Microsoft.Web.WebView2.Core.dll', 'Microsoft.Web.WebView2.Wpf.dll', 'WebView2Loader.dll',

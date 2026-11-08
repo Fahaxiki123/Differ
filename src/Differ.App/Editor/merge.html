@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; worker-src 'self' blob:; connect-src 'self';">
+<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="merge.css"></head>
+<body class="hide-base">
+<header id="toolbar">
+  <strong data-label="Title"></strong>
+  <div class="tools"><button id="showBase" data-label="ShowBase" aria-pressed="false"></button><button id="find" data-label="Find"></button><button id="zoomOut" title="Ctrl+-">−</button><span id="zoom">100%</span><button id="zoomIn" title="Ctrl++">+</button><button id="theme" data-label="Theme"></button></div>
+</header>
+<div id="notice" role="status"></div>
+<main id="workspace">
+  <section id="sources">
+    <div id="sourceTabs" role="tablist"><button data-source="mine" data-label="Mine"></button><button data-source="base" data-label="Base"></button><button data-source="theirs" data-label="Theirs"></button></div>
+    <div class="source" data-pane="mine"><div class="paneHeader"><b data-label="Mine"></b><span id="mineName"></span><small data-label="ReadOnly"></small></div><div class="editor" id="mine"></div></div>
+    <div class="source" data-pane="base"><div class="paneHeader"><b data-label="Base"></b><span id="baseName"></span><small data-label="ReadOnly"></small></div><div class="editor" id="base"></div></div>
+    <div class="source" data-pane="theirs"><div class="paneHeader"><b data-label="Theirs"></b><span id="theirsName"></span><small data-label="ReadOnly"></small></div><div class="editor" id="theirs"></div></div>
+  </section>
+  <div id="splitter" role="separator" tabindex="0" aria-orientation="horizontal"></div>
+  <section id="resultPane">
+    <div class="resultHeader"><b data-label="Result"></b><span id="counter" role="status"></span><span id="saveState"></span><span class="spacer"></span><button id="undo" data-label="Undo"></button><button id="redo" data-label="Redo"></button><button id="save" data-label="Save"></button><button id="finish" class="primary" data-label="Finish"></button></div>
+    <div id="resolveBar">
+      <div class="navigation"><button id="previous" class="arrow">↑</button><span id="selectionStatus" role="status"></span><button id="next" class="arrow">↓</button></div>
+      <div class="decisions"><button id="mineChoice" class="decision" data-label="TakeMine"></button><button id="baseChoice" class="decision" data-label="TakeBase"></button><button id="theirsChoice" class="decision" data-label="TakeTheirs"></button><button id="confirm" class="decision" data-label="Confirm"></button></div>
+      <button id="autoAdvance" data-label="AutoAdvance" aria-pressed="false"></button>
+    </div>
+    <div class="editor" id="result"></div>
+  </section>
+</main>
+<footer><span id="outputPath"></span><span id="warning"></span><span id="encoding"></span></footer>
+<script src="vs/loader.js"></script><script src="merge.js"></script></body></html>

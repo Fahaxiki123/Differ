@@ -1,0 +1,16 @@
+<Window x:Class="Differ.App.MergeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:resources="clr-namespace:Differ.App.Resources"
+        Title="{Binding Title}" Width="1440" Height="900" MinWidth="720" MinHeight="540"
+        Background="{DynamicResource Sample.SurfaceBrush}" Foreground="{DynamicResource InkBrush}"
+        Icon="/Differ.App;component/Assets/Differ.ico" WindowStartupLocation="CenterScreen"
+        Loaded="OnLoaded" Closing="OnClosing" Closed="OnClosed">
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <TextBlock x:Name="StartupStatus" Text="{x:Static resources:MergeStrings.Loading}"
+                   Margin="16" TextWrapping="Wrap"/>
+        <wv2:WebView2 x:Name="Browser" Grid.Row="1" Visibility="Hidden"/>
+    </Grid>
+</Window>
