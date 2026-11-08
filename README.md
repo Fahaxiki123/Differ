@@ -1,5 +1,17 @@
 # Differ
 
+## 下载版本
+
+| 版本 | 用途 | 下载 |
+|---|---|---|
+| **0.18.2 稳定版（推荐）** | 本主分支已有稳定源码；需要回退时选择 | [Windows x64安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.18.2/Differ-0.18.2-win-x64-Setup.exe) · [说明及校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.18.2) |
+| **0.20.0 测试版（Pre-release）** | 三方冲突合并与交互优化，尚未经过用户验收 | [Windows x64安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.20.0/Differ-0.20.0-win-x64-Setup.exe) · [说明及校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.20.0) |
+
+[全部历史版本](https://github.com/Fahaxiki123/Differ/releases)。旧稳定版安装包继续保留，测试版不会替换Latest。0.18.2安装包按该稳定源码重新构建；请下载EXE附件，GitHub的Source code是源码而不是安装程序。
+
+当前main保留0.18.2应用代码。0.20.0源码位于[独立测试分支](https://github.com/Fahaxiki123/Differ/tree/codex/preview-0.20.0)，不会自动合入main。安装器是原位替换，安装前请关闭Differ；仓库保持私有，下载者需要已有访问权限。
+
+
 Differ 是供 TortoiseSVN 调用的 Windows 外部差异查看器。
 
 真实使用流程：
