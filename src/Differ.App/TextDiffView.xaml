@@ -1,0 +1,427 @@
+<UserControl x:Class="Differ.App.TextDiffView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Differ.App.Controls"
+             xmlns:models="clr-namespace:Differ.Core.Models;assembly=Differ.Core"
+             xmlns:resources="clr-namespace:Differ.App.Resources"
+             Background="{DynamicResource PanelBrush}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="PaneRevisionStyle" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{DynamicResource MutedInkBrush}" />
+                <Setter Property="FontSize" Value="11" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}"
+                                 Value="{x:Static resources:Strings.RevisionUnknown}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="TextDiffCellStyle" TargetType="DataGridCell">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="TextDiffRowStyle" TargetType="DataGridRow">
+                <Setter Property="Height" Value="{StaticResource Ui.TextLineHeight}" />
+                <Setter Property="MinHeight" Value="{StaticResource Ui.TextLineHeight}" />
+                <Setter Property="MaxHeight" Value="{StaticResource Ui.TextLineHeight}" />
+                <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridRow">
+                                    <Button Command="{Binding ExpandCommand}"
+                                            Content="{Binding CollapsedLabel}"
+                                            MinHeight="0"
+                                            Background="{DynamicResource GutterBackgroundBrush}"
+                                            Foreground="{DynamicResource MutedInkBrush}"
+                                            BorderThickness="0"
+                                            Padding="10,0"
+                                            HorizontalContentAlignment="Left"
+                                            FontSize="11" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <DataTemplate x:Key="BaseLineNumberTemplate">
+                <Grid Background="{DynamicResource GutterBackgroundBrush}"
+                      ToolTip="{Binding KindLabel}">
+                    <Border x:Name="Marker"
+                            Width="3"
+                            HorizontalAlignment="Left"
+                            Background="Transparent" />
+                    <TextBlock Margin="7,0,7,0"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource GutterTextBrush}"
+                               FontFamily="Cascadia Mono, Consolas"
+                               FontSize="11"
+                               Text="{Binding OldLineNumberText}" />
+                    <Border x:Name="SelectionOutline" BorderThickness="1" BorderBrush="Transparent" IsHitTestVisible="False" />
+                </Grid>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="True">
+                        <Setter TargetName="SelectionOutline" Property="BorderBrush" Value="{DynamicResource SelectionBorderBrush}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Deleted}">
+                        <Setter TargetName="Marker"
+                                Property="Background"
+                                Value="{DynamicResource Diff.Row.Deleted.Border}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="Marker"
+                                Property="Background"
+                                Value="{DynamicResource Diff.Row.Deleted.Border}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Added}">
+                        <Setter TargetName="Marker"
+                                Property="Background"
+                                Value="{DynamicResource Diff.Row.Added.Border}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate x:Key="MineLineNumberTemplate">
+                <Grid Background="{DynamicResource GutterBackgroundBrush}"
+                      ToolTip="{Binding KindLabel}">
+                    <Border x:Name="Marker"
+                            Width="3"
+                            HorizontalAlignment="Left"
+                            Background="Transparent" />
+                    <TextBlock Margin="7,0,7,0"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource GutterTextBrush}"
+                               FontFamily="Cascadia Mono, Consolas"
+                               FontSize="11"
+                               Text="{Binding NewLineNumberText}" />
+                    <Border x:Name="SelectionOutline" BorderThickness="1" BorderBrush="Transparent" IsHitTestVisible="False" />
+                </Grid>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="True">
+                        <Setter TargetName="SelectionOutline" Property="BorderBrush" Value="{DynamicResource SelectionBorderBrush}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Added}">
+                        <Setter TargetName="Marker"
+                                Property="Background"
+                                Value="{DynamicResource Diff.Row.Added.Border}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="Marker"
+                                Property="Background"
+                                Value="{DynamicResource Diff.Row.Deleted.Border}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Deleted}">
+                        <Setter TargetName="Marker"
+                                Property="Background"
+                                Value="{DynamicResource Diff.Row.Deleted.Border}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate x:Key="BaseTextTemplate">
+                <Border x:Name="Chrome"
+                        MinHeight="{StaticResource Ui.TextLineHeight}"
+                        Padding="8,0"
+                        Background="{DynamicResource PanelBrush}"
+                        ClipToBounds="True">
+                    <controls:InlineDiffTextBlock
+                        VerticalAlignment="Center"
+                        DiffKind="{Binding Kind}"
+                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
+                        FontSize="{StaticResource Ui.BodyFontSize}"
+                        Foreground="{DynamicResource InkBrush}"
+                        Segments="{Binding OldSegments}"
+                        TextWrapping="NoWrap"
+                        ToolTip="{Binding OldText}" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Added}">
+                        <Setter TargetName="Chrome"
+                                Property="Background"
+                                Value="{DynamicResource Diff.TextCell.Base.Added}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Deleted}">
+                        <Setter TargetName="Chrome"
+                                Property="Background"
+                                Value="{DynamicResource Diff.TextCell.Base.Deleted}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="Chrome"
+                                Property="Background"
+                                Value="{DynamicResource Diff.TextCell.Base.Modified}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <ContextMenu x:Key="TextRowContextMenu">
+                <MenuItem Click="CopyBaseSide_Click"
+                          Header="{x:Static resources:Strings.CopyBaseSide}" />
+                <MenuItem Click="CopyMineSide_Click"
+                          Header="{x:Static resources:Strings.CopyMineSide}" />
+                <Separator />
+                <MenuItem Click="CopyBothSides_Click"
+                          Header="{x:Static resources:Strings.CopyBothSides}" />
+            </ContextMenu>
+
+            <DataTemplate x:Key="MineTextTemplate">
+                <Border x:Name="Chrome"
+                        MinHeight="{StaticResource Ui.TextLineHeight}"
+                        Padding="8,0"
+                        Background="{DynamicResource PanelBrush}"
+                        ClipToBounds="True">
+                    <controls:InlineDiffTextBlock
+                        VerticalAlignment="Center"
+                        DiffKind="{Binding Kind}"
+                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
+                        FontSize="{StaticResource Ui.BodyFontSize}"
+                        Foreground="{DynamicResource InkBrush}"
+                        Segments="{Binding NewSegments}"
+                        TextWrapping="NoWrap"
+                        ToolTip="{Binding NewText}" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Added}">
+                        <Setter TargetName="Chrome"
+                                Property="Background"
+                                Value="{DynamicResource Diff.TextCell.Mine.Added}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Deleted}">
+                        <Setter TargetName="Chrome"
+                                Property="Background"
+                                Value="{DynamicResource Diff.TextCell.Mine.Deleted}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="Chrome"
+                                Property="Background"
+                                Value="{DynamicResource Diff.TextCell.Mine.Modified}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource PanelBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource Ui.PaneHeaderRowHeight}" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="0" />
+            <RowDefinition Height="{StaticResource Ui.DetailHeaderRowHeight}" MinHeight="{StaticResource Ui.DetailHeaderHeight}" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"  Background="{DynamicResource PaneHeaderBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Padding="10,0"
+                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+                <Border.ToolTip>
+                    <StackPanel MaxWidth="640">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding BaseTitle}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding BasePath}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding BaseRevisionText}" />
+                    </StackPanel>
+                </Border.ToolTip>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}" FontSize="11" FontWeight="SemiBold"
+                               Text="{x:Static resources:Strings.BaseSide}" />
+                    <TextBlock Style="{StaticResource PaneRevisionStyle}" Text="{Binding BaseRevisionText}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Padding="10,0"
+                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+                <Border.ToolTip>
+                    <StackPanel MaxWidth="640">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding MineTitle}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding MinePath}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding MineRevisionText}" />
+                    </StackPanel>
+                </Border.ToolTip>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}" FontSize="11" FontWeight="SemiBold"
+                               Text="{x:Static resources:Strings.MineSide}" />
+                    <TextBlock Style="{StaticResource PaneRevisionStyle}" Text="{Binding MineRevisionText}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Background="{DynamicResource PaneSeparatorBrush}" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="1" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DataGrid x:Name="BaseTextGrid"
+                      Grid.Column="0"
+                      AutoGenerateColumns="False"
+                      CellStyle="{StaticResource TextDiffCellStyle}"
+                      ClipboardCopyMode="None"
+                      ContextMenu="{StaticResource TextRowContextMenu}"
+                      ContextMenuOpening="TextGrid_ContextMenuOpening"
+                      GridLinesVisibility="None"
+                      HeadersVisibility="None"
+                      ItemsSource="{Binding TextRows}"
+                      Loaded="TextGrid_Loaded"
+                      PreviewKeyDown="TextGrid_PreviewKeyDown"
+                      RowStyle="{StaticResource TextDiffRowStyle}"
+                      SelectedItem="{Binding SelectedTextRow, Mode=TwoWay}"
+                      SelectionChanged="TextGrid_SelectionChanged"
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow"
+                      ScrollViewer.CanContentScroll="True"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.IsDeferredScrollingEnabled="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="52"
+                                            CellTemplate="{StaticResource BaseLineNumberTemplate}" />
+                    <DataGridTemplateColumn Width="*"
+                                            MinWidth="320"
+                                            CellTemplate="{StaticResource BaseTextTemplate}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Border Grid.Column="1" Background="{DynamicResource PaneSeparatorBrush}" />
+
+            <DataGrid x:Name="MineTextGrid"
+                      Grid.Column="2"
+                      AutoGenerateColumns="False"
+                      CellStyle="{StaticResource TextDiffCellStyle}"
+                      ClipboardCopyMode="None"
+                      ContextMenu="{StaticResource TextRowContextMenu}"
+                      ContextMenuOpening="TextGrid_ContextMenuOpening"
+                      GridLinesVisibility="None"
+                      HeadersVisibility="None"
+                      ItemsSource="{Binding TextRows}"
+                      Loaded="TextGrid_Loaded"
+                      PreviewKeyDown="TextGrid_PreviewKeyDown"
+                      RowStyle="{StaticResource TextDiffRowStyle}"
+                      SelectedItem="{Binding SelectedTextRow, Mode=TwoWay}"
+                      SelectionChanged="TextGrid_SelectionChanged"
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow"
+                      ScrollViewer.CanContentScroll="True"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.IsDeferredScrollingEnabled="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="52"
+                                            CellTemplate="{StaticResource MineLineNumberTemplate}" />
+                    <DataGridTemplateColumn Width="*"
+                                            MinWidth="320"
+                                            CellTemplate="{StaticResource MineTextTemplate}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <GridSplitter x:Name="DetailSplitter" Grid.Row="2"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      Background="Transparent" Visibility="Collapsed"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext">
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border x:Name="Divider" Height="1" VerticalAlignment="Center"
+                                Background="{DynamicResource PaneHeaderBorderBrush}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Divider" Property="Background" Value="{DynamicResource AccentBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
+        <Grid Grid.Row="3" Background="{DynamicResource DetailBackgroundBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{StaticResource Ui.DetailHeaderRowHeight}" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ToggleButton x:Name="DetailsToggle" Grid.Row="0"
+                          Style="{StaticResource DetailToggleStyle}" IsChecked="False"
+                          HorizontalContentAlignment="Stretch"
+                          AutomationProperties.Name="{x:Static resources:Strings.SelectedContentDetails}">
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Left" Margin="0,0,16,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}"
+                               Text="{x:Static resources:Strings.SelectedContentDetails}" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Foreground="{DynamicResource MutedInkBrush}" Text="{x:Static resources:Strings.BaseSide}" />
+                        <TextBlock Margin="6,0,12,0" Foreground="{DynamicResource MutedInkBrush}"
+                                   FontFamily="Cascadia Mono, Consolas" Text="{Binding SelectedTextRow.OldLineNumberText}" />
+                        <TextBlock Margin="0,0,12,0" Foreground="{DynamicResource MutedInkBrush}" Text="↔" />
+                        <TextBlock Foreground="{DynamicResource MutedInkBrush}" Text="{x:Static resources:Strings.MineSide}" />
+                        <TextBlock Margin="6,0,0,0" Foreground="{DynamicResource MutedInkBrush}"
+                                   FontFamily="Cascadia Mono, Consolas" Text="{Binding SelectedTextRow.NewLineNumberText}" />
+                    </StackPanel>
+                </DockPanel>
+            </ToggleButton>
+            <Grid x:Name="DetailsContent" Grid.Row="1" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Padding="10,5,10,8">
+                    <controls:SelectableDiffTextBox
+                        DiffKind="{Binding SelectedTextRow.Kind}"
+                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="{StaticResource Ui.BodyFontSize}"
+                        Foreground="{DynamicResource InkBrush}"
+                        AutomationProperties.Name="{x:Static resources:Strings.FullBaseContent}"
+                        Segments="{Binding SelectedTextRow.OldSegments}" />
+                </Border>
+                <Border Grid.Column="1" Background="{DynamicResource PaneHeaderBorderBrush}" />
+                <Border Grid.Column="2" Padding="10,5,10,8">
+                    <controls:SelectableDiffTextBox
+                        DiffKind="{Binding SelectedTextRow.Kind}"
+                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="{StaticResource Ui.BodyFontSize}"
+                        Foreground="{DynamicResource InkBrush}"
+                        AutomationProperties.Name="{x:Static resources:Strings.FullCurrentContent}"
+                        Segments="{Binding SelectedTextRow.NewSegments}" />
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

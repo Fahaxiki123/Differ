@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="CurrentBlock" xml:space="preserve"><value>第 {0} / {1} 块 · {2} · BASE {3} ↔ 结果 {4}</value></data>
+  <data name="Line" xml:space="preserve"><value>第 {0} 行</value></data>
+  <data name="Lines" xml:space="preserve"><value>第 {0}–{1} 行</value></data>
+  <data name="MissingAtStart" xml:space="preserve"><value>文件开头无对应行</value></data>
+  <data name="MissingAfter" xml:space="preserve"><value>第 {0} 行后无对应行</value></data>
+  <data name="NotSelected" xml:space="preserve"><value>尚未定位差异块 · F7 / F8 切换</value></data>
+  <data name="NoDifferences" xml:space="preserve"><value>没有差异块</value></data>
+  <data name="Updating" xml:space="preserve"><value>差异更新中</value></data>
+  <data name="Added" xml:space="preserve"><value>新增</value></data>
+  <data name="Deleted" xml:space="preserve"><value>删除</value></data>
+  <data name="Modified" xml:space="preserve"><value>修改</value></data>
+  <data name="UnchangedLocation" xml:space="preserve"><value>{0} · 此处无差异</value></data>
+  <data name="UnselectedIndex" xml:space="preserve"><value>—</value></data>
+  <data name="ResultSide" xml:space="preserve"><value>结果</value></data>
+  <data name="Saved" xml:space="preserve"><value>已保存</value></data>
+  <data name="Saving" xml:space="preserve"><value>保存中…</value></data>
+  <data name="Unsaved" xml:space="preserve"><value>未保存</value></data>
+  <data name="NeedsSaveAs" xml:space="preserve"><value>需另存</value></data>
+  <data name="UnsavedNeedsSaveAs" xml:space="preserve"><value>未保存 · 需另存</value></data>
+  <data name="WorkingCopy" xml:space="preserve"><value>工作副本</value></data>
+  <data name="LocalFile" xml:space="preserve"><value>当前文件</value></data>
+  <data name="ResultCopy" xml:space="preserve"><value>结果副本</value></data>
+  <data name="ReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="Editable" xml:space="preserve"><value>可编辑</value></data>
+  <data name="ModeChangeFailed" xml:space="preserve"><value>编辑模式切换未完成；内容已保留，请重试。</value></data>
+  <data name="ModeUnconfirmed" xml:space="preserve"><value>模式未同步</value></data>
+  <data name="AdoptCurrent" xml:space="preserve"><value>采用左侧当前块（Ctrl+Alt+→）</value></data>
+  <data name="Location" xml:space="preserve"><value>BASE {0} ↔ 结果 {1}</value></data>
+  <data name="ReadOnlyBaseMessage" xml:space="preserve"><value>BASE 始终只读。</value></data>
+  <data name="ReadOnlyMineMessage" xml:space="preserve"><value>开启编辑模式后可修改右侧文档。</value></data>
+  <data name="SaveAsEllipsis" xml:space="preserve"><value>另存为…</value></data>
+</root>

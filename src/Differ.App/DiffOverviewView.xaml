@@ -1,0 +1,63 @@
+<UserControl x:Class="Differ.App.DiffOverviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Differ.App.Controls"
+             xmlns:resources="clr-namespace:Differ.App.Resources"
+             Background="{DynamicResource Diff.Overview.BackgroundBrush}"
+             SnapsToDevicePixels="True">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+    <Border Background="{DynamicResource Diff.Overview.BackgroundBrush}"
+            BorderBrush="{DynamicResource Diff.Overview.BorderBrush}"
+            BorderThickness="0,0,1,0">
+        <controls:DiffOverviewCanvas x:Name="Overview"
+                                     Rows="{Binding OverviewRows}"
+                                     IsEnabled="{Binding CanInteractWithOverview}"
+                                     ViewportStart="{Binding OverviewViewportStart}"
+                                     ViewportEnd="{Binding OverviewViewportEnd}"
+                                     AutomationProperties.Name="{x:Static resources:Strings.OverviewLabel}"
+                                     SelectRowCommand="{Binding SelectOverviewRowCommand}" />
+    </Border>
+        <Popup x:Name="PreviewPopup" Placement="Right" PlacementTarget="{Binding ElementName=Overview}"
+               HorizontalOffset="2" AllowsTransparency="True" PopupAnimation="None" StaysOpen="True"
+               IsHitTestVisible="False" Focusable="False">
+            <Grid Width="420" MaxHeight="236" Margin="8">
+                <Border Background="{DynamicResource Diff.Overview.PreviewBrush}"
+                        CornerRadius="{StaticResource Ui.PopupCornerRadius}"
+                        Effect="{StaticResource FloatingPanelShadow}" />
+                <Border Padding="{StaticResource Ui.PopupPadding}"
+                        Background="{DynamicResource Diff.Overview.PreviewBrush}"
+                        BorderBrush="{DynamicResource Diff.Overview.PreviewBorderBrush}"
+                        BorderThickness="1" CornerRadius="{StaticResource Ui.PopupCornerRadius}">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <DockPanel LastChildFill="True">
+                        <TextBlock x:Name="PreviewKind" DockPanel.Dock="Right" Margin="12,0,0,0" FontSize="{StaticResource Ui.MetadataFontSize}" />
+                        <TextBlock x:Name="PreviewPath" FontSize="{StaticResource Ui.ToolbarFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource InkBrush}" TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                    <TextBlock x:Name="PreviewPosition" Grid.Row="1" Margin="0,4,0,8" FontSize="{StaticResource Ui.MetadataFontSize}" Foreground="{DynamicResource MutedInkBrush}" />
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="16" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{x:Static resources:Strings.OverviewBase}" FontSize="{StaticResource Ui.MetadataFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource BaseSideAccentBrush}" />
+                            <TextBlock x:Name="BasePreview" Margin="0,4,0,0" FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="{StaticResource Ui.MetadataFontSize}" LineHeight="16" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="104" Foreground="{DynamicResource InkBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="1" Background="{DynamicResource Diff.Overview.PreviewBorderBrush}" />
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="{x:Static resources:Strings.OverviewMine}" FontSize="{StaticResource Ui.MetadataFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource MineSideAccentBrush}" />
+                            <TextBlock x:Name="MinePreview" Margin="0,4,0,0" FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="{StaticResource Ui.MetadataFontSize}" LineHeight="16" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="104" Foreground="{DynamicResource InkBrush}" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Grid.Row="3" Margin="0,8,0,0" FontSize="{StaticResource Ui.MetadataFontSize}" Foreground="{DynamicResource MutedInkBrush}" Text="{x:Static resources:Strings.OverviewHint}" />
+                </Grid>
+                </Border>
+            </Grid>
+        </Popup>
+    </Grid>
+</UserControl>

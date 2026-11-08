@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ReaderBinaryData" xml:space="preserve"><value>文件包含无法可靠解释为文本的二进制数据。</value></data>
+  <data name="ReaderEncodingProbeFailed" xml:space="preserve"><value>文件编码探测失败，未用替换字符生成可能误导的差异。</value></data>
+  <data name="ReaderUtf16LeNoBom" xml:space="preserve"><value>文件没有 BOM，已根据字节分布识别为 UTF-16 LE。</value></data>
+  <data name="ReaderUtf16BeNoBom" xml:space="preserve"><value>文件没有 BOM，已根据字节分布识别为 UTF-16 BE。</value></data>
+  <data name="ReaderGb18030Fallback" xml:space="preserve"><value>文件没有 BOM 且不是有效 UTF-8，已按 GB18030 解码；可在“比较选项”中切换编码。</value></data>
+  <data name="ReaderFileTooLarge" xml:space="preserve"><value>文本超过安全读取限制（64 MiB、6400 万字符或 100 万行）。请缩小文件范围后重新比较。</value></data>
+  <data name="AdapterLineEndingChangedFormat" xml:space="preserve"><value>行尾符发生变化：{0} → {1}。</value></data>
+  <data name="AdapterFinalNewlineChanged" xml:space="preserve"><value>文件末尾换行状态发生变化。</value></data>
+  <data name="AdapterEncodingChangedFormat" xml:space="preserve"><value>文本编码发生变化：{0} → {1}。</value></data>
+  <data name="AdapterBinaryReason" xml:space="preserve"><value>二进制文件不支持文本差异。</value></data>
+  <data name="AdapterBinaryWarning" xml:space="preserve"><value>文件被识别为二进制数据。</value></data>
+  <data name="EditorExternalChange" xml:space="preserve"><value>保存目标已被其他程序修改。请另存当前结果，或重新打开并审阅外部变化。</value></data>
+  <data name="EditorStaleBlock" xml:space="preserve"><value>差异正在更新，旧块不能应用到当前文档。</value></data>
+  <data name="EditorUnverifiedTarget" xml:space="preserve"><value>只有明确的本地文件或经过验证的工作文件可以原位保存。</value></data>
+  <data name="EditorAlreadySaving" xml:space="preserve"><value>正在保存，请等待本次写入完成。</value></data>
+  <data name="EditorSaveAsRequired" xml:space="preserve"><value>此来源未确认，请选择另存为目标。</value></data>
+  <data name="EditorMixedNewlines" xml:space="preserve"><value>原文件包含混合换行。保存前请明确选择统一为 CRLF 或 LF。</value></data>
+  <data name="EditorResultsPending" xml:space="preserve"><value>当前文档差异尚未更新。</value></data>
+  <data name="EditorProtectedTarget" xml:space="preserve"><value>BASE 和 Differ 会话快照始终只读，请选择其他保存目标。</value></data>
+  <data name="EditorCoarseRegionFormat" xml:space="preserve"><value>{0} 个大范围无可靠锚点区域按完整变更块显示；未声称建立精确逐行对应。</value></data>
+  <data name="EditorRowLabel" xml:space="preserve"><value>行</value></data>
+</root>

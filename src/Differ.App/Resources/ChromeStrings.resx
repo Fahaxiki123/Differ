@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="DisplayAll" xml:space="preserve"><value>全部</value></data>
+  <data name="DisplayDifferences" xml:space="preserve"><value>差异</value></data>
+  <data name="DisplayContext" xml:space="preserve"><value>上下文</value></data>
+  <data name="EditMode" xml:space="preserve"><value>编辑模式</value></data>
+  <data name="EditModeHint" xml:space="preserve"><value>开启后可编辑右侧文档；关闭保留未保存内容及撤销历史</value></data>
+  <data name="ReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="SaveOptions" xml:space="preserve"><value>保存选项</value></data>
+  <data name="SaveShortcut" xml:space="preserve"><value>保存（Ctrl+S）</value></data>
+  <data name="UndoShortcut" xml:space="preserve"><value>撤销（Ctrl+Z）</value></data>
+  <data name="RedoShortcut" xml:space="preserve"><value>重做（Ctrl+Y）</value></data>
+  <data name="AdvancedRules" xml:space="preserve"><value>高级比较规则…</value></data>
+  <data name="FindContent" xml:space="preserve"><value>查找内容</value></data>
+</root>

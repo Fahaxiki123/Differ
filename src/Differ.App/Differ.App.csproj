@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Differ.Core\Differ.Core.csproj" />
+    <ProjectReference Include="..\Differ.Svn\Differ.Svn.csproj" />
+    <ProjectReference Include="..\Differ.Formats.Text\Differ.Formats.Text.csproj" />
+    <ProjectReference Include="..\Differ.Formats.Word\Differ.Formats.Word.csproj" />
+    <ProjectReference Include="..\Differ.Formats.Excel\Differ.Formats.Excel.csproj" />
+    <ProjectReference Include="..\Differ.Formats.Csv\Differ.Formats.Csv.csproj" />
+    <ProjectReference Include="..\Differ.Formats.Rtf\Differ.Formats.Rtf.csproj" />
+    <ProjectReference Include="..\Differ.Formats.Binary\Differ.Formats.Binary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Version>0.18.2</Version>
+    <AssemblyVersion>0.18.2.0</AssemblyVersion>
+    <FileVersion>0.18.2.0</FileVersion>
+    <InformationalVersion>0.18.2</InformationalVersion>
+    <ApplicationIcon>Assets\Differ.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Differ.ico" />
+    <Content Include="Editor\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Native\win-x64\vcruntime140.dll" Link="vcruntime140.dll"
+             TargetPath="vcruntime140.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
+
+
+

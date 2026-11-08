@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AdapterWorkbookPartMissing" xml:space="preserve"><value>XLSX 缺少工作簿部件。</value></data>
+  <data name="AdapterWorkbookEmpty" xml:space="preserve"><value>XLSX 工作簿内容为空。</value></data>
+  <data name="AdapterSheetUnreadableFormat" xml:space="preserve"><value>工作表“{0}”无法读取。</value></data>
+  <data name="AdapterSheetEmptyFormat" xml:space="preserve"><value>工作表“{0}”内容为空。</value></data>
+  <data name="AdapterFormulaWarning" xml:space="preserve"><value>公式按公式文本和已保存缓存值比较，Differ 不会重新计算工作簿。</value></data>
+  <data name="AdapterFormulaDetailsFormat" xml:space="preserve"><value>={0}  [缓存值: {1}]</value></data>
+  <data name="AdapterGridLimit" xml:space="preserve"><value>工作表有效区域超出比较资源预算（最多 100,000 行、16,384 列，全部工作表合计 1,000,000 个对齐单元格）。请将需要审阅的区域另存为较小工作簿后重试；原文件未修改。</value></data>
+  <data name="AdapterInvalidAddress" xml:space="preserve"><value>工作表包含无效或重复的单元格地址，无法可靠恢复原始网格。请用 Excel 检查文件并另存副本后重试。</value></data>
+  <data name="AdapterSharedFormulaInvalid" xml:space="preserve"><value>工作表包含缺少主项、引用范围无效或无法可靠展开的公式。请用 Excel 重新保存副本后重试；Differ 未计算或修改公式。</value></data>
+  <data name="AdapterSharedStringInvalid" xml:space="preserve"><value>工作表的共享字符串引用无效，无法可靠读取单元格文字。请用 Excel 检查文件并另存副本后重试。</value></data>
+  <data name="AdapterEmptyRow" xml:space="preserve"><value>空白行</value></data>
+  <data name="AdapterStyleInvalid" xml:space="preserve"><value>工作表引用的样式不存在，无法可靠比较格式。请用 Excel 检查并另存副本后重试，或关闭格式比较查看数据内容。</value></data>
+  <data name="AdapterKeyColumnsInvalidFormat" xml:space="preserve"><value>工作表“{0}”的关键列设置无效，请使用不重复的 Excel 列名（例如 A 或 A,C）。本表已回退默认序列对齐。</value></data>
+  <data name="AdapterKeyColumnMissingFormat" xml:space="preserve"><value>工作表“{0}”的{1}不存在关键列 {2}。本表已回退默认序列对齐，请检查关键列设置。</value></data>
+  <data name="AdapterKeyEmptyFormat" xml:space="preserve"><value>工作表“{0}”的{1}第 {2} 行关键列 {3} 为空或缺失。本表已回退默认序列对齐，请选择每行都有完整值的关键列。</value></data>
+  <data name="AdapterKeyDuplicateFormat" xml:space="preserve"><value>工作表“{0}”的{1}第 {2} 行与第 {3} 行关键列组合重复。本表已回退默认序列对齐，请增加关键列或选择唯一标识列。</value></data>
+  <data name="AdapterBaseSide" xml:space="preserve"><value>BASE 侧</value></data>
+  <data name="AdapterCurrentSide" xml:space="preserve"><value>当前文件侧</value></data>
+  <data name="MappingInvalidRows" xml:space="preserve"><value>字段名行必须非负，数据起始行必须在字段名行之后。</value></data>
+  <data name="MappingInvalidOverrides" xml:space="preserve"><value>人工列对应包含不存在或重复使用的列。请修正比较规则。</value></data>
+  <data name="MappingManual" xml:space="preserve"><value>人工确认</value></data>
+  <data name="MappingPhysical" xml:space="preserve"><value>未识别字段行；保留物理列，未推断结构变化</value></data>
+  <data name="MappingUniqueField" xml:space="preserve"><value>唯一字段名</value></data>
+  <data name="MappingSample" xml:space="preserve"><value>字段/辅助表头与数据样本</value></data>
+  <data name="MappingAmbiguousBasis" xml:space="preserve"><value>同名候选无法唯一辨别；当前为阅读占位，请人工确认</value></data>
+  <data name="MappingOldColumn" xml:space="preserve"><value>BASE 独有列</value></data>
+  <data name="MappingNewColumn" xml:space="preserve"><value>当前文件独有列</value></data>
+  <data name="MappingAutomatic" xml:space="preserve"><value>自动识别</value></data>
+  <data name="MappingExplicit" xml:space="preserve"><value>指定规则</value></data>
+  <data name="MappingMissingHeader" xml:space="preserve"><value>未可靠识别字段名行；使用物理列或完整列样本，建议指定字段名行与数据起始行。</value></data>
+  <data name="MappingUniqueKey" xml:space="preserve"><value>唯一类型化主键</value></data>
+  <data name="MappingUniqueContent" xml:space="preserve"><value>已映射字段的唯一内容</value></data>
+  <data name="MappingRepeatedContent" xml:space="preserve"><value>重复相同内容按原顺序对应</value></data>
+  <data name="MappingLocalContent" xml:space="preserve"><value>稳定锚点内的受限内容匹配</value></data>
+  <data name="MappingHeader" xml:space="preserve"><value>表头/说明行</value></data>
+  <data name="MappingDeletedRecord" xml:space="preserve"><value>BASE 独有记录</value></data>
+  <data name="MappingAddedRecord" xml:space="preserve"><value>当前文件新增记录</value></data>
+  <data name="MappingColumnLabel" xml:space="preserve"><value>列</value></data>
+  <data name="MappingPendingColumnLabel" xml:space="preserve"><value>列对应待确认</value></data>
+  <data name="MappingColumnOrderLabel" xml:space="preserve"><value>列相对顺序</value></data>
+  <data name="MappingRecordOrderLabel" xml:space="preserve"><value>记录相对顺序</value></data>
+  <data name="MappingHeaderRowLabel" xml:space="preserve"><value>表头行</value></data>
+  <data name="MappingDataRowLabel" xml:space="preserve"><value>数据行</value></data>
+  <data name="MappingFormulaAdjustmentLabel" xml:space="preserve"><value>公式结构引用调整</value></data>
+  <data name="MappingHiddenRowLabel" xml:space="preserve"><value>行隐藏状态</value></data>
+  <data name="MappingHeaderLimitFormat" xml:space="preserve"><value>工作表“{0}”表头区超过 8 行：前 8 行固定，剩余说明行保留在可滚动正文中，内容与导航不省略。</value></data>
+  <data name="MappingAmbiguousFormat" xml:space="preserve"><value>工作表“{0}”的列 {1} 存在对应歧义；请在工作表规则中指定 BASE 列与当前列，当前不宣称唯一配对。</value></data>
+  <data name="MappingDescriptionFormat" xml:space="preserve"><value>{0}：字段名第 {1} 行，数据第 {2} 行起；列对应依据可在列标题查看。</value></data>
+  <data name="MappingInvalidKeyFormat" xml:space="preserve"><value>工作表“{0}”不存在关键列 {1}，或关键列设置无效；已回退默认序列对齐。</value></data>
+  <data name="MappingAnomalyFormat" xml:space="preserve"><value>工作表“{0}”关键列组合重复或为空/缺失：BASE {1} 行、当前 {2} 行；仅异常组局部匹配，其他唯一主键对应保留。</value></data>
+  <data name="MappingUnsupportedFormulaFormat" xml:space="preserve"><value>工作表“{0}”包含不能证明等价的公式变化；跨工作表、命名范围、外部引用、数组/结构化引用或映射范围外引用保留原始差异。支持已映射区域内 A1、绝对/混合引用及有界区域的完整成员，不计算公式。</value></data>
+  <data name="MappingFormatDetails" xml:space="preserve"><value>基础格式：{0}</value></data>
+  <data name="MappingTypeDetails" xml:space="preserve"><value>语义类型：{0}</value></data>
+  <data name="MappingCommentDetails" xml:space="preserve"><value>批注：{0}</value></data>
+</root>

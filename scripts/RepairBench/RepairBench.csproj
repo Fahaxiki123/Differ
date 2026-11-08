@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Differ.App.Tests</AssemblyName>
+    <DefineConstants Condition="'$(SourceRoot)' == ''">$(DefineConstants);DOCUMENT_EDITOR</DefineConstants>
+    <SourceRoot Condition="'$(SourceRoot)' == ''">$(MSBuildThisFileDirectory)..\..</SourceRoot>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SourceRoot)\src\Differ.App\Differ.App.csproj" />
+  </ItemGroup>
+</Project>

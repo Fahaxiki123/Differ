@@ -1,0 +1,504 @@
+<UserControl x:Class="Differ.App.WordDiffView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Differ.App.Controls"
+             xmlns:converters="clr-namespace:Differ.App.Converters"
+             xmlns:models="clr-namespace:Differ.Core.Models;assembly=Differ.Core"
+             xmlns:resources="clr-namespace:Differ.App.Resources"
+             Background="{DynamicResource PanelBrush}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="PaneRevisionStyle" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{DynamicResource MutedInkBrush}" />
+                <Setter Property="FontSize" Value="11" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}"
+                                 Value="{x:Static resources:Strings.RevisionUnknown}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:WordLeftInsetConverter x:Key="WordLeftInsetConverter" />
+
+            <Style x:Key="WordInlineTextStyle"
+                   TargetType="{x:Type controls:WordParagraphHost}">
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI" />
+                <Setter Property="FontSize" Value="13.5" />
+                <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+                <Setter Property="LineHeight" Value="24" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <Style x:Key="WordRowItemStyle" TargetType="ListBoxItem">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0" />
+                <!-- The virtualizing panel can retain the previous horizontal
+                     extent after a window shrinks. Size both sides from the
+                     live viewport, so long paragraphs reflow together. -->
+                <Setter Property="Width"
+                        Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ScrollContentPresenter}}" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Grid>
+                                <Border x:Name="ItemChrome"
+                                        Background="Transparent">
+                                    <ContentPresenter />
+                                </Border>
+                                <Border x:Name="SelectionChrome"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0,2,0,2"
+                                        IsHitTestVisible="False" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="SelectionChrome"
+                                            Property="BorderBrush"
+                                            Value="{DynamicResource SelectionBorderBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ItemChrome"
+                                            Property="Background"
+                                            Value="{DynamicResource SelectionHoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DataTemplate x:Key="WordDiffRowTemplate">
+                <Grid MinHeight="42"
+                      ToolTip="{Binding Path}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="1" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border x:Name="BasePane"
+                            Grid.Column="0"
+                            Padding="18,10,22,10"
+                            Background="{DynamicResource PanelBrush}">
+                        <controls:WordParagraphLayout MarkerOffset="{Binding BaseListMarkerInset}" TextOffset="{Binding BaseTextLeftInset}">
+                            <TextBlock x:Name="BaseListMarker" TextWrapping="Wrap"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Foreground="{DynamicResource MutedInkBrush}"
+                                       FontFamily="{Binding BaseFontFamily}"
+                                       FontSize="{Binding BaseFontSize}" FontStyle="{Binding BaseFontStyle}" FontWeight="{Binding BaseFontWeight}"
+                                       Text="{Binding BaseListMarker}" />
+                            <controls:WordParagraphHost x:Name="BaseText"
+                                                               
+                                                               FirstLineIndent="{Binding BaseParagraphFirstLine}"
+                                                               Style="{StaticResource WordInlineTextStyle}"
+                                                               DiffKind="{Binding Kind}"
+                                                               FontFamily="{Binding BaseFontFamily}"
+                                                               FontSize="{Binding BaseFontSize}"
+                                                               FontStyle="{Binding BaseFontStyle}"
+                                                               FontWeight="{Binding BaseFontWeight}"
+                                                               Segments="{Binding OldSegments}"
+                                                               Side="Base"
+                                                               TextAlignment="{Binding BaseTextAlignment}"
+                                                               ToolTip="{Binding InlineDiagnostic}" />
+                        </controls:WordParagraphLayout>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Background="{DynamicResource PaneSeparatorBrush}" />
+
+                    <Border x:Name="MinePane"
+                            Grid.Column="2"
+                            Padding="22,10,18,10"
+                            Background="{DynamicResource PanelBrush}">
+                        <controls:WordParagraphLayout MarkerOffset="{Binding MineListMarkerInset}" TextOffset="{Binding MineTextLeftInset}">
+                            <TextBlock x:Name="MineListMarker" TextWrapping="Wrap"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Foreground="{DynamicResource MutedInkBrush}"
+                                       FontFamily="{Binding MineFontFamily}"
+                                       FontSize="{Binding MineFontSize}" FontStyle="{Binding MineFontStyle}" FontWeight="{Binding MineFontWeight}"
+                                       Text="{Binding MineListMarker}" />
+                            <controls:WordParagraphHost x:Name="MineText"
+                                                               
+                                                               FirstLineIndent="{Binding MineParagraphFirstLine}"
+                                                               Style="{StaticResource WordInlineTextStyle}"
+                                                               DiffKind="{Binding Kind}"
+                                                               FontFamily="{Binding MineFontFamily}"
+                                                               FontSize="{Binding MineFontSize}"
+                                                               FontStyle="{Binding MineFontStyle}"
+                                                               FontWeight="{Binding MineFontWeight}"
+                                                               Segments="{Binding NewSegments}"
+                                                               Side="Mine"
+                                                               TextAlignment="{Binding MineTextAlignment}"
+                            ToolTip="{Binding InlineDiagnostic}" />
+                        </controls:WordParagraphLayout>
+                    </Border>
+
+                </Grid>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Added}">
+                        <Setter TargetName="BasePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Base.Added}" />
+                        <Setter TargetName="MinePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Mine.Added}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Deleted}">
+                        <Setter TargetName="BasePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Base.Deleted}" />
+                        <Setter TargetName="MinePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Mine.Deleted}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="BasePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Modified}" />
+                        <Setter TargetName="MinePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Modified}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Moved}">
+                        <Setter TargetName="BasePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Moved}" />
+                        <Setter TargetName="MinePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Moved}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Conflict}">
+                        <Setter TargetName="BasePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Conflict}" />
+                        <Setter TargetName="MinePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Conflict}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Unsupported}">
+                        <Setter TargetName="BasePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Unsupported}" />
+                        <Setter TargetName="MinePane"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Unsupported}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsHeading}"
+                                 Value="True">
+                        <Setter TargetName="BaseText"
+                                Property="FontSize"
+                                Value="16" />
+                        <Setter TargetName="MineText"
+                                Property="FontSize"
+                                Value="16" />
+                        <Setter TargetName="BaseText"
+                                Property="FontWeight"
+                                Value="SemiBold" />
+                        <Setter TargetName="MineText"
+                                Property="FontWeight"
+                                Value="SemiBold" />
+                        <Setter TargetName="BasePane"
+                                Property="Padding"
+                                Value="18,16,22,14" />
+                        <Setter TargetName="MinePane"
+                                Property="Padding"
+                                Value="22,16,18,14" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate x:Key="WordBaseTableCellTemplate">
+                <Border x:Name="Cell"
+                        Padding="10,8"
+                        Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,0,1,1">
+                    <controls:WordInlineDiffTextBlock DiffKind="{Binding Kind}"
+                                                       FontFamily="Microsoft YaHei UI, Segoe UI"
+                                                       FontSize="13"
+                                                       Foreground="{DynamicResource InkBrush}"
+                                                       Segments="{Binding OldSegments}"
+                                                       Side="Base"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip="{Binding OldText}" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Deleted}">
+                        <Setter TargetName="Cell"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Base.Deleted}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="Cell"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Modified}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate x:Key="WordMineTableCellTemplate">
+                <Border x:Name="Cell"
+                        Padding="10,8"
+                        Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,0,1,1">
+                    <controls:WordInlineDiffTextBlock DiffKind="{Binding Kind}"
+                                                       FontFamily="Microsoft YaHei UI, Segoe UI"
+                                                       FontSize="13"
+                                                       Foreground="{DynamicResource InkBrush}"
+                                                       Segments="{Binding NewSegments}"
+                                                       Side="Mine"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip="{Binding NewText}" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Added}">
+                        <Setter TargetName="Cell"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Mine.Added}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}"
+                                 Value="{x:Static models:DiffKind.Modified}">
+                        <Setter TargetName="Cell"
+                                Property="Background"
+                                Value="{DynamicResource Diff.WordPane.Modified}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <ContextMenu x:Key="WordRowContextMenu">
+                <MenuItem Click="CopyBaseSide_Click"
+                          Header="{x:Static resources:Strings.CopyBaseSide}" />
+                <MenuItem Click="CopyMineSide_Click"
+                          Header="{x:Static resources:Strings.CopyMineSide}" />
+                <Separator />
+                <MenuItem Click="CopyBothSides_Click"
+                          Header="{x:Static resources:Strings.CopyBothSides}" />
+                <Separator />
+                <MenuItem Click="SelectParagraphCharacters_Click" Tag="select-characters"
+                          Header="{x:Static resources:WordReviewStrings.SelectCharacters}" />
+            </ContextMenu>
+
+            <DataTemplate x:Key="WordGroupBaseParagraph">
+                <controls:WordParagraphLayout MarkerOffset="{Binding BaseListMarkerInset}" TextOffset="{Binding BaseTextLeftInset}" Margin="18,5,22,5">
+                    <TextBlock Text="{Binding BaseListMarker}" HorizontalAlignment="Left" VerticalAlignment="Top"
+                               Foreground="{DynamicResource MutedInkBrush}"
+                               TextWrapping="Wrap" FontFamily="{Binding BaseFontFamily}" FontSize="{Binding BaseFontSize}" FontStyle="{Binding BaseFontStyle}" FontWeight="{Binding BaseFontWeight}" />
+                    <controls:WordParagraphHost Style="{StaticResource WordInlineTextStyle}"
+                        
+                        FirstLineIndent="{Binding BaseParagraphFirstLine}" FontFamily="{Binding BaseFontFamily}"
+                        FontSize="{Binding BaseFontSize}" FontStyle="{Binding BaseFontStyle}" FontWeight="{Binding BaseFontWeight}"
+                        TextAlignment="{Binding BaseTextAlignment}" Segments="{Binding OldSegments}" DiffKind="{Binding Kind}" Side="Base" />
+                </controls:WordParagraphLayout>
+            </DataTemplate>
+            <DataTemplate x:Key="WordGroupMineParagraph">
+                <controls:WordParagraphLayout MarkerOffset="{Binding MineListMarkerInset}" TextOffset="{Binding MineTextLeftInset}" Margin="22,5,18,5">
+                    <TextBlock Text="{Binding MineListMarker}" HorizontalAlignment="Left" VerticalAlignment="Top"
+                               Foreground="{DynamicResource MutedInkBrush}"
+                               TextWrapping="Wrap" FontFamily="{Binding MineFontFamily}" FontSize="{Binding MineFontSize}" FontStyle="{Binding MineFontStyle}" FontWeight="{Binding MineFontWeight}" />
+                    <controls:WordParagraphHost Style="{StaticResource WordInlineTextStyle}"
+                        
+                        FirstLineIndent="{Binding MineParagraphFirstLine}" FontFamily="{Binding MineFontFamily}"
+                        FontSize="{Binding MineFontSize}" FontStyle="{Binding MineFontStyle}" FontWeight="{Binding MineFontWeight}"
+                        TextAlignment="{Binding MineTextAlignment}" Segments="{Binding NewSegments}" DiffKind="{Binding Kind}" Side="Mine" />
+                </controls:WordParagraphLayout>
+            </DataTemplate>
+
+            <DataTemplate x:Key="WordChangeGroupTemplate">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <DockPanel Margin="10,4" LastChildFill="True">
+                        <Button DockPanel.Dock="Right" Content="{Binding ToggleLabel}" Command="{Binding ToggleCommand}"
+                                Visibility="{Binding CanCollapse, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Padding="8,2" MinHeight="24" FontSize="11"/>
+                        <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource MutedInkBrush}" FontSize="11"
+                                   VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </DockPanel>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="1"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Border Background="{DynamicResource Diff.WordPane.Base.Deleted}">
+                            <Grid>
+                                <ItemsControl ItemsSource="{Binding VisibleBaseRows}" ItemTemplate="{StaticResource WordGroupBaseParagraph}"/>
+                                <TextBlock Text="{x:Static resources:WordReviewStrings.Missing}" Margin="18,10" VerticalAlignment="Top"
+                                    Foreground="{DynamicResource MutedInkBrush}" FontSize="11"
+                                    Visibility="{Binding BaseMissing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Column="1" Background="{DynamicResource PaneSeparatorBrush}"/>
+                        <Border Grid.Column="2" Background="{DynamicResource Diff.WordPane.Mine.Added}">
+                            <Grid>
+                                <ItemsControl ItemsSource="{Binding VisibleMineRows}" ItemTemplate="{StaticResource WordGroupMineParagraph}"/>
+                                <TextBlock Text="{x:Static resources:WordReviewStrings.Missing}" Margin="22,10" VerticalAlignment="Top"
+                                    Foreground="{DynamicResource MutedInkBrush}" FontSize="11"
+                                    Visibility="{Binding MineMissing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <DockPanel Grid.Row="2" Margin="12,3">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                            Visibility="{Binding HasMultipleWindows, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button Content="{x:Static resources:WordReviewStrings.Previous}" Command="{Binding PreviousCommand}" Padding="8,2" FontSize="11"/>
+                            <Button Content="{x:Static resources:WordReviewStrings.Next}" Command="{Binding NextCommand}" Padding="8,2" FontSize="11" Margin="4,0,0,0"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding WindowLabel}" Foreground="{DynamicResource MutedInkBrush}" FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </DockPanel>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="WordDisplayRowTemplate">
+                <Grid>
+                    <Button Command="{Binding ExpandCommand}"
+                            Content="{Binding CollapsedLabel}"
+                            MinHeight="0"
+                            Visibility="{Binding IsCollapsed, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Height="28" Margin="8,2" Padding="10,0" BorderThickness="0"
+                            HorizontalContentAlignment="Left" FontSize="11"
+                            Background="{DynamicResource GutterBackgroundBrush}"
+                            Foreground="{DynamicResource MutedInkBrush}" />
+                    <ContentControl Content="{Binding Paragraph}"
+                                    HorizontalContentAlignment="Stretch"
+                                    ContentTemplate="{StaticResource WordDiffRowTemplate}"
+                                    Visibility="{Binding IsParagraph,
+                                                         Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    <ContentControl Content="{Binding Group}" HorizontalContentAlignment="Stretch"
+                                    ContentTemplate="{StaticResource WordChangeGroupTemplate}"
+                                    Visibility="{Binding IsGroup, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                    <Grid x:Name="TableRow"
+                          MinHeight="46"
+                          Visibility="{Binding IsTable,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="1" />
+                        <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Padding="18,4,22,4"
+                                Background="{DynamicResource PanelBrush}">
+                            <ItemsControl ItemsSource="{Binding BaseCells}"
+                                          ItemTemplate="{StaticResource WordBaseTableCellTemplate}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="{Binding TableColumnCount}" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="{DynamicResource PaneSeparatorBrush}" />
+
+                        <Border Grid.Column="2"
+                                Padding="22,4,18,4"
+                                Background="{DynamicResource PanelBrush}">
+                            <ItemsControl ItemsSource="{Binding MineCells}"
+                                          ItemTemplate="{StaticResource WordMineTableCellTemplate}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="{Binding TableColumnCount}" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Border>
+
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource PanelBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="{StaticResource Ui.PaneHeaderRowHeight}" />
+        </Grid.RowDefinitions>
+
+        <ListBox x:Name="WordRows"
+                 Grid.Row="0"
+                 Background="{DynamicResource PanelBrush}"
+                 BorderThickness="0"
+                 ContextMenu="{StaticResource WordRowContextMenu}"
+                 ContextMenuOpening="WordRows_ContextMenuOpening"
+                 ItemContainerStyle="{StaticResource WordRowItemStyle}"
+                 ItemTemplate="{StaticResource WordDisplayRowTemplate}"
+                 ItemsSource="{Binding WordDisplayRows}"
+                 PreviewKeyDown="WordRows_PreviewKeyDown"
+                 SelectionChanged="WordRows_SelectionChanged"
+                 ScrollViewer.CanContentScroll="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                 VirtualizingPanel.IsVirtualizing="True"
+                 VirtualizingPanel.VirtualizationMode="Recycling" />
+
+        <Grid Grid.Row="1" Margin="0,0,17,0" Background="{DynamicResource PaneHeaderBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Padding="10,0"
+                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+                <Border.ToolTip>
+                    <StackPanel MaxWidth="640">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding BaseTitle}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding BasePath}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding BaseRevisionText}" />
+                    </StackPanel>
+                </Border.ToolTip>
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Left" Margin="0,0,10,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}" FontSize="11" FontWeight="SemiBold"
+                               Text="{x:Static resources:Strings.BaseSide}" />
+                    <TextBlock DockPanel.Dock="Right" Margin="10,0,0,0" Style="{StaticResource PaneRevisionStyle}"
+                               Text="{Binding BaseRevisionText}" />
+                    <TextBlock VerticalAlignment="Center" FontSize="12" Text="{Binding BaseTitle}"
+                               TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+            </Border>
+            <Border Grid.Column="2" Padding="10,0"
+                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+                <Border.ToolTip>
+                    <StackPanel MaxWidth="640">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding MineTitle}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding MinePath}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding MineRevisionText}" />
+                    </StackPanel>
+                </Border.ToolTip>
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Left" Margin="0,0,10,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}" FontSize="11" FontWeight="SemiBold"
+                               Text="{x:Static resources:Strings.MineSide}" />
+                    <TextBlock DockPanel.Dock="Right" Margin="10,0,0,0" Style="{StaticResource PaneRevisionStyle}"
+                               Text="{Binding MineRevisionText}" />
+                    <TextBlock VerticalAlignment="Center" FontSize="12" Text="{Binding MineTitle}"
+                               TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+            </Border>
+            <Border Grid.Column="1" Background="{DynamicResource PaneSeparatorBrush}" />
+        </Grid>
+    </Grid>
+</UserControl>

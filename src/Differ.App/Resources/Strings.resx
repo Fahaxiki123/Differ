@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ProductName" xml:space="preserve"><value>Differ</value></data>
+  <data name="SelectedContentDetails" xml:space="preserve"><value>所选内容详情</value></data>
+  <data name="ExpandFullContent" xml:space="preserve"><value>展开完整内容</value></data>
+  <data name="CollapseContentDetails" xml:space="preserve"><value>收起内容详情</value></data>
+  <data name="ComparisonRulesAdjusted" xml:space="preserve"><value>规则已调整</value></data>
+  <data name="ComparisonRulesPending" xml:space="preserve"><value>规则待应用</value></data>
+  <data name="Summary" xml:space="preserve"><value>统计</value></data>
+  <data name="WarningCountFormat" xml:space="preserve"><value>提示 {0}</value></data>
+  <data name="PreviousDifference" xml:space="preserve"><value>上一个差异</value></data>
+  <data name="NextDifference" xml:space="preserve"><value>下一个差异</value></data>
+  <data name="ShowUnchanged" xml:space="preserve"><value>显示未修改</value></data>
+  <data name="PreviousDifferenceShortcut" xml:space="preserve"><value>上一个差异（F7）</value></data>
+  <data name="NextDifferenceShortcut" xml:space="preserve"><value>下一个差异（F8）</value></data>
+  <data name="ShowUnchangedShortcut" xml:space="preserve"><value>显示或隐藏未修改项（Ctrl+U）</value></data>
+  <data name="ToggleThemeShortcut" xml:space="preserve"><value>切换浅色/深色主题（F9）</value></data>
+  <data name="SummaryFormat" xml:space="preserve"><value>新增 {0} · 删除 {1} · 修改 {2} · 移动 {3} · 冲突 {4} · 未支持 {5}</value></data>
+  <data name="FileKindText" xml:space="preserve"><value>文本</value></data>
+  <data name="FileKindWord" xml:space="preserve"><value>Word</value></data>
+  <data name="FileKindExcel" xml:space="preserve"><value>Excel</value></data>
+  <data name="FileKindBinary" xml:space="preserve"><value>二进制</value></data>
+  <data name="FileKindUnsupported" xml:space="preserve"><value>不支持</value></data>
+  <data name="DiffUnchanged" xml:space="preserve"><value>未修改</value></data>
+  <data name="DiffAdded" xml:space="preserve"><value>新增</value></data>
+  <data name="DiffDeleted" xml:space="preserve"><value>删除</value></data>
+  <data name="DiffModified" xml:space="preserve"><value>修改</value></data>
+  <data name="DiffMoved" xml:space="preserve"><value>移动</value></data>
+  <data name="DiffConflict" xml:space="preserve"><value>冲突</value></data>
+  <data name="DiffUnsupported" xml:space="preserve"><value>不支持</value></data>
+  <data name="ExternalDiffAppTitle" xml:space="preserve"><value>Differ - 文件差异</value></data>
+  <data name="ExternalDiffSubtitle" xml:space="preserve"><value>TortoiseSVN BASE  ↔  当前工作文件</value></data>
+  <data name="BaseSide" xml:space="preserve"><value>BASE</value></data>
+  <data name="MineSide" xml:space="preserve"><value>工作副本</value></data>
+  <data name="ComparisonLoading" xml:space="preserve"><value>正在只读解析并比较两个文件...</value></data>
+  <data name="ComparisonCompleteFormat" xml:space="preserve"><value>比较完成：共 {0} 个差异</value></data>
+  <data name="ComparisonIdentical" xml:space="preserve"><value>两个文件没有内容差异。</value></data>
+  <data name="DifferencePositionFormat" xml:space="preserve"><value>差异 {0} / {1}</value></data>
+  <data name="NoNavigableDifference" xml:space="preserve"><value>没有可导航的差异</value></data>
+  <data name="InputFileMissingFormat" xml:space="preserve"><value>{0}文件不存在或已不可用：{1}</value></data>
+  <data name="InputPathIsDirectoryFormat" xml:space="preserve"><value>{0}路径是目录，无法作为文件比较：{1}</value></data>
+  <data name="ComparisonFailedFormat" xml:space="preserve"><value>无法完成文件比较：{0}</value></data>
+  <data name="CloseWindow" xml:space="preserve"><value>关闭</value></data>
+  <data name="RevisionUnknown" xml:space="preserve"><value>修订：未提供</value></data>
+  <data name="RevisionFormat" xml:space="preserve"><value>修订：{0}</value></data>
+  <data name="IntegrationAppTitle" xml:space="preserve"><value>Differ - TortoiseSVN 集成</value></data>
+  <data name="IntegrationHeadline" xml:space="preserve"><value>Differ 由 TortoiseSVN 提交窗口调用</value></data>
+  <data name="IntegrationDescription" xml:space="preserve"><value>这个工具通常不需要提前打开。请在 TortoiseSVN 提交窗口中双击已修改文件，Differ 会自动接收 BASE 和当前文件并弹出差异界面。</value></data>
+  <data name="IntegrationSteps" xml:space="preserve"><value>使用方法：右键工作副本 → SVN 提交 → 在变更列表中双击文件 → 查看差异 → 关闭窗口后继续提交。</value></data>
+  <data name="ExecutablePathLabel" xml:space="preserve"><value>当前 Differ 程序</value></data>
+  <data name="ExternalCommandLabel" xml:space="preserve"><value>TortoiseSVN 外部差异命令</value></data>
+  <data name="SupportedTypesLabel" xml:space="preserve"><value>支持格式</value></data>
+  <data name="TortoiseFoundFormat" xml:space="preserve"><value>已检测到 TortoiseSVN：{0}</value></data>
+  <data name="TortoiseNotFound" xml:space="preserve"><value>未检测到 TortoiseSVN。仍可用两个文件路径手动测试 Differ。</value></data>
+  <data name="OpenTortoiseSettings" xml:space="preserve"><value>打开 TortoiseSVN 设置</value></data>
+  <data name="OpenTortoiseSettingsFailedFormat" xml:space="preserve"><value>无法打开 TortoiseSVN 设置：{0}</value></data>
+  <data name="IntegrationChecking" xml:space="preserve"><value>正在检查 TortoiseSVN 差异工具配置...</value></data>
+  <data name="InstallIntegration" xml:space="preserve"><value>安装到 TortoiseSVN</value></data>
+  <data name="RestoreIntegration" xml:space="preserve"><value>恢复原差异工具</value></data>
+  <data name="IntegrationOperationFailedFormat" xml:space="preserve"><value>TortoiseSVN 集成操作失败：{0}</value></data>
+  <data name="ArgumentErrorUnknownOptionFormat" xml:space="preserve"><value>无法识别命令行参数：{0}</value></data>
+  <data name="ArgumentErrorMissingValueFormat" xml:space="preserve"><value>命令行参数缺少值：{0}</value></data>
+  <data name="ArgumentErrorDuplicateFormat" xml:space="preserve"><value>命令行参数重复：{0}</value></data>
+  <data name="ArgumentErrorMissingRequiredFormat" xml:space="preserve"><value>缺少必需的命令行参数：{0}</value></data>
+  <data name="ArgumentErrorPositionalCount" xml:space="preserve"><value>手动比较必须正好传入 BASE 和当前文件两个路径。</value></data>
+  <data name="ArgumentErrorMixedStyles" xml:space="preserve"><value>不能混用命名参数和双路径参数。</value></data>
+  <data name="ArgumentErrorTitle" xml:space="preserve"><value>TortoiseSVN 调用参数有误</value></data>
+  <data name="CloseTab" xml:space="preserve"><value>关闭标签</value></data>
+  <data name="WorksheetTabs" xml:space="preserve"><value>工作表</value></data>
+  <data name="WorksheetTabWithCountFormat" xml:space="preserve"><value>{0}  ·  {1}</value></data>
+  <data name="SessionSnapshotFailedFormat" xml:space="preserve"><value>无法创建只读比较快照：{0}</value></data>
+  <data name="InstanceForwardFailed" xml:space="preserve"><value>无法把比较请求发送到已打开的 Differ 窗口。请关闭现有 Differ 后重试。</value></data>
+  <data name="FullBaseContent" xml:space="preserve"><value>BASE 完整内容</value></data>
+  <data name="FullCurrentContent" xml:space="preserve"><value>当前完整内容</value></data>
+  <data name="GlobalIntegrationRegistered" xml:space="preserve"><value>已注册为 TortoiseSVN 全局文件差异查看器，且受支持格式没有高级覆盖；可在“设置 → 差异查看器”中直接确认。</value></data>
+  <data name="GlobalIntegrationNotRegistered" xml:space="preserve"><value>尚未完整注册为 TortoiseSVN 全局文件差异查看器，或仍有受支持格式的高级覆盖。</value></data>
+  <data name="ExistingGlobalToolBackup" xml:space="preserve"><value>检测到其他全局工具或会优先于全局路径的高级格式绑定。安装 Differ 前会统一备份，之后可一键恢复。</value></data>
+  <data name="InstallGlobalCompleteFormat" xml:space="preserve"><value>全局差异查看器已更新；保留 {0} 项原配置，清理 {1} 个会覆盖全局路径的高级格式绑定。</value></data>
+  <data name="RestoreGlobalCompleteFormat" xml:space="preserve"><value>已恢复 TortoiseSVN 原全局差异查看器配置（{0} 项）。</value></data>
+  <data name="RestoreGlobalSkippedFormat" xml:space="preserve"><value>恢复 {0} 项；检测到 {1} 项后来被手动修改，已安全跳过。</value></data>
+  <data name="TortoiseGlobalDiffPathLabel" xml:space="preserve"><value>TortoiseSVN 全局差异查看器配置位置</value></data>
+  <data name="CopyBaseSide" xml:space="preserve"><value>复制 BASE 侧内容</value></data>
+  <data name="CopyMineSide" xml:space="preserve"><value>复制当前侧内容</value></data>
+  <data name="CopyBothSides" xml:space="preserve"><value>复制两侧内容（制表符分隔）</value></data>
+  <data name="CopyBaseRow" xml:space="preserve"><value>复制整行（BASE 侧）</value></data>
+  <data name="CopyMineRow" xml:space="preserve"><value>复制整行（当前侧）</value></data>
+  <data name="StructuralDifference" xml:space="preserve"><value>结构变化</value></data>
+  <data name="ComparisonOptions" xml:space="preserve"><value>比较选项</value></data>
+  <data name="IgnoreWhitespace" xml:space="preserve"><value>忽略空白</value></data>
+  <data name="IgnoreCase" xml:space="preserve"><value>忽略大小写</value></data>
+  <data name="IgnoreLineEndings" xml:space="preserve"><value>忽略行尾提示</value></data>
+  <data name="CompareFormatting" xml:space="preserve"><value>比较字体与格式</value></data>
+  <data name="TextEncoding" xml:space="preserve"><value>文本编码</value></data>
+  <data name="AutomaticEncoding" xml:space="preserve"><value>自动识别</value></data>
+  <data name="ApplyComparisonOptions" xml:space="preserve"><value>应用并重新比较</value></data>
+  <data name="Diagnostics" xml:space="preserve"><value>版本与诊断信息</value></data>
+  <data name="DiagnosticsFormat" xml:space="preserve"><value>Differ {0} · 构建 {1} · .NET {2} · Open XML {3} · NPOI {4} · TortoiseSVN {5}</value></data>
+  <data name="DiagnosticVersionUnavailable" xml:space="preserve"><value>无法读取版本</value></data>
+  <data name="FindReady" xml:space="preserve"><value>输入查找内容</value></data>
+  <data name="FindNoMatches" xml:space="preserve"><value>未找到匹配</value></data>
+  <data name="FindStatusFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+  <data name="LocationInvalid" xml:space="preserve"><value>请输入行号或单元格地址，例如 A123 或 工作表!A123</value></data>
+  <data name="LocationNotFound" xml:space="preserve"><value>未找到指定位置</value></data>
+  <data name="LocationFoundFormat" xml:space="preserve"><value>已定位 {0}</value></data>
+  <data name="CollapsedContextFormat" xml:space="preserve"><value>已折叠 {0} 行 / 逻辑块 · 点击展开</value></data>
+  <data name="RefreshMine" xml:space="preserve"><value>刷新工作文件（F5）</value></data>
+  <data name="RefreshFailedFormat" xml:space="preserve"><value>刷新失败，保留原比较结果：{0}</value></data>
+  <data name="SnapshotTimeFormat" xml:space="preserve"><value>工作文件快照：{0}</value></data>
+  <data name="RulesSaved" xml:space="preserve"><value>已保存此格式的比较规则</value></data>
+  <data name="RulesRestored" xml:space="preserve"><value>已恢复默认比较规则</value></data>
+  <data name="RulesOperationFailedFormat" xml:space="preserve"><value>规则操作失败：{0}</value></data>
+  <data name="ExportNoSelection" xml:space="preserve"><value>请先选择要导出的差异</value></data>
+  <data name="ExportProtectedPath" xml:space="preserve"><value>导出不能覆盖原始文件或会话快照，请选择其他路径。</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>Differ 差异报告</value></data>
+  <data name="ExportLocation" xml:space="preserve"><value>位置</value></data>
+  <data name="ExportOldValue" xml:space="preserve"><value>BASE / 原始内容</value></data>
+  <data name="ExportNewValue" xml:space="preserve"><value>当前内容</value></data>
+  <data name="ExportSummaryFormat" xml:space="preserve"><value>新增 {0} · 删除 {1} · 修改 {2} · 移动 {3} · 其他 {4}</value></data>
+  <data name="CloseOtherTabs" xml:space="preserve"><value>关闭其他文件</value></data>
+  <data name="CloseAllTabs" xml:space="preserve"><value>关闭全部文件</value></data>
+  <data name="FilterTabs" xml:space="preserve"><value>查找已打开文件</value></data>
+  <data name="SaveRules" xml:space="preserve"><value>保存为此格式的默认规则</value></data>
+  <data name="RestoreRules" xml:space="preserve"><value>恢复默认规则</value></data>
+  <data name="ExportHtml" xml:space="preserve"><value>导出当前差异报告…</value></data>
+  <data name="ExportSelectedText" xml:space="preserve"><value>导出选中内容…</value></data>
+  <data name="Find" xml:space="preserve"><value>查找（Ctrl+F）</value></data>
+  <data name="GoTo" xml:space="preserve"><value>跳转（Ctrl+G）</value></data>
+  <data name="MatchCase" xml:space="preserve"><value>区分大小写</value></data>
+  <data name="FindDifferencesOnly" xml:space="preserve"><value>仅差异</value></data>
+  <data name="FindNext" xml:space="preserve"><value>下一个匹配（Enter）</value></data>
+  <data name="FindPrevious" xml:space="preserve"><value>上一个匹配（Shift+Enter）</value></data>
+  <data name="ClosePanel" xml:space="preserve"><value>关闭（Esc）</value></data>
+  <data name="GoToPrompt" xml:space="preserve"><value>行号 / 单元格 / 工作表!A123</value></data>
+  <data name="GoToAction" xml:space="preserve"><value>定位</value></data>
+  <data name="DisplayAll" xml:space="preserve"><value>全部内容</value></data>
+  <data name="DisplayDifferences" xml:space="preserve"><value>仅差异</value></data>
+  <data name="DisplayContext" xml:space="preserve"><value>差异上下文</value></data>
+  <data name="DisplayModeLabel" xml:space="preserve"><value>显示范围</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>放大字体</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>缩小字体</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>恢复 100%</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>更多操作</value></data>
+  <data name="ComparisonRelationShort" xml:space="preserve"><value>BASE ↔ 当前</value></data>
+  <data name="KeyColumns" xml:space="preserve"><value>关键列（例如 A 或 A,C）</value></data>
+  <data name="KeyColumnsHint" xml:space="preserve"><value>留空时按默认顺序比较；空键或重复键会提示并回退。</value></data>
+  <data name="OverviewLabel" xml:space="preserve"><value>内容与差异概览</value></data>
+  <data name="OverviewPreview" xml:space="preserve"><value>附近内容</value></data>
+  <data name="OverviewHint" xml:space="preserve"><value>悬停预览 · 单击/拖动定位</value></data>
+  <data name="OverviewBase" xml:space="preserve"><value>BASE</value></data>
+  <data name="OverviewMine" xml:space="preserve"><value>当前</value></data>
+  <data name="OverviewPositionFormat" xml:space="preserve"><value>位置 {0} / {1}</value></data>
+  <data name="OverviewEmpty" xml:space="preserve"><value>此侧为空</value></data>
+  <data name="ExportFailedFormat" xml:space="preserve"><value>导出失败：{0}</value></data>
+  <data name="ExportCompletedFormat" xml:space="preserve"><value>已导出：{0}</value></data>
+  <data name="RulesDefault" xml:space="preserve"><value>默认准确比较</value></data>
+  <data name="KeyColumnsLabel" xml:space="preserve"><value>关键列</value></data>
+  <data name="ExportHtmlFilter" xml:space="preserve"><value>HTML 报告|*.html</value></data>
+  <data name="ExportTextFilter" xml:space="preserve"><value>文本文件|*.txt</value></data>
+  <data name="ZoomLevelFormat" xml:space="preserve"><value>{0:P0}</value></data>
+  <data name="PreferencesSaveFailed" xml:space="preserve"><value>无法保存阅读偏好，下次启动将使用原设置。</value></data>
+  <data name="PendingComparisonOptions" xml:space="preserve"><value>规则已修改，应用后生效</value></data>
+  <data name="ExportRulesFormat" xml:space="preserve"><value>比较规则：{0}</value></data>
+  <data name="EditorBaseTitleFormat" xml:space="preserve"><value>BASE · {0} · 只读</value></data>
+  <data name="EditorMineTitleFormat" xml:space="preserve"><value>结果 · {0} · 可编辑</value></data>
+  <data name="EditorAdopt" xml:space="preserve"><value>使用左侧块</value></data>
+  <data name="EditorKeep" xml:space="preserve"><value>保留右侧</value></data>
+  <data name="EditorUndo" xml:space="preserve"><value>撤销</value></data>
+  <data name="EditorRedo" xml:space="preserve"><value>重做</value></data>
+  <data name="EditorSave" xml:space="preserve"><value>保存</value></data>
+  <data name="EditorSaveAs" xml:space="preserve"><value>另存为</value></data>
+  <data name="EditorStarting" xml:space="preserve"><value>正在初始化离线文本编辑器…</value></data>
+  <data name="EditorProcessFailed" xml:space="preserve"><value>编辑器进程中断。已传到宿主的内存文本仍保留；请另存结果后重新打开标签。</value></data>
+  <data name="EditorStartupFailed" xml:space="preserve"><value>离线编辑器无法启动。请用完整安装包安装 WebView2 Runtime 后重试。</value></data>
+  <data name="EditorMessageFailed" xml:space="preserve"><value>编辑器消息未能应用；保留当前内存文本。</value></data>
+  <data name="EditorSaveTitle" xml:space="preserve"><value>保存当前文本结果（BASE 与会话快照只读）</value></data>
+  <data name="EditorAllFilesFilter" xml:space="preserve"><value>所有文件|*.*</value></data>
+  <data name="EditorNewlinePrompt" xml:space="preserve"><value>原文件含混合换行。保存编辑结果需要统一换行。
+是：CRLF（Windows）
+否：LF
+取消：保留内存，不保存。</value></data>
+  <data name="EditorNewlineTitle" xml:space="preserve"><value>选择保存换行</value></data>
+  <data name="EditorSaveFailed" xml:space="preserve"><value>保存未完成，内存文本和未保存状态已保留。</value></data>
+  <data name="EditorUnsavedPrompt" xml:space="preserve"><value>当前文本有未保存更改。是否先保存？
+是：保存后继续；否：放弃更改；取消：留在当前文档。</value></data>
+  <data name="EditorUnsavedTitle" xml:space="preserve"><value>未保存文本</value></data>
+  <data name="EditorUnsaved" xml:space="preserve"><value>● 未保存</value></data>
+  <data name="EditorSaved" xml:space="preserve"><value>已保存 / 未编辑</value></data>
+  <data name="EditorUpdating" xml:space="preserve"><value>差异更新中</value></data>
+  <data name="EditorUnknownTarget" xml:space="preserve"><value> · 来源未确认，请另存为</value></data>
+  <data name="EditorWorkingTarget" xml:space="preserve"><value> · 已验证 SVN 工作文件</value></data>
+  <data name="EditorLocalTarget" xml:space="preserve"><value> · 明确的本地保存目标</value></data>
+  <data name="EditorHunkCountFormat" xml:space="preserve"><value>{0} 个差异块</value></data>
+  <data name="EditorStateFormat" xml:space="preserve"><value>{0} · v{1} · {2} · {3}{4}</value></data>
+  <data name="EditorFileKind" xml:space="preserve"><value>代码 / 文本</value></data>
+  <data name="EditorSummaryFormat" xml:space="preserve"><value>{0} 个差异块 · {1} 个变化行</value></data>
+  <data name="EditorComparisonFailed" xml:space="preserve"><value>文本比较未完成，内存编辑仍保留：</value></data>
+  <data name="EditorExportPending" xml:space="preserve"><value>差异更新中，请等待当前文档版本完成比较。</value></data>
+  <data name="EditorPositionFormat" xml:space="preserve"><value>块 {0} / {1}</value></data>
+  <data name="EditorEncodingAfterEdit" xml:space="preserve"><value>已有编辑内容，不能用旧快照重新解码。请保存后重新打开，再选择编码。</value></data>
+  <data name="SpreadsheetRulesTitle" xml:space="preserve"><value>工作表字段与主键规则</value></data>
+  <data name="SpreadsheetRulesHint" xml:space="preserve"><value>按文件名与工作表匹配；* 表示任意。规则只保存表格布局，不保存正文。应用后，在比较选项选择“应用并重新比较”；需要下次沿用时选择“保存当前规则”。</value></data>
+  <data name="SpreadsheetRuleFileLabel" xml:space="preserve"><value>文件名或模式（例如 W-*.xlsx）</value></data>
+  <data name="SpreadsheetRuleSheetLabel" xml:space="preserve"><value>工作表名（* 为所有工作表）</value></data>
+  <data name="SpreadsheetRuleHeaderLabel" xml:space="preserve"><value>字段名行（0 为无字段名行）</value></data>
+  <data name="SpreadsheetRuleDataLabel" xml:space="preserve"><value>数据起始行</value></data>
+  <data name="SpreadsheetRuleAuxiliaryLabel" xml:space="preserve"><value>辅助表头行（逗号分隔，例如 3,5,6）</value></data>
+  <data name="SpreadsheetRuleKeysLabel" xml:space="preserve"><value>组合主键（BASE 列名或字段名，逗号分隔）</value></data>
+  <data name="SpreadsheetRuleFrozenLabel" xml:space="preserve"><value>冻结左侧逻辑列数（不含行号，0 为不冻结）</value></data>
+  <data name="SpreadsheetRuleMappingsLabel" xml:space="preserve"><value>人工列对应（每行 BASE=当前，例如 H=H、I=J；-=I 表示新增，J=- 表示删除）</value></data>
+  <data name="SpreadsheetRuleAdd" xml:space="preserve"><value>添加新规则</value></data>
+  <data name="SpreadsheetRuleSave" xml:space="preserve"><value>保存这一条</value></data>
+  <data name="SpreadsheetRuleDelete" xml:space="preserve"><value>删除这一条</value></data>
+  <data name="SpreadsheetRuleDone" xml:space="preserve"><value>完成</value></data>
+  <data name="SpreadsheetRuleInvalidRows" xml:space="preserve"><value>请填写文件与工作表名；数据起始行须大于字段名行，且不超过 100000。</value></data>
+  <data name="SpreadsheetRuleInvalidAuxiliary" xml:space="preserve"><value>辅助表头行必须在数据起始行之前。</value></data>
+  <data name="SpreadsheetRuleInvalidMapping" xml:space="preserve"><value>列对应格式为 A=B；每侧列只能使用一次，无对应列用 -。</value></data>
+  <data name="SpreadsheetRuleListFormat" xml:space="preserve"><value>{0}
+{1} · 第 {2} 行字段</value></data>
+  <data name="SpreadsheetRuleCountFormat" xml:space="preserve"><value>工作表规则 {0} 项</value></data>
+  <data name="SpreadsheetSummaryUnitsFormat" xml:space="preserve"><value>{0} 个审阅事件 · 结构 {1} 个 · 内容单元格 {2} 个 · 仅格式单元格 {3} 个</value></data>
+  <data name="SpreadsheetMappingToolTipFormat" xml:space="preserve"><value>BASE {0} → 当前 {1} · {2}
+{3}
+{4}</value></data>
+  <data name="FindSearching" xml:space="preserve"><value>正在搜索…</value></data>
+  <data name="ComparisonCompleteRegionsFormat" xml:space="preserve"><value>比较完成：{0} 个变更区域</value></data>
+  <data name="ComparisonCompleteEventsFormat" xml:space="preserve"><value>比较完成：{0} 个审阅事件</value></data>
+</root>

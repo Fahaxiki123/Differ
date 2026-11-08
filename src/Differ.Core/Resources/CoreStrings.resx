@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="CoordinatorUnsupportedReason" xml:space="preserve"><value>没有可处理该文件格式的差异适配器。</value></data>
+  <data name="CoordinatorUnsupportedWarning" xml:space="preserve"><value>该文件格式暂不支持结构化比较。</value></data>
+  <data name="CoordinatorParseFallbackWarning" xml:space="preserve"><value>文件结构无法可靠解析，已改为字节级比较；当前结果只表示原始文件字节差异，不能解释文档或表格内容。可使用原编辑器检查文件完整性后重试。</value></data>
+  <data name="GuardTooManyPartsFormat" xml:space="preserve"><value>Office 文件包含 {0} 个部件，超过安全上限 {1}。</value></data>
+  <data name="GuardExpandedTooLargeFormat" xml:space="preserve"><value>Office 文件解压后超过安全上限 {0:N0} 字节。</value></data>
+  <data name="GuardSuspiciousRatioFormat" xml:space="preserve"><value>Office 部件 {0} 的压缩比异常（{1:N1}:1）。</value></data>
+  <data name="GuardInvalidPackageStructure" xml:space="preserve"><value>Office 文件的压缩包结构损坏，无法可靠读取文档内容。</value></data>
+</root>

@@ -1,0 +1,230 @@
+<Window x:Class="Differ.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:resources="clr-namespace:Differ.App.Resources"
+        Title="{x:Static resources:Strings.IntegrationAppTitle}"
+        Icon="Assets/Differ.ico"
+        Width="920"
+        Height="680"
+        MinWidth="720"
+        MinHeight="560"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid Background="{DynamicResource CanvasBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Padding="28,22"
+                Background="{DynamicResource MainWindow.HeaderBg}">
+            <StackPanel>
+                <TextBlock Foreground="{DynamicResource MainWindow.HeaderText}"
+                           FontSize="25"
+                           FontWeight="SemiBold"
+                           Text="{x:Static resources:Strings.IntegrationHeadline}" />
+                <TextBlock Margin="0,8,0,0"
+                           MaxWidth="790"
+                           HorizontalAlignment="Left"
+                           Foreground="{DynamicResource MainWindow.HeaderSubtext}"
+                           FontSize="13"
+                           LineHeight="20"
+                           Text="{x:Static resources:Strings.IntegrationDescription}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1"
+                      Padding="24,20"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Padding="13,10"
+                        Background="{DynamicResource MainWindow.InfoBg}"
+                        BorderBrush="{DynamicResource MainWindow.InfoBorder}"
+                        BorderThickness="1"
+                        CornerRadius="7">
+                    <TextBlock Foreground="{DynamicResource MainWindow.InfoText}"
+                               FontWeight="SemiBold"
+                               Text="{x:Static resources:Strings.IntegrationSteps}"
+                               TextWrapping="Wrap" />
+                </Border>
+
+                <Border Margin="0,14,0,0"
+                        Padding="14"
+                        Background="{DynamicResource MainWindow.ErrorBg}"
+                        BorderBrush="{DynamicResource MainWindow.ErrorBorder}"
+                        BorderThickness="1"
+                        CornerRadius="7"
+                        Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Foreground="{DynamicResource MainWindow.ErrorText}"
+                                   FontWeight="Bold"
+                                   Text="{x:Static resources:Strings.ArgumentErrorTitle}" />
+                        <TextBlock Margin="0,5,0,0"
+                                   Foreground="{DynamicResource MainWindow.ErrorText}"
+                                   Text="{Binding ErrorText}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,14,0,0"
+                        Padding="18"
+                        Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <StackPanel>
+                        <TextBlock FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding TortoiseStatus}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Margin="0,7,0,0"
+                                    Foreground="{DynamicResource MutedInkBrush}"
+                                   Text="{Binding IntegrationStatusText}"
+                                   TextWrapping="Wrap" />
+
+                        <Border Margin="0,12,0,0"
+                                Padding="10,8"
+                                Background="{DynamicResource MainWindow.WarningBg}"
+                                BorderBrush="{DynamicResource MainWindow.WarningBorder}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Visibility="{Binding HasConfigurationNotice, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Foreground="{DynamicResource MainWindow.WarningText}"
+                                       Text="{Binding ConfigurationNotice}"
+                                       TextWrapping="Wrap" />
+                        </Border>
+
+                        <Border Margin="0,12,0,0"
+                                Padding="10,8"
+                                Background="{DynamicResource MainWindow.SuccessBg}"
+                                BorderBrush="{DynamicResource MainWindow.SuccessBorder}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Visibility="{Binding HasOperationResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Foreground="{DynamicResource MainWindow.SuccessText}"
+                                       Text="{Binding OperationResult}"
+                                       TextWrapping="Wrap" />
+                        </Border>
+
+                        <StackPanel Margin="0,13,0,0"
+                                    Orientation="Horizontal">
+                            <Button Command="{Binding InstallIntegrationCommand}"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Content="{x:Static resources:Strings.InstallIntegration}" />
+                            <Button Margin="8,0,0,0"
+                                    Command="{Binding RestoreIntegrationCommand}"
+                                    Content="{x:Static resources:Strings.RestoreIntegration}" />
+                            <Button Margin="8,0,0,0"
+                                    Command="{Binding OpenTortoiseSettingsCommand}"
+                                    Content="{x:Static resources:Strings.OpenTortoiseSettings}" />
+                            <ProgressBar Width="90"
+                                         Height="4"
+                                         Margin="12,0,0,0"
+                                         VerticalAlignment="Center"
+                                         IsIndeterminate="True"
+                                         Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,12,0,0"
+                        Padding="18"
+                        Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <StackPanel>
+                        <TextBlock Foreground="{DynamicResource MutedInkBrush}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Text="{x:Static resources:Strings.ExecutablePathLabel}" />
+                        <TextBox Margin="0,6,0,0"
+                                 FontFamily="Cascadia Mono, Consolas"
+                                 FontSize="11.5"
+                                 IsReadOnly="True"
+                                 Text="{Binding ExecutablePath, Mode=OneWay}" />
+
+                        <TextBlock Margin="0,16,0,0"
+                                   Foreground="{DynamicResource MutedInkBrush}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Text="{x:Static resources:Strings.TortoiseGlobalDiffPathLabel}" />
+                        <TextBox Margin="0,6,0,0"
+                                 FontFamily="Cascadia Mono, Consolas"
+                                 FontSize="11.5"
+                                 IsReadOnly="True"
+                                 Text="{Binding TortoiseRegistryValue, Mode=OneWay}" />
+
+                        <TextBlock Margin="0,16,0,0"
+                                   Foreground="{DynamicResource MutedInkBrush}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Text="{x:Static resources:Strings.ExternalCommandLabel}" />
+                        <TextBox Margin="0,6,0,0"
+                                 MinHeight="72"
+                                 Padding="9"
+                                 FontFamily="Cascadia Mono, Consolas"
+                                 FontSize="11.5"
+                                 IsReadOnly="True"
+                                 Text="{Binding ExternalCommand, Mode=OneWay}"
+                                 TextWrapping="Wrap" />
+
+                        <TextBlock Margin="0,16,0,0"
+                                   Foreground="{DynamicResource MutedInkBrush}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Text="{x:Static resources:Strings.SupportedTypesLabel}" />
+                        <TextBlock Margin="0,6,0,0"
+                                   FontFamily="Cascadia Mono, Consolas"
+                                   FontSize="11.5"
+                                   Text="{Binding SupportedTypes}"
+                                   TextWrapping="Wrap" />
+
+                        <Expander Margin="0,16,0,0"
+                                  Header="{x:Static resources:Strings.Diagnostics}"
+                                  AutomationProperties.Name="{x:Static resources:Strings.Diagnostics}">
+                            <TextBox Margin="0,8,0,0"
+                                     Padding="9"
+                                     FontFamily="Cascadia Mono, Consolas"
+                                     FontSize="11.5"
+                                     IsReadOnly="True"
+                                     Text="{Binding DiagnosticInfo, Mode=OneWay}"
+                                     TextWrapping="Wrap" />
+                        </Expander>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2"
+                Padding="20,9"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Width="34"
+                            MinWidth="34"
+                            Margin="0,0,8,0"
+                            Padding="0"
+                            Click="ToggleTheme_Click"
+                            Content="&#xE706;"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            FontSize="14"
+                            ToolTip="{x:Static resources:Strings.ToggleThemeShortcut}" />
+                    <Button Click="Close_Click"
+                            Content="{x:Static resources:Strings.CloseWindow}" />
+                </StackPanel>
+                <TextBlock VerticalAlignment="Center"
+                           Foreground="{DynamicResource MutedInkBrush}"
+                           Text="{x:Static resources:Strings.ExternalDiffSubtitle}" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

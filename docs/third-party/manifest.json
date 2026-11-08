@@ -1,0 +1,484 @@
+[
+  {
+    "package": "BouncyCastle.Cryptography/2.4.0",
+    "license": "MIT",
+    "copyright": "Copyright © Legion of the Bouncy Castle Inc. 2000-2024",
+    "authors": "Legion of the Bouncy Castle Inc.",
+    "repository": "https://github.com/bcgit/bc-csharp",
+    "revision": "83ebf4a8054955bb4b55e081fb6a755ea8c7bb92",
+    "files": [
+      {
+        "file": "BouncyCastle.Cryptography-2.4.0-LICENSE.md",
+        "source": "NuGet package BouncyCastle.Cryptography/2.4.0/LICENSE.md",
+        "sha256": "79199a2daf23de60604dfff8dc7d9f53d16ac0cad44954a43905fec20cefdff0"
+      }
+    ]
+  },
+  {
+    "package": "CommunityToolkit.Mvvm/8.4.2",
+    "license": "MIT",
+    "copyright": "(c) .NET Foundation and Contributors. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/CommunityToolkit/dotnet",
+    "revision": "35dfe7b12da0e64384bfaec7ebc0883196a89f9f",
+    "files": [
+      {
+        "file": "CommunityToolkit.Mvvm-8.4.2-License.md",
+        "source": "NuGet package CommunityToolkit.Mvvm/8.4.2/License.md",
+        "sha256": "651997ef19dbb9ecb8dd660dbc86444a65af21f18cfe08daa69bf201cd5cfdfc"
+      },
+      {
+        "file": "CommunityToolkit.Mvvm-8.4.2-ThirdPartyNotices.txt",
+        "source": "NuGet package CommunityToolkit.Mvvm/8.4.2/ThirdPartyNotices.txt",
+        "sha256": "7774f8b0ab66bfb47ec154ce24a2d6d574febc44a74d940b8a037d1c56756163"
+      }
+    ]
+  },
+  {
+    "package": "DiffPlex/1.9.0",
+    "license": "Apache-2.0",
+    "copyright": "",
+    "authors": "Matthew Manela",
+    "repository": "https://github.com/mmanela/diffplex",
+    "revision": "3cb6415c331a0af2f2686154cb77169ef29b63ce",
+    "files": [
+      {
+        "file": "DiffPlex-1.9.0-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/mmanela/diffplex/3cb6415c331a0af2f2686154cb77169ef29b63ce/License.txt",
+        "sha256": "e3481b4f313a0c8a23e73e5163d923e96741e393e576c39d73b06979cf87a5ab"
+      }
+    ]
+  },
+  {
+    "package": "DocumentFormat.OpenXml/3.5.1",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/Open-XML-SDK",
+    "revision": "3139fdfd27414548a41555f7848d5728f6e71a42",
+    "files": [
+      {
+        "file": "DocumentFormat.OpenXml-3.5.1-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/Open-XML-SDK/3139fdfd27414548a41555f7848d5728f6e71a42/LICENSE",
+        "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    ]
+  },
+  {
+    "package": "DocumentFormat.OpenXml.Framework/3.5.1",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/Open-XML-SDK",
+    "revision": "3139fdfd27414548a41555f7848d5728f6e71a42",
+    "files": [
+      {
+        "file": "DocumentFormat.OpenXml.Framework-3.5.1-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/Open-XML-SDK/3139fdfd27414548a41555f7848d5728f6e71a42/LICENSE",
+        "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    ]
+  },
+  {
+    "package": "Enums.NET/5.0.0",
+    "license": "MIT",
+    "copyright": "Copyright © Tyler Brinkley 2016",
+    "authors": "Tyler Brinkley",
+    "repository": "https://github.com/TylerBrinkley/Enums.NET",
+    "revision": "1ce2a8836bc40c16fc99cb6ca4f4ceceba713724",
+    "files": [
+      {
+        "file": "Enums.NET-5.0.0-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/TylerBrinkley/Enums.NET/1ce2a8836bc40c16fc99cb6ca4f4ceceba713724/LICENSE.md",
+        "sha256": "516334751b7724cc4a6ff72e0717188afe021e8015b7c9ebff1da142a3c24fb0"
+      }
+    ]
+  },
+  {
+    "package": "ExtendedNumerics.BigDecimal/2025.1001.2.129",
+    "license": "MIT",
+    "copyright": "Adam White. MIT License. See License.",
+    "authors": "Adam White, Jan Christoph Bernack, Rick Harker",
+    "repository": "https://github.com/AdamWhiteHat/BigDecimal",
+    "revision": "8d3de28cf6ee59e9c6be864dacdba7d450c2a026",
+    "files": [
+      {
+        "file": "ExtendedNumerics.BigDecimal-2025.1001.2.129-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/AdamWhiteHat/BigDecimal/8d3de28cf6ee59e9c6be864dacdba7d450c2a026/LICENSE.txt",
+        "sha256": "4c9e7ff385000dd345befd7a824ab9ffba8b4d14ad4251ced26325b35a55013c"
+      }
+    ]
+  },
+  {
+    "package": "MathNet.Numerics.Signed/5.0.0",
+    "license": "MIT",
+    "copyright": "Copyright Math.NET Project",
+    "authors": "Christoph Ruegg, Marcus Cuda, Jurgen Van Gael",
+    "repository": "https://github.com/mathnet/mathnet-numerics",
+    "revision": "v5.0.0",
+    "files": [
+      {
+        "file": "MathNet.Numerics.Signed-5.0.0-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/mathnet/mathnet-numerics/v5.0.0/LICENSE.md",
+        "sha256": "8229b911632f0ef6faf651da7c9742ebedd9e29e521c5531276d4e5889900a5f"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.DependencyInjection/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.DependencyInjection-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.DependencyInjection/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.DependencyInjection.Abstractions/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.DependencyInjection.Abstractions-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.DependencyInjection.Abstractions/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.Logging/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.Logging-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.Logging/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.Logging.Abstractions/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.Logging.Abstractions-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.Logging.Abstractions/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.Logging.Debug/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.Logging.Debug-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.Logging.Debug/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.Options/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.Options-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.Options/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.Extensions.Primitives/10.0.10",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/dotnet/dotnet",
+    "revision": "f7d90799ce4ef09a0bb257852a57248d2a8fb8dd",
+    "files": [
+      {
+        "file": "Microsoft.Extensions.Primitives-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet package Microsoft.Extensions.Primitives/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      },
+      {
+        "file": "Microsoft.Extensions-10.0.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/dotnet/dotnet/f7d90799ce4ef09a0bb257852a57248d2a8fb8dd/src/runtime/LICENSE.TXT",
+        "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft.IO.RecyclableMemoryStream/3.0.1",
+    "license": "MIT",
+    "copyright": "© Microsoft Corporation. All rights reserved.",
+    "authors": "Microsoft",
+    "repository": "https://github.com/Microsoft/Microsoft.IO.RecyclableMemoryStream",
+    "revision": "e29a28387da9018fa9605a1dcb3f7a0435aa9974",
+    "files": [
+      {
+        "file": "Microsoft.IO.RecyclableMemoryStream-3.0.1-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/Microsoft/Microsoft.IO.RecyclableMemoryStream/e29a28387da9018fa9605a1dcb3f7a0435aa9974/LICENSE",
+        "sha256": "8bad94c5e25a8858e7e14f1c20c18123d72b6b80b3d8179a893045cdfaf77e7f"
+      }
+    ]
+  },
+  {
+    "package": "NPOI/2.7.4",
+    "license": "Apache-2.0",
+    "copyright": "Nissl LLC",
+    "authors": "Tony Qu,NPOI Contributors",
+    "repository": "https://github.com/nissl-lab/npoi",
+    "revision": "258ddcfce3bd6e843893bc71bd7b712587da299d",
+    "files": [
+      {
+        "file": "NPOI-2.7.4-LICENSE",
+        "source": "NuGet package NPOI/2.7.4/LICENSE",
+        "sha256": "f92377e0b22d9e7c47ae636b1c5c1e0553187db28166de2bb2533d8413bd4a7a"
+      }
+    ]
+  },
+  {
+    "package": "SharpZipLib/1.4.2",
+    "license": "MIT",
+    "copyright": "Copyright © 2000-2022 SharpZipLib Contributors",
+    "authors": "ICSharpCode",
+    "repository": "https://github.com/icsharpcode/SharpZipLib",
+    "revision": "33f64eb0f28cdd2b084cb822fcc224c7c5aba553",
+    "files": [
+      {
+        "file": "SharpZipLib-1.4.2-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/icsharpcode/SharpZipLib/33f64eb0f28cdd2b084cb822fcc224c7c5aba553/LICENSE.txt",
+        "sha256": "388e38853d88b24b4e2a65bd4a7ac316cc2cf088d08b4a25508205daa62a15a7"
+      }
+    ]
+  },
+  {
+    "package": "SixLabors.Fonts/1.0.1",
+    "license": "Apache-2.0",
+    "copyright": "Copyright © Six Labors",
+    "authors": "Six Labors and contributors",
+    "repository": "https://github.com/SixLabors/Fonts",
+    "revision": "be8883caf13f364292508274d68c39c2455ec3e2",
+    "files": [
+      {
+        "file": "SixLabors.Fonts-1.0.1-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/SixLabors/Fonts/be8883caf13f364292508274d68c39c2455ec3e2/LICENSE",
+        "sha256": "cf576c2f0e6ac1afc0f6dc130f977be83cc4db983d04b51e8f65f323f47d1b89"
+      }
+    ]
+  },
+  {
+    "package": "SixLabors.ImageSharp/2.1.10",
+    "license": "Apache-2.0",
+    "copyright": "Copyright © Six Labors",
+    "authors": "Six Labors and contributors",
+    "repository": "https://github.com/SixLabors/ImageSharp",
+    "revision": "d133ef99e8becfc3b924b0bb4315e63b8681d307",
+    "files": [
+      {
+        "file": "SixLabors.ImageSharp-2.1.10-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/SixLabors/ImageSharp/d133ef99e8becfc3b924b0bb4315e63b8681d307/LICENSE",
+        "sha256": "cf576c2f0e6ac1afc0f6dc130f977be83cc4db983d04b51e8f65f323f47d1b89"
+      }
+    ]
+  },
+  {
+    "package": "ZString/2.6.0",
+    "license": "MIT",
+    "copyright": "© Cysharp, Inc.",
+    "authors": "Cysharp",
+    "repository": "https://github.com/Cysharp/ZString",
+    "revision": "3156134075b89a162fe95350a2e92a4c85ccca59",
+    "files": [
+      {
+        "file": "ZString-2.6.0-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/Cysharp/ZString/3156134075b89a162fe95350a2e92a4c85ccca59/LICENSE",
+        "sha256": "c042a784a242932d577f7f8f0852be2d4cc1a944053888bf58f3b0469169475a"
+      }
+    ]
+  },
+  {
+    "package": "microsoft.netcore.app.runtime.win-x64/10.0.10",
+    "license": "See included license",
+    "files": [
+      {
+        "file": "microsoft.netcore.app.runtime.win-x64-10.0.10-LICENSE.TXT",
+        "source": "NuGet runtime pack microsoft.netcore.app.runtime.win-x64/10.0.10/LICENSE.TXT",
+        "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      },
+      {
+        "file": "microsoft.netcore.app.runtime.win-x64-10.0.10-THIRD-PARTY-NOTICES.TXT",
+        "source": "NuGet runtime pack microsoft.netcore.app.runtime.win-x64/10.0.10/THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      }
+    ]
+  },
+  {
+    "package": "microsoft.windowsdesktop.app.runtime.win-x64/10.0.10",
+    "license": "See included license",
+    "files": [
+      {
+        "file": "microsoft.windowsdesktop.app.runtime.win-x64-10.0.10-LICENSE",
+        "source": "NuGet runtime pack microsoft.windowsdesktop.app.runtime.win-x64/10.0.10/LICENSE",
+        "sha256": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab"
+      }
+    ]
+  },
+  {
+    "package": "Differ.Vendor.HWPF (NPOI 2.7.4-rc3 sources)",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "file": "Differ.Vendor.HWPF-LICENSE.txt",
+        "source": "src/Differ.Vendor.HWPF/LICENSE",
+        "sha256": "5603ddad0359e9ca43d7c72a32b0e7e130c9deaaf93550d20582ed23486bfe02"
+      }
+    ],
+    "modifications": "Local .NET compatibility adaptations are documented in src/Differ.Vendor.HWPF/Differ.Vendor.HWPF.csproj."
+  },
+  {
+    "package": "Microsoft.Web.WebView2/1.0.3537.50",
+    "license": "Microsoft WebView2 SDK license",
+    "files": [
+      {
+        "source": "NuGet Microsoft.Web.WebView2 1.0.3537.50",
+        "file": "Microsoft.Web.WebView2-1.0.3537.50-LICENSE.txt",
+        "sha256": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55"
+      },
+      {
+        "source": "NuGet Microsoft.Web.WebView2 1.0.3537.50",
+        "file": "Microsoft.Web.WebView2-1.0.3537.50-NOTICE.txt",
+        "sha256": "106423785c5b7eba0a8e61d1837f2132e9c828e20ad530f565d981c1df60dd90"
+      }
+    ]
+  },
+  {
+    "package": "Monaco Editor/0.52.2",
+    "license": "MIT",
+    "files": [
+      {
+        "source": "npm monaco-editor 0.52.2/LICENSE",
+        "file": "Monaco-0.52.2-LICENSE.txt",
+        "sha256": "33e4ff1a06ef62ba21788ea162564ee8165269a24a9ce6ef301837447eab0ac6"
+      }
+    ]
+  },
+  {
+    "package": "SharpSvn/1.14005.390",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "source": "https://github.com/AmpScm/SharpSvn/blob/856b1033537d771e3d4e239e6323ed000f8fe9f4/LICENSE",
+        "file": "SharpSvn-1.14005.390-LICENSE.txt",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ]
+  },
+  {
+    "package": "microsoft.netcore.app.runtime.win-x64/10.0.12",
+    "license": "See included license",
+    "files": [
+      {
+        "source": "NuGet runtime pack microsoft.netcore.app.runtime.win-x64/10.0.12/LICENSE.TXT",
+        "file": "microsoft.netcore.app.runtime.win-x64-10.0.12-LICENSE.TXT",
+        "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      },
+      {
+        "source": "NuGet runtime pack microsoft.netcore.app.runtime.win-x64/10.0.12/THIRD-PARTY-NOTICES.TXT",
+        "file": "microsoft.netcore.app.runtime.win-x64-10.0.12-THIRD-PARTY-NOTICES.TXT",
+        "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+      }
+    ]
+  },
+  {
+    "package": "microsoft.windowsdesktop.app.runtime.win-x64/10.0.12",
+    "license": "See included license",
+    "files": [
+      {
+        "source": "NuGet runtime pack microsoft.windowsdesktop.app.runtime.win-x64/10.0.12/LICENSE",
+        "file": "microsoft.windowsdesktop.app.runtime.win-x64-10.0.12-LICENSE",
+        "sha256": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab"
+      }
+    ]
+  },
+  {
+    "package": "Microsoft Visual C++ Runtime (app-local x64)/14.51.36247.0",
+    "license": "Microsoft Visual Studio 2026 distributable code license",
+    "copyright": "Copyright (c) Microsoft Corporation. All rights reserved.",
+    "modifications": "Unmodified retail vcruntime140.dll, x64, SHA256 D1F4225DF2CD877DBF130D5668A021DCE3F94118455FF5EC952061C30AFC9CE7. App-local servicing is maintained by Differ releases; no system installation.",
+    "files": [
+      {
+        "source": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual_Studio_2026-License-Community_ENU.docx",
+        "file": "Microsoft-Visual-Studio-2026-Community-LICENSE.txt",
+        "sha256": "135ec11ee7948c7b53ac93346b1893f11295a205b7000e88134ac51c33e4916a"
+      },
+      {
+        "source": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+        "file": "Microsoft-Visual-Cpp-V14-Runtime-2026-LICENSE.txt",
+        "sha256": "1ba0b353f44f1234a0091977e23bf7c93d9d56147dc2581209eb4feff3747f5c"
+      },
+      {
+        "source": "https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution?accept=text/markdown",
+        "file": "Microsoft-Visual-Studio-2026-REDIST-LICENSE.txt",
+        "sha256": "d6482a47e91ab904187b795d4b5e9271f9c08edd45ad648a8fa99c90b99c7aa0"
+      }
+    ]
+  }
+]

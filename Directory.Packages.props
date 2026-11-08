@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3537.50" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="DiffPlex" Version="1.9.0" />
+    <PackageVersion Include="DocumentFormat.OpenXml" Version="3.5.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <!--
+      NPOI 锁定在 2.7.4，禁止升级：2.8.0 起 NuGet 二进制包改按 OSMF EULA 发布，
+      2.7.5/2.7.6 又引入 NSax 依赖。.doc 解析不再使用 ScratchPad.NPOI.HWPF
+      二进制包（该包按 NPOI 2.5.6 编译，与 2.7.x 二进制不兼容），改为仓库内
+      vendored 源码项目 Differ.Vendor.HWPF（Apache-2.0）。升级 NPOI 前必须
+      重新评估许可、依赖树并全量回归 .doc 与 .xls。
+    -->
+    <PackageVersion Include="NPOI" Version="2.7.4" />
+    <PackageVersion Include="SharpSvn" Version="1.14005.390" />
+    <!-- 仅供 Differ.Vendor.HWPF（化石级 NPOI scratchpad 源码）使用 -->
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+</Project>

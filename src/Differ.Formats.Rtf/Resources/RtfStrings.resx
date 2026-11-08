@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="InvalidDocument" xml:space="preserve"><value>RTF 控制字或分组结构损坏，无法准确提取正文。</value></data>
+  <data name="InvalidByteSequence" xml:space="preserve"><value>RTF 包含无法解码的字符转义，无法准确提取正文。</value></data>
+</root>

@@ -1,0 +1,153 @@
+<UserControl x:Class="Differ.App.SpreadsheetDiffView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Differ.App.Controls"
+             xmlns:local="clr-namespace:Differ.App"
+             xmlns:resources="clr-namespace:Differ.App.Resources"
+             Background="{DynamicResource PanelBrush}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="PaneRevisionStyle" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{DynamicResource MutedInkBrush}" />
+                <Setter Property="FontSize" Value="{StaticResource Ui.MetadataFontSize}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}"
+                                 Value="{x:Static resources:Strings.RevisionUnknown}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style x:Key="WorksheetTabItemStyle" TargetType="ListBoxItem">
+                <Setter Property="MinWidth" Value="92" />
+                <Setter Property="Height" Value="{StaticResource Ui.WorksheetTabHeight}" />
+                <Setter Property="FontSize" Value="{StaticResource Ui.ToolbarFontSize}" />
+                <Setter Property="Padding" Value="12,0" />
+                <Setter Property="Margin" Value="0,0,4,0" />
+                <Setter Property="Background" Value="{DynamicResource TabRestBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource FileTab.TextBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource TabRestBorderBrush}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="Chrome"
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="{StaticResource Ui.TabCornerRadius}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource TabHoverBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource TabSelectedBrush}" />
+                                    <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource TabSelectedBorderBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <DataTemplate x:Key="WorksheetContentTemplate">
+                <local:SpreadsheetWorksheetDiffView />
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource PanelBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{StaticResource Ui.PaneHeaderRowHeight}" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" MinHeight="{StaticResource Ui.WorksheetTabBarHeight}" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"  Background="{DynamicResource PaneHeaderBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Padding="{StaticResource Ui.PaneHeaderPadding}"
+                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+                <Border.ToolTip>
+                    <StackPanel MaxWidth="640">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding BaseTitle}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding BasePath}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding BaseRevisionText}" />
+                    </StackPanel>
+                </Border.ToolTip>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}" FontSize="{StaticResource Ui.ToolbarFontSize}"
+                               Text="{x:Static resources:Strings.BaseSide}" />
+                    <TextBlock Style="{StaticResource PaneRevisionStyle}" Text="{Binding BaseRevisionText}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Padding="{StaticResource Ui.PaneHeaderPadding}"
+                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+                <Border.ToolTip>
+                    <StackPanel MaxWidth="640">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding MineTitle}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding MinePath}" TextWrapping="Wrap" />
+                        <TextBlock Margin="0,4,0,0" Text="{Binding MineRevisionText}" />
+                    </StackPanel>
+                </Border.ToolTip>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedInkBrush}" FontSize="{StaticResource Ui.ToolbarFontSize}"
+                               Text="{x:Static resources:Strings.MineSide}" />
+                    <TextBlock Style="{StaticResource PaneRevisionStyle}" Text="{Binding MineRevisionText}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Background="{DynamicResource PaneSeparatorBrush}" />
+        </Grid>
+
+        <controls:PersistentContentHost Grid.Row="1"
+                                        ContentTemplate="{StaticResource WorksheetContentTemplate}"
+                                        ItemsSource="{Binding WorksheetTabs}"
+                                        SelectedItem="{Binding SelectedWorksheet}"
+                                        TraceCategory="worksheet-switch" />
+
+        <Border Grid.Row="2"
+                Padding="8,0"
+                Background="{DynamicResource TabStripBackgroundBrush}"
+                BorderBrush="{DynamicResource TabStripBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Visibility="{Binding HasWorksheetTabs, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="2,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource StatusTextBrush}" FontSize="{StaticResource Ui.MetadataFontSize}" Text="{x:Static resources:Strings.WorksheetTabs}" />
+                <ListBox x:Name="WorksheetTabs" Grid.Column="1"
+                         Background="Transparent"
+                         Padding="0"
+                         BorderThickness="0"
+                         ItemContainerStyle="{StaticResource WorksheetTabItemStyle}"
+                         ItemsSource="{Binding WorksheetTabs}"
+                         SelectedItem="{Binding SelectedWorksheet, Mode=TwoWay}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

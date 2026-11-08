@@ -1,0 +1,37 @@
+# Version-control and local agent / IDE state
+.svn/
+.codex/
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Reproducible build, publish, package and test output
+**/bin/
+**/obj/
+**/TestResults/
+**/__pycache__/
+/artifacts/
+*.trx
+*.log
+*.dmp
+
+# Original business documents stay local; automated tests generate fixtures
+/测试用例/
+
+# Personal application data and credentials
+**/Sessions/
+**/Logs/
+**/Backups/
+Preferences.json
+TortoiseDiffToolsBackup.json
+.env
+.env.*
+*.pfx
+*.p12
+*.key
+
+# Required offline Editor assets, vendored source, licences and
+# Native/win-x64/vcruntime140.dll are intentionally tracked.

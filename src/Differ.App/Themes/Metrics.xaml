@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <!-- Theme-independent geometry. GridLength values are separate because
+         RowDefinition and ColumnDefinition cannot consume boxed doubles. -->
+    <sys:Double x:Key="Ui.ToolbarHeight">38</sys:Double>
+    <sys:Double x:Key="Ui.FileTabHeight">30</sys:Double>
+    <sys:Double x:Key="Ui.PaneHeaderHeight">28</sys:Double>
+    <sys:Double x:Key="Ui.OverviewWidth">44</sys:Double>
+    <sys:Double x:Key="Ui.StatusBarHeight">24</sys:Double>
+    <sys:Double x:Key="Ui.DetailHeaderHeight">28</sys:Double>
+    <sys:Double x:Key="Ui.DetailSplitterHeight">6</sys:Double>
+    <sys:Double x:Key="Ui.ToolbarButtonHeight">28</sys:Double>
+    <sys:Double x:Key="Ui.ToolbarIconButtonWidth">32</sys:Double>
+    <sys:Double x:Key="Ui.ToolbarIconSize">14</sys:Double>
+    <sys:Double x:Key="Ui.ToolbarFontSize">12</sys:Double>
+    <sys:Double x:Key="Ui.MetadataFontSize">11.5</sys:Double>
+    <sys:Double x:Key="Ui.SpreadsheetFontSize">13</sys:Double>
+    <sys:Double x:Key="Ui.SpreadsheetRowHeight">28</sys:Double>
+    <sys:Double x:Key="Ui.SpreadsheetHeaderHeight">28</sys:Double>
+    <sys:Double x:Key="Ui.WorksheetTabHeight">26</sys:Double>
+    <sys:Double x:Key="Ui.WorksheetTabBarHeight">28</sys:Double>
+    <sys:Double x:Key="Ui.BodyFontSize">13.5</sys:Double>
+    <sys:Double x:Key="Ui.TextLineHeight">24</sys:Double>
+    <sys:Double x:Key="Ui.PopupShadowBlur">14</sys:Double>
+    <sys:Double x:Key="Ui.PopupShadowDepth">3</sys:Double>
+    <GridLength x:Key="Ui.ToolbarRowHeight">38</GridLength>
+    <GridLength x:Key="Ui.FileTabRowHeight">30</GridLength>
+    <GridLength x:Key="Ui.PaneHeaderRowHeight">28</GridLength>
+    <GridLength x:Key="Ui.OverviewColumnWidth">44</GridLength>
+    <GridLength x:Key="Ui.StatusBarRowHeight">24</GridLength>
+    <GridLength x:Key="Ui.DetailHeaderRowHeight">28</GridLength>
+    <GridLength x:Key="Ui.DetailSplitterRowHeight">6</GridLength>
+    <GridLength x:Key="Ui.WorksheetTabRowHeight">28</GridLength>
+    <CornerRadius x:Key="Ui.ButtonCornerRadius">6</CornerRadius>
+    <CornerRadius x:Key="Ui.TabCornerRadius">4,4,0,0</CornerRadius>
+    <CornerRadius x:Key="Ui.PopupCornerRadius">8</CornerRadius>
+    <Thickness x:Key="Ui.ToolbarButtonPadding">8,3</Thickness>
+    <Thickness x:Key="Ui.ToolbarItemMargin">4,0,0,0</Thickness>
+    <Thickness x:Key="Ui.ToolbarGroupMargin">12,0,0,0</Thickness>
+    <Thickness x:Key="Ui.CellPadding">8,0</Thickness>
+    <Thickness x:Key="Ui.DetailContentPadding">8</Thickness>
+    <Thickness x:Key="Ui.PaneHeaderPadding">10,0</Thickness>
+    <Thickness x:Key="Ui.PopupPadding">12</Thickness>
+    <Thickness x:Key="Ui.TooltipPadding">8</Thickness>
+    <sys:Double x:Key="Sample.PaneHeaderHeight">36</sys:Double>
+    <GridLength x:Key="Sample.PaneHeaderRowHeight">36</GridLength>
+    <sys:Double x:Key="Sample.BodyFontSize">15</sys:Double>
+    <sys:Double x:Key="Sample.PaneTitleFontSize">14</sys:Double>
+</ResourceDictionary>

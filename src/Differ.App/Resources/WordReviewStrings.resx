@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="GroupUnresolved" xml:space="preserve"><value>变更组 · 未建立精确逐段对应</value></data>
+  <data name="GroupSplitMerge" xml:space="preserve"><value>拆分 / 合并段落</value></data>
+  <data name="GroupSummary" xml:space="preserve"><value>{0} · BASE {1} 段 → 当前 {2} 段</value></data>
+  <data name="GroupPreview" xml:space="preserve"><value>预览前 {0} 段 · 省略 BASE {1} 段 / 当前 {2} 段</value></data>
+  <data name="GroupWindow" xml:space="preserve"><value>当前窗口 {0}–{1} / {2} 段（两侧独立顺序）</value></data>
+  <data name="Expand" xml:space="preserve"><value>展开变更组</value></data>
+  <data name="Collapse" xml:space="preserve"><value>收起变更组</value></data>
+  <data name="Previous" xml:space="preserve"><value>前一段组</value></data>
+  <data name="Next" xml:space="preserve"><value>后一段组</value></data>
+  <data name="Missing" xml:space="preserve"><value>此侧无对应段落</value></data>
+  <data name="ApproximateInline" xml:space="preserve"><value>文字细化已达到预算：部分片段使用粗略高亮，完整原文仍保留。</value></data>
+  <data name="SelectCharacters" xml:space="preserve"><value>选择段内文字…</value></data>
+  <data name="SelectCharactersHint" xml:space="preserve"><value>双击或按 F2 选择段内文字；也可使用右键菜单。</value></data>
+</root>

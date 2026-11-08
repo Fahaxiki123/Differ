@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Vendored NPOI HWPF (Word 97 .doc) sources taken from the official NPOI
+    repository scratchpad/HWPF at tag 2.7.4-rc3 (nuspec confirms the released
+    2.7.4 binaries were built from this commit), Apache-2.0 (see LICENSE).
+    The upstream scratchpad still targets .NET Framework 2.0 and does not
+    compile against the released NPOI 2.7.4 binary, so this copy carries the
+    minimal documented deviations:
+    - UserModel/PictureType.cs: invalid C# PICT initializer `[][]` fixed to
+      `new byte[0][]`.
+    - Model/HWPFStream.cs: implements NPOI.Util.ILittleEndianInput (the
+      released interface name) and uses NPOI.Util.LittleEndianConsts.
+    - Model/IO/HWPFOutputStream.cs: the writer class is renamed back to its
+      Java name HWPFOutputStream to stop colliding with the reader
+      Model.HWPFStream (the C# port had given both the same name).
+    - HWPFDocument/HWPFDocumentCore/HWPFOldDocument: implement the abstract
+      POIDocument members of the released binary and use one of its real
+      constructors; in-place Write() throws NotSupportedException.
+    - Call sites updated to the released LittleEndian buffer overloads
+      (Put*/Get* with explicit offsets) and IndexOutOfBoundsException
+      replaced with IndexOutOfRangeException; Range aliases disambiguate
+      from System.Range on modern TFMs.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NPOI.HWPF</RootNamespace>
+    <AssemblyName>Differ.Vendor.HWPF</AssemblyName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <AnalysisLevel>none</AnalysisLevel>
+    <NoWarn>$(NoWarn);CS0618;CS0649;CS0414;CS0162;CS0219;CS0168;CS0067;CS0472;CS0675;CS8981;SYSLIB0014</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NPOI" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
+  </ItemGroup>
+
+</Project>

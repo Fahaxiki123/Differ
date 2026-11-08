@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AdapterMainPartMissing" xml:space="preserve"><value>DOCX 缺少主文档部件。</value></data>
+  <data name="AdapterMainDocumentEmpty" xml:space="preserve"><value>DOCX 主文档内容为空。</value></data>
+  <data name="AdapterPendingRevisionsFormat" xml:space="preserve"><value>文档包含未接受修订：插入 {0} 处，删除 {1} 处；当前按最终有效文本比较。</value></data>
+  <data name="AdapterUnsupportedBlocksFormat" xml:space="preserve"><value>文档包含 {0} 处无法解析的块级结构，已跳过并未计入比较。</value></data>
+  <data name="AdapterDocScopeOnly" xml:space="preserve"><value>.doc 仅提取正文段落与表格单元格文本；页眉页脚、图片与复杂排版不参与比较。</value></data>
+  <data name="AdapterDocTooOld" xml:space="preserve"><value>该 .doc 由 Word 95 或更早版本创建，暂不支持解析。</value></data>
+  <data name="AdapterDocEncrypted" xml:space="preserve"><value>该 .doc 已加密，无法解析。</value></data>
+  <data name="AdapterInvalidPackage" xml:space="preserve"><value>DOCX 文件结构损坏，无法读取文档内容。</value></data>
+  <data name="AdapterInvalidDoc" xml:space="preserve"><value>DOC 文件结构损坏或与扩展名不符，无法读取文档内容。</value></data>
+  <data name="AdapterBoundedAlignment" xml:space="preserve">
+    <value>部分段落区间超过局部匹配预算，已按原顺序保留为未确定对应的变更组；未执行全篇两两比较。</value>
+  </data>
+</root>
