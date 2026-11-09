@@ -70,7 +70,7 @@ public partial class MergeWindow : Window
         try
         {
             var environment = await CoreWebView2Environment.CreateAsync(null,
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ", "EditorRuntime"),
+                Path.Combine(AppRuntimeProfile.DataRoot, "EditorRuntime"),
                 new CoreWebView2EnvironmentOptions("--disable-background-networking --disable-component-update"));
             if (_closed) return;
             await Browser.EnsureCoreWebView2Async(environment);

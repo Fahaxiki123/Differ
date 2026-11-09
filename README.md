@@ -6,8 +6,9 @@
 |---|---|---|
 | **0.18.2 稳定版** | 当前已确认的GitHub源码基线；需要可靠回退时选择 | [稳定版安装包与说明](https://github.com/Fahaxiki123/Differ/releases/tag/v0.18.2) |
 | **0.20.0 测试版** | 三方冲突合并与新交互，尚未经过用户验收 | [预发布安装包与说明](https://github.com/Fahaxiki123/Differ/releases/tag/v0.20.0) |
+| **0.21.0 界面预览版** | 共用的 WPF 界面组件、组件 Gallery 和改版后的双栏文本比较 | [版本源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.0) |
 
-[查看全部历史版本](https://github.com/Fahaxiki123/Differ/releases)。测试版不替换Latest稳定版，旧安装包继续保留；请下载Release附件中的安装EXE，Source code不是安装程序。仓库为私有时，下载者需要已有仓库访问权限。当前分支包含0.20.0测试功能，稳定应用代码保留在main及v0.18.2。
+[查看全部历史版本](https://github.com/Fahaxiki123/Differ/releases)。从已发布版本的附件下载安装 EXE。当前分支包含 0.21.0 界面预览和 0.20.0 的三方合并。稳定源码见 `main` 和 `v0.18.2`。界面范围与验收记录见 [第一阶段说明](docs/ui/PHASE1.md)。
 
 Differ 是供 TortoiseSVN 调用的 Windows 外部差异查看器。
 

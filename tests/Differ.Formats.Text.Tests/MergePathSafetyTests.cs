@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Differ.Core.External;
+using Differ.Formats.Text.Resources;
 
 namespace Differ.Formats.Text.Tests;
 
@@ -26,6 +28,14 @@ public sealed class MergePathSafetyTests : IDisposable
     {
         var sessions = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ", "Sessions");
         Assert.Throws<IOException>(() => MergePathSafety.AssertOutputSafe(Path.Combine(sessions, "not-created", "result.txt"), [Write("source.txt")]));
+    }
+
+    [Fact]
+    public void PreviewProfileCannotBeAnOutput()
+    {
+        var target = Path.Combine(ExternalDiffSessionStore.PreviewProfilesPath, "test", "Sessions", "new.txt");
+        var error = Assert.Throws<IOException>(() => MergePathSafety.AssertOutputSafe(target, [Write("source.txt")]));
+        Assert.Equal(MergePathStrings.ProtectedOutput, error.Message);
     }
 
     [Theory]

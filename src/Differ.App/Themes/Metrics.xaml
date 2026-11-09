@@ -47,4 +47,6 @@
     <GridLength x:Key="Sample.PaneHeaderRowHeight">36</GridLength>
     <sys:Double x:Key="Sample.BodyFontSize">15</sys:Double>
     <sys:Double x:Key="Sample.PaneTitleFontSize">14</sys:Double>
+    <sys:Double x:Key="Editor.FontSize">15</sys:Double>
+    <sys:Double x:Key="Editor.LineHeight">24</sys:Double>
 </ResourceDictionary>

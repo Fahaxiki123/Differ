@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Differ.Core.External;
 using Differ.Formats.Text.Resources;
 using Microsoft.Win32.SafeHandles;
 
@@ -30,7 +31,8 @@ internal static class MergePathSafety
         target = NormalizeAndValidate(target);
         var sessions = Path.GetFullPath(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ", "Sessions"));
-        if (IsSameOrChild(target, sessions)) throw new IOException(MergePathStrings.ProtectedOutput);
+        if (IsSameOrChild(target, sessions) || ExternalDiffSessionStore.IsWithinPreviewProfile(target))
+            throw new IOException(MergePathStrings.ProtectedOutput);
         var parent = Path.GetDirectoryName(target);
         if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent))
             throw new DirectoryNotFoundException(MergePathStrings.MissingOutputDirectory);

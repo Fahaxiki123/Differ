@@ -25,6 +25,17 @@ public sealed class ExternalDiffSessionStore
 
     public string RootPath => _rootPath;
 
+    public static string PreviewProfilesPath => Path.GetFullPath(Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ.UIPhase1", "Profiles"));
+
+    public static bool IsWithinPreviewProfile(string fullPath)
+    {
+        var root = PreviewProfilesPath;
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        return string.Equals(fullPath, root, comparison)
+            || fullPath.StartsWith(root + Path.DirectorySeparatorChar, comparison);
+    }
+
     public async Task<ExternalDiffSession> CreateAsync(
         ExternalDiffRequest request,
         CancellationToken cancellationToken)

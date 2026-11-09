@@ -26,6 +26,7 @@ using Differ.Formats.Binary;
 using Differ.Formats.Excel;
 using Differ.Formats.Text;
 using Differ.Formats.Word;
+using Differ.UI.Controls;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -338,8 +339,8 @@ public sealed class ComparisonTemplateRuntimeTests
 
     private static void AssertToolbarFits(Grid root, DiffWindowViewModel viewModel)
     {
-        AssertPixelRoundedSize(38, root.RowDefinitions[0].ActualHeight, root);
-        AssertPixelRoundedSize(30, root.RowDefinitions[1].ActualHeight, root);
+        AssertPixelRoundedSize(40, root.RowDefinitions[0].ActualHeight, root);
+        AssertPixelRoundedSize(32, root.RowDefinitions[1].ActualHeight, root);
         var dpi = VisualTreeHelper.GetDpi(root);
         var horizontalTolerance = 1 / dpi.DpiScaleX;
         var verticalTolerance = 1 / dpi.DpiScaleY;
@@ -404,12 +405,13 @@ public sealed class ComparisonTemplateRuntimeTests
         {
             var header = Named("MinePaneHeader");
             var headerBounds = header.TransformToAncestor(root).TransformBounds(new Rect(header.RenderSize));
-            foreach (var name in new[] { "SaveButton", "SaveMenuButton" })
-            {
-                var button = Assert.IsType<Button>(Named(name));
-                var label = Assert.IsType<TextBlock>(button.Content);
-                Assert.Equal(((SolidColorBrush)button.Foreground).Color, ((SolidColorBrush)label.Foreground).Color);
-            }
+            var save = Assert.IsType<Button>(Named("SaveButton"));
+            var label = Assert.IsType<TextBlock>(save.Content);
+            Assert.Equal(((SolidColorBrush)save.Foreground).Color, ((SolidColorBrush)label.Foreground).Color);
+            var saveMenu = Assert.IsType<Button>(Named("SaveMenuButton"));
+            var icon = Assert.IsType<AppIcon>(saveMenu.Content);
+            Assert.Equal(AppIconKind.ChevronDown, icon.Kind);
+            Assert.Equal(((SolidColorBrush)saveMenu.Foreground).Color, ((SolidColorBrush)icon.Foreground).Color);
             var actionBounds = EditorActionNames.Select(name =>
             {
                 var action = Named(name);

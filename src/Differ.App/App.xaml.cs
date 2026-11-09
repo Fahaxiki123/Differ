@@ -54,6 +54,12 @@ public partial class App : Application, IDisposable
         var maintenanceOperation = IntegrationMaintenanceArguments.Parse(e.Args);
         if (maintenanceOperation != IntegrationMaintenanceOperation.None)
         {
+            if (AppRuntimeProfile.IsPreview && maintenanceOperation is IntegrationMaintenanceOperation.Install or IntegrationMaintenanceOperation.Restore)
+            {
+                Shutdown(IntegrationMaintenanceService.Failed);
+                return;
+            }
+
             var maintenance = new IntegrationMaintenanceService(
                 new SvnClientLocator(),
                 new RegistryTortoiseDiffToolConfigurationStore(),
@@ -97,11 +103,7 @@ public partial class App : Application, IDisposable
         services.AddSingleton<UserPreferencesService>();
         services.AddSingleton(
             new ExternalDiffSessionStore(
-                Path.Combine(
-                    Environment.GetFolderPath(
-                        Environment.SpecialFolder.LocalApplicationData),
-                    "Differ",
-                    "Sessions")));
+                Path.Combine(AppRuntimeProfile.DataRoot, "Sessions")));
 
         _serviceProvider = services.BuildServiceProvider();
         _serviceProvider.GetRequiredService<IThemeService>().InitializeFromSystem();
@@ -229,8 +231,7 @@ public partial class App : Application, IDisposable
         var sessionStore = provider.GetRequiredService<ExternalDiffSessionStore>();
         var logger = provider.GetRequiredService<ILogger<App>>();
         var session = await PrepareSessionAsync(sessionStore, request);
-        var instanceKey =
-            ExternalDiffInstanceCoordinator.CreateCurrentDesktopSessionKey();
+        var instanceKey = AppRuntimeProfile.CreateDiffInstanceKey();
         var coordinator = new ExternalDiffInstanceCoordinator(instanceKey);
 
         if (!coordinator.IsPrimary)

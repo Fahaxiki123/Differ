@@ -29,8 +29,7 @@ internal sealed class DiagnosticLogProvider : ILoggerProvider
 
     public DiagnosticLogProvider()
         : this(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Differ", "Logs"))
+            AppRuntimeProfile.DataRoot, "Logs"))
     {
     }
 

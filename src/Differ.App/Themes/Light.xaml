@@ -1,5 +1,9 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Differ.UI;component/Themes/Light.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <!--
         Light design tokens. This is the single source of truth for every
         semantic diff colour, chrome surface, border and text colour used in
@@ -233,4 +237,8 @@
     <SolidColorBrush x:Key="Sample.ScrollPressedBrush" Color="#8E82AF" />
     <SolidColorBrush x:Key="Sample.IndentBrush" Color="#EEEAF5" />
     <SolidColorBrush x:Key="Sample.MissingBrush" Color="#F1F0F7" />
+    <SolidColorBrush x:Key="Editor.Selection" Color="#DEE4FF" />
+    <SolidColorBrush x:Key="Editor.InactiveSelection" Color="#E9EDF6" />
+    <SolidColorBrush x:Key="Editor.Indent" Color="#E3E7EE" />
+    <SolidColorBrush x:Key="Editor.Missing" Color="#F2F4F7" />
 </ResourceDictionary>

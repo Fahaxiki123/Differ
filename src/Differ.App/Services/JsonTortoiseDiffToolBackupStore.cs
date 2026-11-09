@@ -22,8 +22,7 @@ public sealed class JsonTortoiseDiffToolBackupStore : ITortoiseDiffToolBackupSto
 
     public JsonTortoiseDiffToolBackupStore(bool throwOnInvalidBackup)
         : this(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Differ",
+            AppRuntimeProfile.DataRoot,
             "TortoiseDiffToolsBackup.json"), throwOnInvalidBackup)
     {
     }

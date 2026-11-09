@@ -4,7 +4,7 @@
 
 ## 固定保留
 
-- `src`、`tests`、`scripts`、`docs`、`installer`、解决方案/包版本/开发规范等原始文件。
+- `src`、`tests`、`samples`、`scripts`、`docs`、`installer`、解决方案/包版本/开发规范等原始文件。Gallery 项目的 `bin/obj` 按同一项目白名单清理。
 - `测试用例` 原件与 `.svn` 工作副本管理数据。
 - `artifacts/publish/Differ-win-x64`：唯一正式软件入口。
 - `artifacts/installers`：最新安装器、校验值、说明。

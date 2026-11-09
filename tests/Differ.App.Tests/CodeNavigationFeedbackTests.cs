@@ -49,7 +49,7 @@ public sealed class CodeNavigationFeedbackTests
             capture.Position = 0;
             var bitmap = new FormatConvertedBitmap(BitmapFrame.Create(capture, BitmapCreateOptions.None, BitmapCacheOption.OnLoad), PixelFormats.Bgra32, null, 0);
             var scale = double.Parse(fixture.Script("window.devicePixelRatio"), System.Globalization.CultureInfo.InvariantCulture);
-            var accent = ((SolidColorBrush)fixture.Browser.FindResource("Sample.AccentBrush")).Color;
+            var modifiedMarker = ((SolidColorBrush)fixture.Browser.FindResource("Diff.Row.Modified.Border")).Color;
             foreach (var side in geometry.RootElement.EnumerateArray())
             {
                 Assert.Equal(6, side.GetArrayLength());
@@ -71,24 +71,25 @@ public sealed class CodeNavigationFeedbackTests
                     var right = (int)Math.Ceiling((x + 5) * scale) - 1;
                     if (start)
                     {
-                        AssertRoundedCorner(bitmap, left, (int)Math.Floor(y * scale), accent);
-                        AssertRoundedCorner(bitmap, right, (int)Math.Floor(y * scale), accent);
+                        AssertRoundedCorner(bitmap, left, (int)Math.Floor(y * scale), modifiedMarker);
+                        AssertRoundedCorner(bitmap, right, (int)Math.Floor(y * scale), modifiedMarker);
                     }
                     if (end)
                     {
-                        AssertRoundedCorner(bitmap, left, (int)Math.Ceiling((y + height) * scale) - 1, accent);
-                        AssertRoundedCorner(bitmap, right, (int)Math.Ceiling((y + height) * scale) - 1, accent);
+                        AssertRoundedCorner(bitmap, left, (int)Math.Ceiling((y + height) * scale) - 1, modifiedMarker);
+                        AssertRoundedCorner(bitmap, right, (int)Math.Ceiling((y + height) * scale) - 1, modifiedMarker);
                     }
-                    AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor((y + height / 2) * scale), accent);
+                    AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor((y + height / 2) * scale), modifiedMarker);
                     if (index >= 4)
                     {
                         var previous = side[index - 1];
                         Assert.InRange(Math.Abs(y - previous.GetProperty("y").GetDouble() - previous.GetProperty("height").GetDouble()), 0, 0.1);
-                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale), accent);
-                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale) - 1, accent);
+                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale), modifiedMarker);
+                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale) - 1, modifiedMarker);
                     }
                 }
             }
+            var accent = ((SolidColorBrush)fixture.Browser.FindResource("Dui.Focus")).Color;
             fixture.Owner.MoveEditorDifference(1);
             fixture.WaitForNavigation();
             PumpUntil(() => fixture.Script("!foldSync") == "true");
@@ -169,7 +170,7 @@ public sealed class CodeNavigationFeedbackTests
             capture.Position = 0;
             var bitmap = new FormatConvertedBitmap(BitmapFrame.Create(capture, BitmapCreateOptions.None, BitmapCacheOption.OnLoad), PixelFormats.Bgra32, null, 0);
             var scale = double.Parse(fixture.Script("window.devicePixelRatio"), System.Globalization.CultureInfo.InvariantCulture);
-            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Sample.AccentBrush")).Color;
+            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Dui.Focus")).Color;
             foreach (var rail in geometry.RootElement.EnumerateArray())
             {
                 foreach (var offset in RailPixelSampleOffsets)
@@ -258,7 +259,7 @@ public sealed class CodeNavigationFeedbackTests
             capture.Position = 0;
             var bitmap = new FormatConvertedBitmap(BitmapFrame.Create(capture, BitmapCreateOptions.None, BitmapCacheOption.OnLoad), PixelFormats.Bgra32, null, 0);
             var scale = double.Parse(fixture.Script("window.devicePixelRatio"), System.Globalization.CultureInfo.InvariantCulture);
-            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Sample.AccentBrush")).Color;
+            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Dui.Focus")).Color;
             foreach (var frame in geometry.RootElement.EnumerateArray())
             {
                 var pixels = new byte[4];
@@ -410,6 +411,48 @@ public sealed class CodeNavigationFeedbackTests
         });
     }
 
+    [Fact]
+    public void ThemeSwapRefreshesSameBackgroundEditorWithoutReplacingModelOrUndoHistory()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var before = Enumerable.Range(1, 120).Select(i => $"local item{i} = {i}").ToArray();
+            var after = before.ToArray();
+            after[10] = "local item11 = 777";
+            using var fixture = new Fixture(string.Join('\n', before), string.Join('\n', after));
+            Wait(fixture.Owner.SetEditModeAsync(true));
+            fixture.Script("right.executeEdits('test',[{range:new monaco.Range(2,1,2,1),text:'-- edited\\n'}])");
+            PumpUntil(() => fixture.Owner.IsEditorDirty && fixture.Owner.CanEditorUndo && fixture.Owner.EditorResultsCurrent);
+            fixture.Script("right.setSelection(new monaco.Range(45,2,45,6));right.revealLineInCenter(45);window.themeTestModel=modified;");
+            const string state = "[modified.getValue(),modified.getAlternativeVersionId(),right.getSelection(),right.getScrollTop()]";
+            var priorState = fixture.Script(state);
+            var priorVersion = fixture.Owner.EditorSession!.Version;
+            var priorBackground = fixture.Script("document.documentElement.style.getPropertyValue('--background')");
+            Assert.Equal("\"#FFFFFF\"", priorBackground);
+            fixture.ApplyThemeWithFixedContentBrush(AppTheme.Dark);
+
+            PumpUntil(() => fixture.Script("document.body.classList.contains('dark')") == "true");
+            Assert.Equal("\"#A5B4FC\"", fixture.Script("document.documentElement.style.getPropertyValue('--focus')"));
+            Assert.Equal(priorBackground, fixture.Script("document.documentElement.style.getPropertyValue('--background')"));
+            Assert.Equal("true", fixture.Script("window.themeTestModel===modified"));
+            Assert.Equal(priorVersion, fixture.Owner.EditorSession.Version);
+            Assert.Equal(priorState, fixture.Script(state));
+            Assert.True(fixture.Owner.IsEditorDirty);
+            Assert.True(fixture.Owner.CanEditorUndo);
+
+            // A previously opened tab remains attached to the persistent host while collapsed.
+            fixture.SetEditorVisibility(Visibility.Collapsed);
+            fixture.ApplyThemeWithFixedContentBrush(AppTheme.Light);
+            PumpUntil(() => fixture.Script("!document.body.classList.contains('dark')") == "true");
+            fixture.SetEditorVisibility(Visibility.Visible);
+            Assert.Equal("true", fixture.Script("window.themeTestModel===modified"));
+            Assert.Equal(priorState, fixture.Script(state));
+            Assert.True(fixture.Owner.IsEditorDirty);
+            fixture.Owner.UndoEditor();
+            PumpUntil(() => fixture.Owner.EditorResultsCurrent && fixture.Owner.EditorSession.Text == string.Join('\n', after));
+        });
+    }
+
     private sealed class Fixture : IDisposable
     {
         private readonly SynchronizationContext? _previousContext = SynchronizationContext.Current;
@@ -456,6 +499,15 @@ public sealed class CodeNavigationFeedbackTests
         public DiffWindowViewModel Owner { get; }
         public WebView2 Browser { get; }
         public string Script(string script) => Wait(Browser.ExecuteScriptAsync(script));
+        public void ApplyThemeWithFixedContentBrush(AppTheme theme)
+        {
+            _window.Resources["Dui.Surface.Content"] = _window.FindResource("Dui.Surface.Content");
+            using var themes = ThemeTestSupport.CreateService(_window.Resources, new FakeSystemThemeMonitor(AppTheme.Light));
+            themes.Apply(theme);
+        }
+
+        public void SetEditorVisibility(Visibility visibility) => _view.Visibility = visibility;
+
         public void Resize(double width, double height) { _window.Width = width; _window.Height = height; _window.UpdateLayout(); }
         public void WaitForNavigation(int index = 0) => PumpUntil(() => Script($"activeHunk==={index}&&feedbackFrames.length===2&&feedbackFrames.every(frame=>!frame.hidden&&frame.dataset.block==='{index + 1}')") == "true");
         public void Dispose()

@@ -20,6 +20,7 @@ public static class ChromeStrings
     public static string RedoShortcut => Get();
     public static string AdvancedRules => Get();
     public static string FindContent => Get();
+    public static string PreviewIntegrationReadOnly => Get();
 
     private static string Get([CallerMemberName] string name = "") => Manager.GetString(name, Strings.Culture ?? CultureInfo.CurrentUICulture) ?? name;
 }

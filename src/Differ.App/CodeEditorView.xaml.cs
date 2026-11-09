@@ -4,7 +4,8 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows.Threading;
+using Differ.App.Presentation.Theme;
 using Differ.App.Resources;
 using Differ.App.Services;
 using Differ.App.ViewModels;
@@ -19,6 +20,10 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     public static readonly DependencyProperty ReadingScaleProperty = DependencyProperty.Register(
         nameof(ReadingScale), typeof(double), typeof(CodeEditorView),
         new FrameworkPropertyMetadata(1.0, OnReadingScaleChanged));
+
+    private static readonly DependencyProperty ThemeRevisionProperty = DependencyProperty.Register(
+        "ThemeRevision", typeof(object), typeof(CodeEditorView),
+        new FrameworkPropertyMetadata(null, OnThemeRevisionChanged));
 
     public double ReadingScale
     {
@@ -43,7 +48,13 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     private TaskCompletionSource? _modeChange;
     private string? _modeChangeId;
 
-    public CodeEditorView() => InitializeComponent();
+    private DispatcherOperation? _pendingThemeUpdate;
+
+    public CodeEditorView()
+    {
+        InitializeComponent();
+        SetResourceReference(ThemeRevisionProperty, ThemeService.ThemeRevisionKey);
+    }
 
     private void OnHeaderSizeChanged(object sender, SizeChangedEventArgs e)
     {
@@ -82,7 +93,7 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
         try
         {
             var environment = await CoreWebView2Environment.CreateAsync(null,
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ", "EditorRuntime"),
+                Path.Combine(AppRuntimeProfile.DataRoot, "EditorRuntime"),
                 new CoreWebView2EnvironmentOptions("--disable-background-networking --disable-component-update"));
             if (_disposed) return;
             await Browser.EnsureCoreWebView2Async(environment);
@@ -127,8 +138,8 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
             modified = editor.Text,
             editMode = _owner.IsEditMode,
             language = GetLanguage(_owner.Session.Request.FileTypePath),
-            dark = IsDarkTheme(),
-            palette = CreatePalette(),
+            dark = EditorThemeAdapter.IsDark(this),
+            palette = EditorThemeAdapter.CreatePalette(this, ReadingScale),
             navigationLabels = new
             {
                 currentBlock = CodeReviewStrings.CurrentBlock,
@@ -248,47 +259,32 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
         Browser.Focus();
         Send(new { type = "focus", mine });
     }
-    public void UpdateTheme() => Send(new { type = "theme", dark = IsDarkTheme(), palette = CreatePalette() });
-
-    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    public void UpdateTheme() => Send(new
     {
-        base.OnPropertyChanged(e);
-        if (e.Property == BackgroundProperty && _ready && IsLoaded && !_disposed && e.NewValue is SolidColorBrush)
-            _ = Dispatcher.BeginInvoke(new Action(() => { if (IsLoaded && !_disposed) UpdateTheme(); }));
+        type = "theme",
+        dark = EditorThemeAdapter.IsDark(this),
+        palette = EditorThemeAdapter.CreatePalette(this, ReadingScale)
+    });
+
+    private static void OnThemeRevisionChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+    {
+        var view = (CodeEditorView)sender;
+        if (!view._ready || view._disposed || view._pendingThemeUpdate is not null)
+        {
+            return;
+        }
+
+        // Read the new palette after all DynamicResource invalidations have completed.
+        // Collapsed cached editors stay attached to the persistent content host.
+        view._pendingThemeUpdate = view.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        {
+            view._pendingThemeUpdate = null;
+            if (!view._disposed)
+            {
+                view.UpdateTheme();
+            }
+        });
     }
-
-    private object CreatePalette() => new
-    {
-        background = BrushColor("Sample.SurfaceBrush"),
-        foreground = BrushColor("Sample.InkBrush"),
-        border = BrushColor("Sample.BorderBrush"),
-        focus = BrushColor("Sample.AccentBrush"),
-        chrome = BrushColor("Sample.PaneHeaderBrush"),
-        muted = BrushColor("Sample.MutedInkBrush"),
-        selection = BrushColor("Sample.SelectionBrush"),
-        inactiveSelection = BrushColor("Sample.InactiveSelectionBrush"),
-        lineNumber = BrushColor("Sample.LineNumberBrush"),
-        scrollThumb = BrushColor("Sample.ScrollThumbBrush"),
-        scrollHover = BrushColor("Sample.ScrollHoverBrush"),
-        scrollPressed = BrushColor("Sample.ScrollPressedBrush"),
-        indent = BrushColor("Sample.IndentBrush"),
-        missing = BrushColor("Sample.MissingBrush"),
-        fontSize = (double)FindResource("Sample.BodyFontSize") * ReadingScale,
-        lineHeight = (double)FindResource("Ui.TextLineHeight") * ReadingScale,
-        added = BrushColor("Diff.Row.Added.Bg"),
-        deleted = BrushColor("Diff.Row.Deleted.Bg"),
-        modified = BrushColor("Diff.Row.Modified.Bg"),
-        addedText = BrushColor("Diff.Row.Added.Border"),
-        deletedText = BrushColor("Diff.Row.Deleted.Border")
-    };
-    private string BrushColor(string key)
-    {
-        var color = (TryFindResource(key) as SolidColorBrush
-            ?? throw new InvalidOperationException($"Missing theme brush: {key}")).Color;
-        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-    }
-
-    private bool IsDarkTheme() => string.Equals(TryFindResource("Theme.Name") as string, "Dark", StringComparison.OrdinalIgnoreCase);
 
     private async Task FlushAsync()
     {
@@ -392,6 +388,9 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     {
         if (_disposed) return;
         _disposed = true;
+        _pendingThemeUpdate?.Abort();
+        _pendingThemeUpdate = null;
+        ClearValue(ThemeRevisionProperty);
         if (_owner is { } owner)
         {
             owner.EditorCommandRequested -= OnEditorCommand;

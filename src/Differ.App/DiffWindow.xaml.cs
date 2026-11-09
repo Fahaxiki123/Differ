@@ -223,6 +223,14 @@ public partial class DiffWindow : Window
         }
     }
 
+    private void FileTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ReferenceEquals(e.OriginalSource, sender) && sender is ListBox { SelectedItem: { } selected } tabs)
+        {
+            tabs.ScrollIntoView(selected);
+        }
+    }
+
     private void FilterInput_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Escape or Key.Enter)

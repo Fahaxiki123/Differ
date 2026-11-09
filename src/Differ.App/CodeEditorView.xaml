@@ -2,8 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:wv="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             xmlns:dui="clr-namespace:Differ.UI.Controls;assembly=Differ.UI"
              xmlns:resources="clr-namespace:Differ.App.Resources"
-             Loaded="OnLoaded" SizeChanged="OnHeaderSizeChanged" Background="{DynamicResource Sample.SurfaceBrush}">
+             Loaded="OnLoaded" SizeChanged="OnHeaderSizeChanged" Background="{DynamicResource Dui.Surface.Content}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,14 +12,14 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource Sample.SurfaceBrush}">
+    <Grid Background="{DynamicResource Dui.Surface.Content}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{StaticResource Sample.PaneHeaderRowHeight}" />
+            <RowDefinition Height="{StaticResource Dui.Metrics.PaneHeaderRowHeight}" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border x:Name="EditorPaneHeaders" Background="{DynamicResource Sample.PaneHeaderBrush}"
-                BorderBrush="{DynamicResource Sample.BorderBrush}" BorderThickness="0,0,0,1">
+        <Border x:Name="EditorPaneHeaders" Style="{StaticResource Dui.PaneHeader}"
+                Background="{DynamicResource Dui.Surface.Content}" Padding="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -34,12 +35,16 @@
                         </StackPanel>
                     </Grid.ToolTip>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding EditorBaseIdentity}" Foreground="{DynamicResource InkBrush}"
-                               FontSize="{StaticResource Sample.PaneTitleFontSize}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Grid.Column="1" Margin="12,0,0,0" Text="{x:Static resources:ChromeStrings.ReadOnly}"
-                               Foreground="{DynamicResource MutedInkBrush}" FontSize="{StaticResource Ui.MetadataFontSize}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding EditorBaseIdentity}" Foreground="{DynamicResource Dui.Text.Primary}"
+                               FontSize="{StaticResource Dui.Metrics.BodyFontSize}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <Border Grid.Column="1" Margin="8,0,0,0" Padding="6,2"
+                            Background="{DynamicResource Dui.State.ReadOnly}" VerticalAlignment="Center"
+                            CornerRadius="{StaticResource Dui.Metrics.SmallRadius}">
+                        <TextBlock Text="{x:Static resources:ChromeStrings.ReadOnly}"
+                                   Foreground="{DynamicResource Dui.Text.Secondary}" FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                    </Border>
                 </Grid>
-                <Border Grid.Column="1" BorderBrush="{DynamicResource PaneSeparatorBrush}" BorderThickness="1,0" />
+                <Border Grid.Column="1" BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="1,0" />
                 <Grid x:Name="MinePaneHeader" Grid.Column="2" Margin="8,0">
                     <Grid.ToolTip>
                         <StackPanel MaxWidth="700">
@@ -53,37 +58,42 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <DockPanel Margin="0,0,6,0" VerticalAlignment="Center" LastChildFill="True">
                     <TextBlock x:Name="MineSaveStatus" DockPanel.Dock="Right" Margin="8,0,0,0" Text="{Binding EditorSaveStatus}"
-                               Foreground="{DynamicResource Sample.MutedInkBrush}" FontSize="{StaticResource Ui.MetadataFontSize}" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding EditorMineIdentity}" Foreground="{DynamicResource InkBrush}"
-                               FontSize="{StaticResource Sample.PaneTitleFontSize}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                               Foreground="{DynamicResource Dui.Text.Secondary}" FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding EditorMineIdentity}" Foreground="{DynamicResource Dui.Text.Primary}"
+                               FontSize="{StaticResource Dui.Metrics.BodyFontSize}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     </DockPanel>
                     <StackPanel x:Name="EditorActions" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="UndoButton" Style="{StaticResource Sample.ToolbarButton}" Width="24" MinWidth="24" Padding="0"
-                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Content="&#xE7A7;"
+                        <Button x:Name="UndoButton" Style="{StaticResource Dui.Button.Icon}" Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
                                 Command="{Binding UndoEditorCommand}" IsEnabled="{Binding CanEditorUndo}"
-                                AutomationProperties.Name="{x:Static resources:Strings.EditorUndo}" ToolTip="{x:Static resources:ChromeStrings.UndoShortcut}" />
-                        <Button x:Name="RedoButton" Style="{StaticResource Sample.ToolbarButton}" Width="24" MinWidth="24" Padding="0" Margin="2,0,4,0"
-                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Content="&#xE7A6;"
+                                AutomationProperties.Name="{x:Static resources:Strings.EditorUndo}" ToolTip="{x:Static resources:ChromeStrings.UndoShortcut}">
+                            <dui:AppIcon Kind="Undo" />
+                        </Button>
+                        <Button x:Name="RedoButton" Style="{StaticResource Dui.Button.Icon}" Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}" Margin="2,0,4,0"
                                 Command="{Binding RedoEditorCommand}" IsEnabled="{Binding CanEditorRedo}"
-                                AutomationProperties.Name="{x:Static resources:Strings.EditorRedo}" ToolTip="{x:Static resources:ChromeStrings.RedoShortcut}" />
-                        <ToggleButton x:Name="EditModeToggle" Style="{StaticResource Sample.EditModeToggle}" Margin="0,0,6,0"
+                                AutomationProperties.Name="{x:Static resources:Strings.EditorRedo}" ToolTip="{x:Static resources:ChromeStrings.RedoShortcut}">
+                            <dui:AppIcon Kind="Redo" />
+                        </Button>
+                        <ToggleButton x:Name="EditModeToggle" Style="{StaticResource Dui.Toggle.Switch}" Margin="0,0,6,0"
                                       Content="{Binding EditorPermissionText}" IsChecked="{Binding IsEditMode, Mode=OneWay}" Command="{Binding ToggleEditModeCommand}"
                                       AutomationProperties.Name="{x:Static resources:ChromeStrings.EditMode}" ToolTip="{x:Static resources:ChromeStrings.EditModeHint}" />
-                        <Border CornerRadius="{StaticResource Ui.ButtonCornerRadius}" Background="Transparent">
+                        <Border CornerRadius="{StaticResource Dui.Metrics.ControlRadius}" Background="Transparent">
                             <StackPanel Orientation="Horizontal">
-                                <Button x:Name="SaveButton" Style="{StaticResource Sample.PrimaryButton}" MinWidth="56" Padding="6,0"
+                                <Button x:Name="SaveButton" Style="{StaticResource Dui.Button.Primary}" MinWidth="56"
+                                        MinHeight="{StaticResource Dui.Metrics.ToolbarButtonHeight}" Padding="8,0"
                                         Command="{Binding SaveEditorCommand}" IsEnabled="{Binding CanEditorSave}"
                                         ToolTip="{x:Static resources:ChromeStrings.SaveShortcut}" AutomationProperties.Name="{Binding EditorSaveActionLabel}">
                                     <TextBlock Text="{Binding EditorSaveActionLabel}" VerticalAlignment="Center"
                                                Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
                                 </Button>
-                                <Button x:Name="SaveMenuButton" Style="{StaticResource Sample.PrimaryButton}" Width="18" MinWidth="18" Padding="0" FontSize="9"
+                                <Button x:Name="SaveMenuButton" Style="{StaticResource Dui.Button.Primary}"
+                                        Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}" MinWidth="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
+                                        MinHeight="{StaticResource Dui.Metrics.ToolbarButtonHeight}" Margin="1,0,0,0" Padding="0"
                                         Click="SaveOptions_Click" IsEnabled="{Binding CanEditorSaveAs}"
                                         ToolTip="{x:Static resources:ChromeStrings.SaveOptions}" AutomationProperties.Name="{x:Static resources:ChromeStrings.SaveOptions}">
-                                    <TextBlock Text="&#xE70D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="9" VerticalAlignment="Center"
-                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                    <dui:AppIcon Kind="ChevronDown"
+                                                 Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
                                     <Button.ContextMenu>
-                                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                        <ContextMenu Style="{StaticResource Dui.ContextMenu}" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                             <MenuItem Header="{x:Static resources:Strings.EditorSaveAs}" InputGestureText="Ctrl+Shift+S"
                                                       Command="{Binding SaveEditorAsCommand}" IsEnabled="{Binding CanEditorSaveAs}" />
                                         </ContextMenu>
@@ -97,6 +107,6 @@
         </Border>
         <wv:WebView2 x:Name="Browser" Grid.Row="2" />
         <TextBlock x:Name="StartupStatus" Grid.Row="1" Text="{x:Static resources:Strings.EditorStarting}" Margin="18"
-                   TextWrapping="Wrap" Foreground="{DynamicResource InkBrush}" VerticalAlignment="Top" IsHitTestVisible="False" />
+                   TextWrapping="Wrap" Foreground="{DynamicResource Dui.Text.Primary}" VerticalAlignment="Top" IsHitTestVisible="False" />
     </Grid>
 </UserControl>

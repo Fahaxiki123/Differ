@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Differ.Core.External;
 using Differ.Core.Models;
 using Differ.Formats.Text.Resources;
 
@@ -349,6 +350,7 @@ public sealed class EditableTextSession
             || string.Equals(path, _snapshotPath, StringComparison.OrdinalIgnoreCase)
             || (_snapshotDirectory is not null && path.StartsWith(_snapshotDirectory.TrimEnd(Path.DirectorySeparatorChar)
                 + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            || ExternalDiffSessionStore.IsWithinPreviewProfile(path)
             || path.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ", "Sessions")
                 + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
             throw new IOException(TextStrings.EditorProtectedTarget);

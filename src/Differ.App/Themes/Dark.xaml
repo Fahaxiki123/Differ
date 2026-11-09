@@ -1,5 +1,9 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Differ.UI;component/Themes/Dark.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <!--
         Dark design tokens. Every key here must mirror a key in Light.xaml;
         ThemeResourceParityTests fail the build if the two dictionaries drift.
@@ -231,4 +235,8 @@
     <SolidColorBrush x:Key="Sample.ScrollPressedBrush" Color="#8875A5" />
     <SolidColorBrush x:Key="Sample.IndentBrush" Color="#302C3B" />
     <SolidColorBrush x:Key="Sample.MissingBrush" Color="#292631" />
+    <SolidColorBrush x:Key="Editor.Selection" Color="#414C79" />
+    <SolidColorBrush x:Key="Editor.InactiveSelection" Color="#353C4C" />
+    <SolidColorBrush x:Key="Editor.Indent" Color="#373E49" />
+    <SolidColorBrush x:Key="Editor.Missing" Color="#1B1E23" />
 </ResourceDictionary>

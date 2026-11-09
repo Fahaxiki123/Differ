@@ -1,6 +1,6 @@
 #requires -Version 7.0
 [CmdletBinding()]
-param([string]$LogDirectory)
+param([string]$LogDirectory, [string]$PreviewDirectory)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -16,6 +16,23 @@ $stagingDirectory = Join-Path $repositoryRoot 'artifacts\Differ-win-x64-staging'
 $previousDirectory = Join-Path $repositoryRoot 'artifacts\Differ-win-x64-previous'
 $projectPath = Join-Path $repositoryRoot 'src\Differ.App\Differ.App.csproj'
 $nugetSource = 'https://api.nuget.org/v3/index.json'
+$preview = $PSBoundParameters.ContainsKey('PreviewDirectory')
+$previewRuntime = '10.0.10'
+
+if ($preview) {
+    if ([string]::IsNullOrWhiteSpace($PreviewDirectory) -or -not [IO.Path]::IsPathFullyQualified($PreviewDirectory)) {
+        throw 'PreviewDirectory must be a new absolute directory outside the repository.'
+    }
+    $outputDirectory = [IO.Path]::TrimEndingDirectorySeparator([IO.Path]::GetFullPath($PreviewDirectory))
+    $publishRoot = [IO.Path]::GetDirectoryName($outputDirectory)
+    if (-not $publishRoot -or
+        $outputDirectory.Equals($repositoryRoot, [StringComparison]::OrdinalIgnoreCase) -or
+        $outputDirectory.StartsWith($repositoryRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+        (Test-Path -LiteralPath $outputDirectory)) {
+        throw 'PreviewDirectory must be a new absolute directory outside the repository.'
+    }
+    $stagingDirectory = Join-Path $publishRoot ('.differ-preview-staging-' + [Guid]::NewGuid().ToString('N'))
+}
 
 function Assert-NoReparsePath {
     param([Parameter(Mandatory)][string]$Path, [switch]$IncludeChildren)
@@ -52,6 +69,18 @@ function Assert-ArtifactPath {
     Assert-NoReparsePath -Path $resolved -IncludeChildren
 }
 
+function Assert-StagingPath {
+    if ($preview) {
+        if ([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($stagingDirectory)) -ne $publishRoot -or
+            [IO.Path]::GetFileName($stagingDirectory) -notmatch '^\.differ-preview-staging-[0-9a-f]{32}$') {
+            throw "Unexpected preview staging directory: $stagingDirectory"
+        }
+        Assert-NoReparsePath -Path $stagingDirectory -IncludeChildren
+    } else {
+        Assert-ArtifactPath -Path $stagingDirectory -RelativePath 'artifacts\Differ-win-x64-staging'
+    }
+}
+
 if ([string]::IsNullOrWhiteSpace($LogDirectory)) {
     $LogDirectory = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Differ\WorkspaceMaintenance'
 }
@@ -72,19 +101,24 @@ try {
     try { $ownsMutex = $maintenanceMutex.WaitOne(0) }
     catch [Threading.AbandonedMutexException] { $ownsMutex = $true }
     if (-not $ownsMutex) { throw 'Another publication, packaging or cleanup operation is using this repository. Retry after it finishes.' }
-    Assert-ArtifactPath -Path $outputDirectory -RelativePath 'artifacts\publish\Differ-win-x64'
-    Assert-ArtifactPath -Path $stagingDirectory -RelativePath 'artifacts\Differ-win-x64-staging'
-    Assert-ArtifactPath -Path $previousDirectory -RelativePath 'artifacts\Differ-win-x64-previous'
-    if (Test-Path -LiteralPath $previousDirectory) {
-        throw "A previous publication needs recovery before retrying: $previousDirectory. It has not been deleted."
-    }
-    foreach ($entry in @(Get-ChildItem -LiteralPath $publishRoot -Force -ErrorAction SilentlyContinue)) {
-        if (-not [string]::Equals($entry.FullName, $outputDirectory, [StringComparison]::OrdinalIgnoreCase)) {
-            throw "Unexpected item in the publish directory; classify it before publishing: $($entry.FullName)"
+    Assert-StagingPath
+    if ($preview) {
+        Assert-NoReparsePath -Path $outputDirectory
+        if (Test-Path -LiteralPath $stagingDirectory) { throw 'Unexpected occupied preview staging path.' }
+    } else {
+        Assert-ArtifactPath -Path $outputDirectory -RelativePath 'artifacts\publish\Differ-win-x64'
+        Assert-ArtifactPath -Path $previousDirectory -RelativePath 'artifacts\Differ-win-x64-previous'
+        if (Test-Path -LiteralPath $previousDirectory) {
+            throw "A previous publication needs recovery before retrying: $previousDirectory. It has not been deleted."
         }
-    }
-    if ($null -ne (Get-Process -Name 'Differ.App' -ErrorAction SilentlyContinue)) {
-        throw 'Close all Differ windows before publishing.'
+        foreach ($entry in @(Get-ChildItem -LiteralPath $publishRoot -Force -ErrorAction SilentlyContinue)) {
+            if (-not [string]::Equals($entry.FullName, $outputDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+                throw "Unexpected item in the publish directory; classify it before publishing: $($entry.FullName)"
+            }
+        }
+        if ($null -ne (Get-Process -Name 'Differ.App' -ErrorAction SilentlyContinue)) {
+            throw 'Close all Differ windows before publishing.'
+        }
     }
 
     # The staging path is disposable even if restore fails; the current release
@@ -93,12 +127,16 @@ try {
     if (Test-Path -LiteralPath $stagingDirectory) {
         Remove-Item -LiteralPath $stagingDirectory -Recurse -Force
     }
-    dotnet restore $projectPath -r win-x64 --source $nugetSource -p:NuGetAudit=false
+    $previewProperties = @()
+    if ($preview) {
+        $previewProperties = @('-p:DifferIsolatedPreview=true', "-p:RuntimeFrameworkVersion=$previewRuntime", '-p:SelfContained=true')
+    }
+    dotnet restore $projectPath -r win-x64 --source $nugetSource -p:NuGetAudit=false @previewProperties
     if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed with exit code $LASTEXITCODE." }
     New-Item -ItemType Directory -Path $publishRoot -Force | Out-Null
-    dotnet publish $projectPath -c Release -r win-x64 --self-contained true --no-restore -p:PublishSingleFile=false -o $stagingDirectory
+    dotnet publish $projectPath -c Release -r win-x64 --self-contained true --no-restore -p:PublishSingleFile=false @previewProperties -o $stagingDirectory
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE." }
-    Assert-ArtifactPath -Path $stagingDirectory -RelativePath 'artifacts\Differ-win-x64-staging'
+    Assert-StagingPath
     $stagedExecutablePath = Join-Path $stagingDirectory 'Differ.App.exe'
     if (-not (Test-Path -LiteralPath $stagedExecutablePath -PathType Leaf)) {
         throw "Staged executable was not created: $stagedExecutablePath"
@@ -107,6 +145,20 @@ try {
         $null = Get-Content -LiteralPath (Join-Path $stagingDirectory $json) -Raw | ConvertFrom-Json
     }
     & (Join-Path $PSScriptRoot 'collect-third-party-notices.ps1') -PublishDirectory $stagingDirectory
+    if ($preview) {
+        $previewExeName = 'Differ.Phase1.Preview.exe'
+        Rename-Item -LiteralPath $stagedExecutablePath -NewName $previewExeName
+        Assert-StagingPath
+        Assert-NoReparsePath -Path $outputDirectory
+        [IO.Directory]::Move($stagingDirectory, $outputDirectory)
+        $executablePath = Join-Path $outputDirectory $previewExeName
+        [pscustomobject]@{
+            Executable = $executablePath
+            Version = (Get-Item -LiteralPath $executablePath).VersionInfo.ProductVersion
+            Log = $logPath
+        }
+        return
+    }
     Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs\INSTALLATION.md') -Destination (Join-Path $stagingDirectory '新电脑安装与SVN说明.txt')
 
     $previousMoved = $false
@@ -163,7 +215,7 @@ catch {
 finally {
     try {
         if ($cleanupStaging -and (Test-Path -LiteralPath $stagingDirectory)) {
-            Assert-ArtifactPath -Path $stagingDirectory -RelativePath 'artifacts\Differ-win-x64-staging'
+            Assert-StagingPath
             Remove-Item -LiteralPath $stagingDirectory -Recurse -Force
         }
     }

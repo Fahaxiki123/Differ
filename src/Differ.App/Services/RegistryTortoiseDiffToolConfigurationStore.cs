@@ -23,6 +23,7 @@ public sealed class RegistryTortoiseDiffToolConfigurationStore :
 
     public void WriteGlobal(string command)
     {
+        AppRuntimeProfile.EnsureIntegrationWritable();
         ArgumentException.ThrowIfNullOrWhiteSpace(command);
 
         using var key = Registry.CurrentUser.CreateSubKey(
@@ -36,6 +37,7 @@ public sealed class RegistryTortoiseDiffToolConfigurationStore :
 
     public void DeleteGlobal()
     {
+        AppRuntimeProfile.EnsureIntegrationWritable();
         using var key = Registry.CurrentUser.OpenSubKey(
             RegistryPath,
             writable: true);
@@ -56,6 +58,7 @@ public sealed class RegistryTortoiseDiffToolConfigurationStore :
 
     public void Write(string extension, string command)
     {
+        AppRuntimeProfile.EnsureIntegrationWritable();
         ArgumentException.ThrowIfNullOrWhiteSpace(extension);
         ArgumentException.ThrowIfNullOrWhiteSpace(command);
 
@@ -67,6 +70,7 @@ public sealed class RegistryTortoiseDiffToolConfigurationStore :
 
     public void Delete(string extension)
     {
+        AppRuntimeProfile.EnsureIntegrationWritable();
         ArgumentException.ThrowIfNullOrWhiteSpace(extension);
 
         using var key = Registry.CurrentUser.OpenSubKey(

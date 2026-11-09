@@ -30,8 +30,7 @@ public sealed class UserPreferencesService : ObservableObject, IDisposable
     public UserPreferencesService(string? path = null)
     {
         _path = Path.GetFullPath(path ?? Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Differ", "Preferences.json"));
+            AppRuntimeProfile.DataRoot, "Preferences.json"));
     }
 
     public double ReadingScale { get => _readingScale; set => SetProperty(ref _readingScale, Clamp(value, 0.8, 1.6, 1)); }

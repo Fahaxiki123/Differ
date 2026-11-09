@@ -36,6 +36,8 @@ docs 中历史验收的 E:/D: 路径是开发机器的证据索引，不是构�
 
 `pwsh -NoProfile -File scripts/publish.ps1` 生成唯一自包含目录 `artifacts/publish/Differ-win-x64`，不自动修改 SVN 配置。
 
+界面第一阶段试用使用显式隔离模式。指定一个尚不存在的仓库外目录，例如 `pwsh -NoProfile -File scripts/publish.ps1 -PreviewDirectory D:\Differ-UI-Trial`。该模式产生 `Differ.Phase1.Preview.exe`，使用独立应用数据和比较进程管道，禁用写入 TortoiseSVN 绑定。Gallery 可用 `dotnet run --project samples/Differ.UI.Gallery/Differ.UI.Gallery.csproj -c Release` 启动。验收和试用入口见 [界面体系第一阶段](ui/PHASE1.md)。
+
 离线安装器不是普通 build/test 的前置条件。生成安装器还需准备被 `.gitignore` 排除的大型打包输入：NSIS 3.12 编译器及 Microsoft WebView2 x64 Evergreen Standalone 安装程序。具体路径、官方来源和锁定校验要求见 [installer/README.md](../installer/README.md) 与 build-installer.ps1；缺少输入时应明确失败，不能用在线 Bootstrapper 替代离线运行库。
 
 本仓库没有为用户自有代码自动新增开源许可证；第三方组件继续遵守各自许可。改变仓库可见性或对外授权前应单独确认。

@@ -16,4 +16,5 @@
   <data name="RedoShortcut" xml:space="preserve"><value>重做（Ctrl+Y）</value></data>
   <data name="AdvancedRules" xml:space="preserve"><value>高级比较规则…</value></data>
   <data name="FindContent" xml:space="preserve"><value>查找内容</value></data>
+  <data name="PreviewIntegrationReadOnly" xml:space="preserve"><value>隔离预览禁止修改 TortoiseSVN 设置。</value></data>
 </root>

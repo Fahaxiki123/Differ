@@ -35,6 +35,7 @@ public interface ISystemThemeMonitor
 public sealed class ThemeService : IThemeService
 {
     private const string ThemeNameKey = "Theme.Name";
+    internal const string ThemeRevisionKey = "Theme.Revision";
 
     private readonly ResourceDictionary _applicationResources;
     private readonly Dispatcher _dispatcher;
@@ -73,6 +74,9 @@ public sealed class ThemeService : IThemeService
         _dispatcher.VerifyAccess();
 
         var replacement = LoadThemeDictionary(theme);
+        // A distinct marker lets renderers observe a complete resource swap without
+        // depending on a background changing or holding per-view event subscriptions.
+        replacement[ThemeRevisionKey] = new object();
         var dictionaries = _applicationResources.MergedDictionaries;
         var existingIndex = FindThemeDictionaryIndex(dictionaries);
         if (existingIndex >= 0)

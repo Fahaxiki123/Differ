@@ -57,7 +57,7 @@ public sealed class TabStripOverflowLayoutTests
                 : window.FindName("FileTabs"));
             var root = Assert.IsType<Grid>(spreadsheet is not null ? spreadsheet.Content : window.Content);
             var tabRow = root.RowDefinitions[worksheet ? 2 : 1];
-            var compactHeight = worksheet ? 28d : 30d;
+            var compactHeight = worksheet ? 28d : 32d;
             // Use the production templates without starting file parsing or
             // replacing their selection bindings with incompatible view models.
             BindingOperations.ClearBinding(tabs, ItemsControl.ItemsSourceProperty);
@@ -78,7 +78,7 @@ public sealed class TabStripOverflowLayoutTests
                 AssertTabFitsViewport(tabs, items[0], scroll);
 
                 tabs.SelectedIndex = items.Length - 1;
-                tabs.ScrollIntoView(items[^1]);
+                if (worksheet) tabs.ScrollIntoView(items[^1]);
                 FlushLayout(window);
                 Assert.True(scroll.HorizontalOffset > 0);
                 Assert.Same(items[^1], tabs.SelectedItem);

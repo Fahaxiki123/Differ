@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using Differ.App.Presentation.Theme;
 using Differ.App.Services;
 
 namespace Differ.App.Tests;
@@ -91,6 +92,19 @@ public sealed class ThemeRuntimeTests
             Assert.Equal(
                 "Dark",
                 ThemeTestSupport.FindResource(resources, "Theme.Name"));
+        });
+    }
+
+    [Fact]
+    public void EditorCssBrushConversionUsesRgbaAndRespectsOpacity()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var opaque = new SolidColorBrush(Color.FromRgb(0x12, 0x34, 0x56));
+            var translucent = new SolidColorBrush(Color.FromArgb(0xA0, 0x12, 0x34, 0x56)) { Opacity = 0.5 };
+
+            Assert.Equal("#123456", EditorThemeAdapter.ToCssHex(opaque));
+            Assert.Equal("#12345650", EditorThemeAdapter.ToCssHex(translucent));
         });
     }
 

@@ -65,10 +65,12 @@ function Record-Pass([string]$Name) {
 
 try {
     $root = New-Workspace 'allowlist'
+    Write-FixtureFile $root 'samples\Gallery\Gallery.csproj' '<Project Sdk="Microsoft.NET.Sdk" />'
     $generated = @('src\Example\bin', 'src\Example\obj', 'scripts\__pycache__',
+        'samples\Gallery\bin', 'samples\Gallery\obj',
         'artifacts\packaging\2026-09-25\tooling\build', 'artifacts\Differ-win-x64-staging')
     foreach ($directory in $generated) { Write-FixtureFile $root ($directory + '\generated.dat') 'rebuildable' }
-    $protected = @('src\Example\Main.cs', '.svn\pristine\original', '测试用例\original.docx',
+    $protected = @('src\Example\Main.cs', 'samples\Gallery\MainWindow.xaml', '.svn\pristine\original', '测试用例\original.docx',
         'artifacts\publish\Differ-win-x64\keep.dll', 'artifacts\installers\Differ-Setup.exe',
         'artifacts\packaging\2026-10-24\webview2\MicrosoftEdgeWebView2RuntimeInstallerX64.exe')
     foreach ($path in $protected) { Write-FixtureFile $root $path }
@@ -76,7 +78,7 @@ try {
     Assert-True ($inspect.ExitCode -eq 0) "Inspect failed: $($inspect.Stderr)"
     foreach ($path in $generated) { Assert-True (Test-Path -LiteralPath (Join-Path $root $path)) 'Inspect changed a target.' }
     $inspection = Get-Content -LiteralPath $inspect.Report -Raw | ConvertFrom-Json
-    Assert-True ($inspection.Targets.Count -eq 5 -and $inspection.RemovedBytes -eq 0) 'Inspect did not report the exact plan.'
+    Assert-True ($inspection.Targets.Count -eq $generated.Count -and $inspection.RemovedBytes -eq 0) 'Inspect did not report the exact plan.'
     Record-Pass 'Default inspection is read-only and reports exact allowlist'
 
     $check = Invoke-Cleaner $root @('-Check')
