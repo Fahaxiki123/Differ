@@ -6,9 +6,9 @@
 
 更新日期：2026-11-13。
 
-[查看 0.21.18 源码](https://github.com/Fahaxiki123/Differ/tree/codex/ui-system-phase1) · [完整版本说明](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/UI-0.21.18.md) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
+**[下载 0.21.18 Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)** · [版本说明与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.18) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
 
-0.21.18 已完成本机测试及用户初步试用，目前提供源码，**该版本安装包尚未发布**。最新源码位于 `codex/ui-system-phase1` 分支，默认 `main` 保留原稳定源码。已发布安装包统一从历史版本页面获取。
+0.21.18 开发预览安装包已发布，约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名；已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。程序测试、安装包校验及未验证范围见[安装包交付记录](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/RELEASE-0.21.18.md)。开发源码位于 `codex/ui-system-phase1`，默认 `main` 保留原稳定应用代码。
 
 ### 本次更新
 
