@@ -1,18 +1,26 @@
 # Differ
 
-## 下载版本
+面向 Windows 的文件差异查看工具，支持代码、文本、Word、Excel 和三方文本合并，可直接打开本地文件或从 TortoiseSVN 调用。
 
-| 版本 | 用途 | 下载 |
-|---|---|---|
-| **0.18.2 稳定版（推荐）** | 本主分支已有稳定源码；需要回退时选择 | [Windows x64安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.18.2/Differ-0.18.2-win-x64-Setup.exe) · [说明及校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.18.2) |
-| **0.20.0 测试版（Pre-release）** | 三方冲突合并与交互优化，尚未经过用户验收 | [Windows x64安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.20.0/Differ-0.20.0-win-x64-Setup.exe) · [说明及校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.20.0) |
+## 最新开发版：0.21.18
 
-[全部历史版本](https://github.com/Fahaxiki123/Differ/releases)。旧稳定版安装包继续保留，测试版不会替换Latest。0.18.2安装包按该稳定源码重新构建；请下载EXE附件，GitHub的Source code是源码而不是安装程序。
+更新日期：2026-11-13。
 
-当前main保留0.18.2应用代码。0.20.0源码位于[独立测试分支](https://github.com/Fahaxiki123/Differ/tree/codex/preview-0.20.0)，不会自动合入main。安装器是原位替换，安装前请关闭Differ；仓库保持私有，下载者需要已有访问权限。
+[查看 0.21.18 源码](https://github.com/Fahaxiki123/Differ/tree/codex/ui-system-phase1) · [完整版本说明](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/UI-0.21.18.md) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
 
+0.21.18 已完成本机测试及用户初步试用，目前提供源码，**该版本安装包尚未发布**。最新源码位于 `codex/ui-system-phase1` 分支，默认 `main` 保留原稳定源码。已发布安装包统一从历史版本页面获取。
 
-Differ 是供 TortoiseSVN 调用的 Windows 外部差异查看器。
+### 本次更新
+
+- **主题切换**：修复右上角窗口按钮区域的矩形接缝，以及语法文字残留旧主题颜色的问题；支持连续和快速反向切换。
+- **窗口交互**：完善最小化、最大化、还原和关闭按钮的按住、拖出、取消与恢复行为，保留 Windows 11 贴靠菜单及未保存关闭保护。
+- **精确查找**：正确定位 BASE 或右侧的实际命中范围，长行结果自动进入可见区域，连续查找保持输入焦点。
+- **另存提示**：显示实际保存目标，区分原始比较来源，并说明 F5 刷新读取的文件。
+- **比较状态**：修复差异概览更新时的异步状态问题，主题切换保留文档内容、选区和撤销历史。
+
+713 项自动测试全部通过；本机实测覆盖双向主题切换、窗口按钮、贴靠菜单、保存与关闭保护、窄窗和 150% 阅读缩放。构建保留既有依赖审计告警，测试条件及未验证范围见完整版本说明。
+
+## 使用方式
 
 真实使用流程：
 
@@ -29,6 +37,8 @@ Differ 不扫描工作副本、不维护提交文件列表，也不执行提交�
 
 ## 当前支持
 
+- 三方文本合并核心样板：共同基础/我的/对方只读，独立结果；自动合并不冲突修改、逐块采纳、手工确认、撤销重做、安全保存。合并使用独立进程等待用户完成，普通双栏多标签不变。
+- 直接启动后可选择两个本地文件比较，或选择三方文本与结果路径。当前 SVN 合并绑定保持原状，集成页提供可复制命令模板。
 - 常见代码及纯文本的行级差异、编码和换行提示。
 - 代码及纯文本使用双侧完整 Monaco 文档，默认只读；开启编辑模式后右侧可连续编辑，BASE始终只读。支持语法、搜索、按块导航、中缝采用左侧块、撤销重做与独立安全保存；关闭模式保留未保存内容和历史。差异由宿主有界 DiffPlex 统一计算。
 - `.docx` 的段落、表格、页眉页脚、图片哈希和修订提示。
@@ -45,38 +55,14 @@ Differ 不扫描工作副本、不维护提交文件列表，也不执行提交�
 - Word/Excel 默认只比较内容、值与公式，单纯格式变化不计为内容差异。
 - 左右表格严格共用列宽和行高，并同步横向、纵向滚动；支持显示/隐藏未修改项和上一个/下一个差异。
 - BASE/当前文件信息压缩为单行表头，提示收纳到状态栏，尽可能把空间留给比较内容。
-- 界面使用中性灰/石墨双主题、紧凑标签与工具栏、弱化的左侧缩略预览；文本详情首次默认折叠，Excel 首次紧凑展开，用户选择与旧详情高度会保留。
+- 界面使用中性灰/石墨双主题、紧凑标签与工具栏、右侧差异导航轨；文本详情首次默认折叠，Excel 首次紧凑展开，用户选择与旧详情高度会保留。
 - TortoiseSVN 两侧显示名称和修订信息。
 
 后续 TortoiseSVN 调用会先保存独立的 BASE/MINE 会话快照，再把请求交给已经运行的主窗口，避免 TortoiseSVN 清理临时 BASE 后导致已打开标签失效。
 
-## 0.18.2 圆角与启动入口修正
-
-普通及选中差异标记统一圆角，补充分散Markdown差异的实际像素验收，并核对开始菜单与已安装程序版本。见 [纠正记录](docs/UI-0.18.2.md)。
-
-## 0.18.0 文本比较样板
-
-按用户参考图调整阅读/编辑操作分组，修复查找被正文遮挡，统一文本样板浅深色状态。试用、同尺寸前后画面和验证范围见 [样板交付](docs/UI-0.18.0.md)，后续界面工作遵循 [界面规范](docs/UI_GUIDELINES.md)。
-
-## 0.17.1 编辑闪烁修复
-
-修复连续输入时整页差异背景、字符高亮和概览反复清空再恢复的问题；稳定更新标记与对齐空区，保留光标、选区和撤销历史。重算期间仍禁用过期差异操作。验证与限制见 [修复记录](docs/FIX-0.17.1.md)。
-
-## 0.17.0 紧凑工具栏与编辑模式
-
-按已确认方案统一保存/撤销/重做、全部/差异/上下文选中按钮、差异导航和编辑模式；移除代码视图内部按钮行和重复说明栏。双侧标题对称显示来源、读写性与保存状态，当前块由双侧框、中缝箭头和单行状态定位。高级规则收进更多菜单，既有安全保存与Office只读边界保留。交付记录见 [0.17.0 实施报告](docs/UI-0.17.0.md)。
-
-## 0.16.1 使用反馈修复
-
-修复 Word 列表编号/项目符号压住正文，以及代码块切换后当前块边框被差异底色遮住的问题。代码现有双侧当前块边框与原始行范围提示；真实 Word 模板宽/窄窗口已验证。详情与截图见 [0.16.1 修复记录](docs/repair-2026-10-24/HOTFIX-0.16.1.md)。
-
-## 0.16.0 修复交付
-
-本轮修复说明、编号验收、性能和证据见 [修复交付报告](docs/repair-2026-10-24/DELIVERY.md)。Excel/Word继续只读，代码与普通文本右侧可编辑。未知/历史来源默认另存；新SVN协议同时验证本地工作文件及快照哈希后允许原位保存。已有绑定不会自动改写，需在集成页主动重新绑定才能启用新来源标记。
-
 ## 快捷键
 
-左侧缩略预览可悬停查看真实双侧内容，单击或拖动定位，滚轮滚动正文；可视范围会随正文滚动变化。显示范围提供“全部内容 / 仅差异 / 差异上下文”，上下文模式保留变化前后 3 行，点击折叠提示可展开。
+右侧差异导航轨可悬停查看双侧内容，单击或拖动定位，滚轮滚动正文；可视范围会随正文滚动变化。显示范围提供“全部内容 / 仅差异 / 差异上下文”，上下文模式保留变化前后 3 行，点击折叠提示可展开。
 
 Excel/CSV 可在更多菜单的高级规则中指定关键列，例如 `A` 或 `A,C`。Excel 空键/重复键只局部降级，已确认的唯一键保持对应；CSV继续兼容原有对齐。Excel可在工作表规则中配置字段行、辅助行、数据起始、人工列对应、组合键与冻结列。当前规则与尚未应用的修改会明确显示；可在菜单中保存为该格式的预设，或恢复默认。
 
@@ -118,7 +104,7 @@ TortoiseSVN“设置 → 差异查看器”主页面确认或手动修改当前�
 .\Differ.App.exe "C:\temp\base.xlsx" "C:\work\current.xlsx"
 ```
 
-直接无参数运行应用时，只显示集成状态、安装/恢复操作和故障排查信息。
+直接无参数运行时，可选择本地双文件比较或三方文本合并，并查看集成状态与故障排查信息。
 
 集成页底部可展开“版本与诊断信息”。运行日志只记录受控的事件信息和异常类型，不保存文件正文、单元格值或完整路径。
 
@@ -128,9 +114,9 @@ TortoiseSVN“设置 → 差异查看器”主页面确认或手动修改当前�
 
 ### 离线安装包
 
-从 0.15.0 起提供正式应用图标与当前用户离线安装包 `artifacts/installers/Differ-Setup.exe`，面向 Windows 10/11 x64。内含 .NET 运行组件；无需 Office 或开发环境。TortoiseSVN 仍由用户或公司 IT 单独安装。
+可构建带正式应用图标的当前用户离线安装包 `artifacts/installers/Differ-Setup.exe`，面向 Windows 10/11 x64。内含 .NET 运行组件；无需 Office 或开发环境。TortoiseSVN 仍由用户或公司 IT 单独安装。
 
-SVN 绑定是默认不勾选的可选项，按目标电脑的实际安装路径生成配置，先备份其原有工具及支持扩展名的高级覆盖。卸载仅恢复该安装位置持有的绑定，并保护安装后的人为修改。公司电脑的安装、绑定、升级和卸载步骤见 [离线安装说明](docs/INSTALLATION.md)。
+SVN 绑定是默认不勾选的可选项，按目标电脑的实际安装路径生成配置，先备份其原有工具及支持扩展名的高级覆盖。卸载仅恢复该安装位置持有的绑定，并保护安装后的人为修改。公司电脑的安装、绑定、升级和卸载步骤见 [离线安装说明](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/INSTALLATION.md)。
 
 生成安装包前先运行下面的发布脚本，再运行 `scripts/build-installer.ps1`。安装器与 SHA-256 文件放在独立的 `artifacts/installers`，不混入软件发布目录。当前安装包未数字签名，企业白名单策略需由公司 IT 审核。
 
@@ -152,7 +138,7 @@ pwsh -NoProfile -File .\scripts\publish.ps1
 
 ## 开发验证
 
-从GitHub克隆后的依赖、源码边界与构建步骤见 [干净源码构建说明](docs/BUILDING.md)。默认测试不需要原始业务文档。
+从GitHub克隆后的依赖、源码边界与构建步骤见 [干净源码构建说明](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/BUILDING.md)。默认测试不需要原始业务文档。
 
 ```powershell
 dotnet restore
@@ -161,12 +147,10 @@ dotnet test .\Differ.sln -c Release
 dotnet format .\Differ.sln --verify-no-changes
 ```
 
-项目长期规范见 [`docs/DEVELOPMENT_SPEC.md`](docs/DEVELOPMENT_SPEC.md)。
+项目长期规范见 [`docs/DEVELOPMENT_SPEC.md`](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/DEVELOPMENT_SPEC.md)。
 
 ## 每次任务结束的目录收尾
 
 完整验证与清理使用 PowerShell 7：`pwsh -NoProfile -File scripts/verify-and-clean.ps1`。它运行 Release build/test、格式检查，无论验证是否成功都清理有明确白名单的输出，并执行目录检查；日志与测试结果保存在项目外。失败时先修问题，再重跑，不能将未通过的清理当作完成。
 
-单独检查使用 `scripts/clean-workspace.ps1 -Check`，清理使用 `-Apply`。历史设计、源码快照、性能基线和截图已迁往项目外，见 [归档索引](docs/ARCHIVE_INDEX.md)。正式程序与安装包仍在原固定路径。详细保留/清理边界见 [目录维护规则](docs/WORKSPACE_HYGIENE.md)。
-
-
+单独检查使用 `scripts/clean-workspace.ps1 -Check`，清理使用 `-Apply`。历史设计、源码快照、性能基线和截图已迁往项目外，见 [归档索引](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/ARCHIVE_INDEX.md)。正式程序与安装包仍在原固定路径。详细保留/清理边界见 [目录维护规则](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/WORKSPACE_HYGIENE.md)。
