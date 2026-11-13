@@ -6,6 +6,8 @@
 
 2026-11-13，用户完成初步试用，反馈暂未发现问题，并要求将当前开发版本提交到GitHub。在确认仓库已为公开状态后，用户明确授权将源码提交 `2951bf5` 推送到 `Fahaxiki123/Differ` 的 `codex/ui-system-phase1` 分支。
 
+随后用户明确要求安装包发布。**0.21.18 Preview 安装包现已发布**：[Windows x64 下载](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)、[Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)。源码标签固定于 `735fea2218b8adfa25e3d1d597aada69002481a2`，包内核验、本轮 711 通过 / 2 项未启用及现用安装保护结果见 [安装包发布记录](RELEASE-0.21.18.md)。下文 713 项和前台画面仍对应此前完整 UI 验收，不与本轮常规验证计数混用。
+
 ## 修复内容
 
 - 标题栏采用全宽不透明 WPF 底板，三个窗口按钮与背景、分隔线、雾光在同一视觉树绘制；取消右侧 156 DIP 透明区及动画中的逐帧 DWM 标题栏着色，解决原固定矩形边界。保留非客户区命中、Windows 11 贴靠菜单和系统窗口操作。
@@ -67,7 +69,7 @@
 
 此前代理的自动删除被审批以 `blocked by policy` 拒绝，命令未执行；`cleanup-remaining.json`、`cache-cleanup-retry-result.json`保留该历史事实。2026-11-13，用户手动删除后，代理只执行核验，没有将手工删除记为代理执行成功。最新[核验记录](D:/项目归档/Differ/2026-11-13-caption-finish/manual-cache-cleanup-confirmation.json)确认缓存不存在、唯一0.21.18开发版完整载荷与源码身份一致、固定开发偏好仍存在、现用0.17.1 SVN安装主程序校验值及Diff/Merge绑定未变。再次Apply/Check均Clean=true、Targets=0、Unclassified=0，见 `manual-cache-workspace-apply.json`、`manual-cache-workspace-check.json`；本轮两处缓存清理已收口。
 
-`D:\Differ\Differ.App.exe` 仍为现用 0.17.1 SVN 安装；本轮不替换它、不更改真实 Diff/Merge 绑定，不运行 SVN 写操作。源码同步遵循本报告开头的公开推送授权，本轮不创建新的Release或安装包。
+`D:\Differ\Differ.App.exe` 仍为现用 0.17.1 SVN 安装。早先的源码同步任务没有创建 Release 或安装包；用户随后追加安装包发布要求，已按 [发布记录](RELEASE-0.21.18.md)完成 Preview 分发。该打包与发布没有替换现用安装、修改真实 Diff/Merge 及高级绑定或执行 SVN 写操作，592 个已安装文件的哈希也已核对不变。
 
 ## 未验证范围
 

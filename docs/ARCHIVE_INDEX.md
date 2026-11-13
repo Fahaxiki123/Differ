@@ -2,6 +2,8 @@
 
 2026-11-12：唯一开发仓库为 `D:\Diff`，唯一开发预览为 `D:\项目归档\Differ\开发预览`，从仓库根目录 `打开开发版.cmd` 启动。现状和未完成项见 [项目状态](PROJECT_STATUS.md)。
 
+2026-11-13，0.21.18 Preview 安装包发布证据：`D:\项目归档\Differ\2026-11-13-release-0.21.18`。`assets` 保留带版本号的安装 EXE、SHA-256、发布清单和说明；`verification` 为本轮 711 通过、0 失败、2 项未启用的常规构建/回归/格式记录。`package-verification-final.json` 保留 598 个归档条目与 592 个运行文件的非执行核验，首次解析生成卸载器空大小的失败留在 `package-verification.json`，未放宽运行文件校验。`runtime-status-probe.json` 是只读启动探针；`github-release-publish.log` 确认四件附件验证后已公开发布 Preview、不替换稳定 Latest。`final-protection.json` 确认现用安装全部文件、绑定、卸载项和开发预览未变；`cleanup-final-apply.json`、`cleanup-final-check.json` 记录发布后清理通过。详见 [安装包发布记录](RELEASE-0.21.18.md)及 [GitHub Release](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)。
+
 2026-11-13，0.21.18 接续修复证据：`D:\项目归档\Differ\2026-11-13-caption-finish`。保留同内容前后自然播放帧、真实窗口按钮与关闭保护结果、合成输入及哈希、工程验证、发布事务与清理清单，详见 [0.21.18交付记录](UI-0.21.18.md)。最终源码验证为 `verification-accepted`，前台截图为 `accepted-*`，安全更新状态为 `preview-update-accepted\preview-state.json`（Finalized）；固定预览为0.21.18，旧next/previous/retired运行副本均已清除。发布后清理见 `cleanup-final-apply.json`、`cleanup-final-check.json`；两处测试缓存现已由用户手动删除，代理复核见 `manual-cache-cleanup-confirmation.json`，再次工作区检查见 `manual-cache-workspace-check.json`；此前 `cleanup-remaining.json` 和重试拒绝记录保留为历史事实。目录中的 `after-*`、`final-*`、`direct-*` 是中间实验，文件名含 final 不代表最终验收；证据归档不是第二个开发入口。
 
 2026-11-12，精确查找与另存目标提示：`D:\项目归档\Differ\2026-11-12-find-save`，实现与前台过程见 [0.21.17](UI-0.21.17.md)。同日标题栏问题调查与接手前审查：`D:\项目归档\Differ\2026-11-12-caption-unified`，原始失败记录见 [0.21.18审查](UI-0.21.18-review.md)，本轮没有改写历史证据。

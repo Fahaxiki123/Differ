@@ -6,8 +6,9 @@
 
 - 唯一开发仓库：`D:\Diff`。分支 `codex/ui-system-phase1`，当前源码与固定开发预览均为 **0.21.18**。本轮主题、按钮、回归和本机前台验收完成；旧预览运行副本已清除，两处测试缓存已由用户手动删除，代理复核通过。详见 [0.21.18交付记录](UI-0.21.18.md)，[接手前审查](UI-0.21.18-review.md)保留当时失败，不作为最新结果。
 - 唯一开发预览：`D:\项目归档\Differ\开发预览\Differ.Phase1.Preview.exe`。从仓库根目录 **打开开发版.cmd** 启动，可在启动页选择本地文件。
+- 最新安装包：**0.21.18 Preview 已发布**，[Windows x64 下载](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)，[Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)。标签对应源码 `735fea2218b8adfa25e3d1d597aada69002481a2`，不抢占稳定 Latest；完整包身份与验证范围见 [安装包发布记录](RELEASE-0.21.18.md)。
 - 日常 SVN 目前调用：`D:\Differ\Differ.App.exe`，安装版本 **0.17.1**。它是已安装程序，不是开发仓库。本次没有替换安装或修改 Diff/Merge 绑定；0.21.18源码按用户明确授权同步到GitHub公开仓库的 `codex/ui-system-phase1` 分支。
-- 本轮证据：`D:\项目归档\Differ\2026-11-13-caption-finish`。历史整理材料在 `D:\项目归档\Differ\2026-11-12-consolidation`，精确查找/另存记录在 `2026-11-12-find-save`；旧样板源码和历史安装包保留，不从历史启动器运行。
+- 证据：UI 修复为 `D:\项目归档\Differ\2026-11-13-caption-finish`，安装包发布为 `D:\项目归档\Differ\2026-11-13-release-0.21.18`。历史整理材料在 `D:\项目归档\Differ\2026-11-12-consolidation`，精确查找/另存记录在 `2026-11-12-find-save`；旧样板源码和历史安装包保留，不从历史启动器运行。
 
 ## UI 做到了哪里
 
@@ -32,6 +33,8 @@
 旧样板独有源码保存在 `history\Differ-installed-UIReview\recovered`，其中 `Differ.App.ViewModels\DiffWindowViewModel.cs` 和 `Editor\editor.js` 是上述查找及目标提示的参考。不要用反编译旧工程整体覆盖主仓库。
 
 ## 当前验证与交付门禁
+
+安装包发布已完成：正式 Release 构建和格式通过，本轮常规回归 711 通过、0 失败、2 项显式前台/取证测试未启用；不是 713 项全部运行。非执行校验覆盖 598 个归档条目和 592 个运行文件，文件大小/SHA-256、源码身份与离线依赖通过。正式程序只执行只读 `--integration-status` 并返回预期未绑定状态；未运行安装器或卸载程序。远端 Preview 为 Draft=false，四件附件验证通过。发布后 `final-protection.json` 确认现用安装全部 592 个文件、全局及高级绑定、卸载项和开发预览未变；清理 23 个目标后 Check 为 Clean=true、Targets=0、Unclassified=0。详见 [安装包发布记录](RELEASE-0.21.18.md)。
 
 0.21.18 最终源码的 `verification-accepted` 已完成：11份TRX共713/713通过、0失败、0跳过（App345项），build/format/Apply/Check均退出0；覆盖最新浏览器调色板与语法色桥。更新脚本18项隔离回归也已通过。720×620、1500×860双向主题，真实150%阅读缩放、长行查找和窗口行为已前台复核。固定入口已更新0.21.18，`preview-update-accepted\preview-state.json`为Finalized，旧0.21.17/0.21.16运行副本及next均不存在。发布后再次清理22个构建输出目标（约206.66 MiB），最终Check为Clean=true、Targets=0、Unclassified=0。完整证据见 [交付记录](UI-0.21.18.md)。此前710项阶段结果保留为历史，不与最终数字混用。
 
