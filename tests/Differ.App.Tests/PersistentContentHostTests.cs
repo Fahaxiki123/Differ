@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Runtime.ExceptionServices;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using Differ.App.Controls;
 
@@ -35,6 +36,39 @@ public sealed class PersistentContentHostTests
             Assert.Equal(1, host.CachedContentCount);
             Assert.DoesNotContain(firstPresenter, host.Children.Cast<object>());
             Assert.Null(firstPresenter.Content);
+        });
+    }
+
+    [Fact]
+    public void PreservedWorksheetLayoutIsLimitedToTwoInactiveVisitedItems()
+    {
+        RunSta(() =>
+        {
+            var items = new ObservableCollection<object>(Enumerable.Range(0, 5).Select(_ => new object()));
+            var host = new PersistentContentHost
+            {
+                PreserveRecentLayout = true,
+                ItemsSource = items,
+                SelectedItem = items[0]
+            };
+
+            Assert.Equal(1, host.CachedContentCount);
+            for (var index = 1; index < 4; index++) host.SelectedItem = items[index];
+
+            var visited = host.Children.Cast<ContentPresenter>().ToArray();
+            Assert.Equal(4, visited.Length);
+            Assert.Equal(Visibility.Collapsed, visited[0].Visibility);
+            Assert.Equal(Visibility.Hidden, visited[1].Visibility);
+            Assert.Equal(Visibility.Hidden, visited[2].Visibility);
+            Assert.Equal(Visibility.Visible, visited[3].Visibility);
+
+            host.SelectedItem = items[1];
+            Assert.Equal(Visibility.Visible, visited[1].Visibility);
+            Assert.Equal(Visibility.Hidden, visited[3].Visibility);
+            items.RemoveAt(3);
+            Assert.Null(visited[3].Content);
+            host.SelectedItem = null;
+            Assert.All(host.Children.Cast<ContentPresenter>(), child => Assert.Equal(Visibility.Collapsed, child.Visibility));
         });
     }
 

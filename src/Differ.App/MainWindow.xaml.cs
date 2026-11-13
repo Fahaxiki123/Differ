@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Differ.App.Resources;
 using Differ.App.Services;
 using Differ.App.ViewModels;
+using Differ.Core.External;
 
 namespace Differ.App;
 
@@ -69,6 +70,11 @@ public partial class MainWindow : Window
         {
             start.ArgumentList.Add(options[i]);
             start.ArgumentList.Add(paths[i]);
+        }
+        if (!merge)
+        {
+            start.ArgumentList.Add("--source");
+            start.ArgumentList.Add(ExternalDiffRequest.LocalFileSource);
         }
         try { using var process = Process.Start(start); }
         catch (Exception exception) when (exception is System.ComponentModel.Win32Exception or InvalidOperationException)

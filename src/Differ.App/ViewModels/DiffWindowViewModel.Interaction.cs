@@ -75,7 +75,10 @@ public sealed partial class DiffWindowViewModel
     public bool IsFindOpen
     {
         get => _isFindOpen;
-        set => SetProperty(ref _isFindOpen, value);
+        set
+        {
+            if (SetProperty(ref _isFindOpen, value) && !value) InvalidateFind();
+        }
     }
 
     public bool IsGoToOpen
@@ -198,6 +201,7 @@ public sealed partial class DiffWindowViewModel
     private void InvalidateFind()
     {
         _findVersion++;
+        ClearEditorFindFeedback();
         _findCancellation?.Cancel();
         _findDirty = true;
         _findMatches.Clear();
@@ -267,9 +271,40 @@ public sealed partial class DiffWindowViewModel
         else if (hit.TextRow is { } textRow)
         {
             SelectTextTarget(textRow);
+            RevealEditorFindTarget(textRow);
         }
 
         NotifyFindPosition();
+    }
+
+    private void ClearEditorFindFeedback()
+    {
+        if (_editorSession is { } editor)
+            SendEditorCommand(new { type = "clearFind", session = editor.Id.ToString("N"), findVersion = _findVersion });
+    }
+
+    private void RevealEditorFindTarget(TextDiffRowViewModel row)
+    {
+        if (_editorSession is not { } editor || !EditorResultsCurrent || FindText.Length == 0) return;
+        var comparison = FindMatchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        // Keep the existing logical-row match count, preferring the current side's first occurrence.
+        var offset = row.NewIndex is not null ? row.NewText.IndexOf(FindText, comparison) : -1;
+        var mine = offset >= 0;
+        var line = mine ? row.NewIndex : row.OldIndex;
+        if (!mine) offset = row.OldText.IndexOf(FindText, comparison);
+        if (offset < 0 || line is null) return;
+        // Re-send even for the same selected row. Both .NET offsets and Monaco columns use UTF-16.
+        SendEditorCommand(new
+        {
+            type = "revealFind",
+            session = editor.Id.ToString("N"),
+            version = editor.Version,
+            findVersion = _findVersion,
+            mine,
+            line = line.Value,
+            column = offset + 1,
+            length = FindText.Length
+        });
     }
 
     private static List<SearchHit> CollectFindMatches(string query, bool matchCase, bool differencesOnly,

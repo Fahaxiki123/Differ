@@ -7,6 +7,8 @@ namespace Differ.App.Tests;
 
 public sealed class ThemeRuntimeTests
 {
+    private static readonly string[] DiffKinds = ["Added", "Deleted", "Modified", "Moved", "Conflict"];
+
     [Fact]
     public void BothThemeDictionariesLoadInWpf()
     {
@@ -22,6 +24,37 @@ public sealed class ThemeRuntimeTests
         });
     }
 
+    [Theory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void DiffForegroundsRemainReadableOnBodyAndCellBackgrounds(string theme)
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var resources = ThemeTestSupport.Load($"Themes/{theme}.xaml");
+            foreach (var kind in DiffKinds)
+            {
+                var foreground = ThemeTestSupport.ResolveColour(resources, $"Diff.Inline.{kind}.Brush");
+                foreach (var backgroundKey in new[] { $"Diff.Row.{kind}.Bg", $"Diff.Cell.{kind}" })
+                {
+                    var background = ThemeTestSupport.ResolveColour(resources, backgroundKey);
+                    var contrast = (Math.Max(Luminance(foreground), Luminance(background)) + 0.05) /
+                        (Math.Min(Luminance(foreground), Luminance(background)) + 0.05);
+                    Assert.True(contrast >= 4.5, $"{theme} {kind} on {backgroundKey}: {contrast:F2}:1.");
+                }
+            }
+        });
+    }
+
+    private static double Luminance(Color colour) =>
+        0.2126 * Linear(colour.R) + 0.7152 * Linear(colour.G) + 0.0722 * Linear(colour.B);
+
+    private static double Linear(byte component)
+    {
+        var value = component / 255d;
+        return value <= 0.04045 ? value / 12.92 : Math.Pow((value + 0.055) / 1.055, 2.4);
+    }
+
     [Fact]
     public void ApplyReplacesTheMergedThemeAndChangesResolvedBrushes()
     {
@@ -34,6 +67,9 @@ public sealed class ThemeRuntimeTests
             using var service = ThemeTestSupport.CreateService(resources, monitor);
 
             service.Apply(AppTheme.Light);
+            var lightDictionary = Assert.Single(resources.MergedDictionaries);
+            service.Apply(AppTheme.Light);
+            Assert.Same(lightDictionary, Assert.Single(resources.MergedDictionaries));
             var lightCanvas = ThemeTestSupport.ResolveColour(
                 resources,
                 "CanvasBrush");
@@ -54,7 +90,7 @@ public sealed class ThemeRuntimeTests
             Assert.Equal(
                 lightCanvas,
                 ThemeTestSupport.ResolveColour(resources, "CanvasBrush"));
-            Assert.Single(resources.MergedDictionaries);
+            Assert.Same(lightDictionary, Assert.Single(resources.MergedDictionaries));
         });
     }
 
@@ -73,6 +109,64 @@ public sealed class ThemeRuntimeTests
 
             service.Toggle();
             Assert.Equal(AppTheme.Light, service.CurrentTheme);
+        });
+    }
+
+    [Fact]
+    public void AnimatedThemeKeepsOneRootAndMovesContinuouslyToItsTarget()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var resources = new ResourceDictionary();
+            using var service = ThemeTestSupport.CreateService(resources, new FakeSystemThemeMonitor(AppTheme.Light));
+            service.InitializeFromSystem();
+            var light = ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content");
+            service.ToggleAnimated(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            Assert.Equal(AppTheme.Dark, service.CurrentTheme);
+            Assert.Single(resources.MergedDictionaries);
+            Assert.Equal(light, ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content"));
+            var target = Assert.IsType<ResourceDictionary>(resources[ThemeService.TargetThemeKey]);
+            var dark = ThemeTestSupport.ResolveColour(target, "Dui.Surface.Content");
+            Assert.NotEqual(light, dark);
+            var previous = light;
+            for (var elapsed = 20; elapsed <= 680; elapsed += 20)
+            {
+                service.RenderTransitionFrame(elapsed);
+                var current = ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content");
+                Assert.InRange(current.R, dark.R, previous.R);
+                Assert.InRange(current.G, dark.G, previous.G);
+                Assert.InRange(current.B, dark.B, previous.B);
+                previous = current;
+            }
+            Assert.Equal(dark, previous);
+            Assert.Equal(dark, ThemeTestSupport.ResolveColour(target, "Dui.Surface.Content"));
+            service.ToggleAnimated(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            Assert.Equal(dark, ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content"));
+            service.CompleteTransition();
+            Assert.Equal(light, ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content"));
+            Assert.Single(resources.MergedDictionaries);
+        });
+    }
+
+    [Fact]
+    public void ReversingAnAnimatedThemeStartsFromItsVisibleColor()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var resources = new ResourceDictionary();
+            using var service = ThemeTestSupport.CreateService(resources, new FakeSystemThemeMonitor(AppTheme.Light));
+            service.InitializeFromSystem();
+            // The window drives its shared timeline, so reversal must preserve the last rendered color.
+            service.PrepareToggle();
+            service.RenderTransitionFrame(200);
+            var before = ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content");
+            service.PrepareToggle();
+            var reversed = ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content");
+            Assert.Equal(before, reversed);
+            service.Apply(AppTheme.Dark);
+            var applied = ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content");
+            service.RenderTransitionFrame(680);
+            Assert.Equal(applied, ThemeTestSupport.ResolveColour(resources, "Dui.Surface.Content"));
         });
     }
 

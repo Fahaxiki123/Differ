@@ -6,7 +6,7 @@
     <sys:Double x:Key="Ui.ToolbarHeight">38</sys:Double>
     <sys:Double x:Key="Ui.FileTabHeight">30</sys:Double>
     <sys:Double x:Key="Ui.PaneHeaderHeight">28</sys:Double>
-    <sys:Double x:Key="Ui.OverviewWidth">44</sys:Double>
+    <sys:Double x:Key="Ui.OverviewWidth">12</sys:Double>
     <sys:Double x:Key="Ui.StatusBarHeight">24</sys:Double>
     <sys:Double x:Key="Ui.DetailHeaderHeight">28</sys:Double>
     <sys:Double x:Key="Ui.DetailSplitterHeight">6</sys:Double>
@@ -27,7 +27,7 @@
     <GridLength x:Key="Ui.ToolbarRowHeight">38</GridLength>
     <GridLength x:Key="Ui.FileTabRowHeight">30</GridLength>
     <GridLength x:Key="Ui.PaneHeaderRowHeight">28</GridLength>
-    <GridLength x:Key="Ui.OverviewColumnWidth">44</GridLength>
+    <GridLength x:Key="Ui.ComparisonRailColumnWidth">16</GridLength>
     <GridLength x:Key="Ui.StatusBarRowHeight">24</GridLength>
     <GridLength x:Key="Ui.DetailHeaderRowHeight">28</GridLength>
     <GridLength x:Key="Ui.DetailSplitterRowHeight">6</GridLength>

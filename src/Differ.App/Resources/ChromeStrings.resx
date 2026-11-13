@@ -5,10 +5,12 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
   <data name="DisplayAll" xml:space="preserve"><value>全部</value></data>
-  <data name="DisplayDifferences" xml:space="preserve"><value>差异</value></data>
+  <data name="DisplayDifferences" xml:space="preserve"><value>仅差异</value></data>
   <data name="DisplayContext" xml:space="preserve"><value>上下文</value></data>
   <data name="EditMode" xml:space="preserve"><value>编辑模式</value></data>
   <data name="EditModeHint" xml:space="preserve"><value>开启后可编辑右侧文档；关闭保留未保存内容及撤销历史</value></data>
+  <data name="EnableEditing" xml:space="preserve"><value>开启编辑</value></data>
+  <data name="EditingActive" xml:space="preserve"><value>编辑中</value></data>
   <data name="ReadOnly" xml:space="preserve"><value>只读</value></data>
   <data name="SaveOptions" xml:space="preserve"><value>保存选项</value></data>
   <data name="SaveShortcut" xml:space="preserve"><value>保存（Ctrl+S）</value></data>
@@ -16,5 +18,19 @@
   <data name="RedoShortcut" xml:space="preserve"><value>重做（Ctrl+Y）</value></data>
   <data name="AdvancedRules" xml:space="preserve"><value>高级比较规则…</value></data>
   <data name="FindContent" xml:space="preserve"><value>查找内容</value></data>
+  <data name="WorkspaceFiles" xml:space="preserve"><value>文件</value></data>
+  <data name="WorkspaceView" xml:space="preserve"><value>视图</value></data>
+  <data name="WorkspaceFind" xml:space="preserve"><value>查找</value></data>
+  <data name="WorkspaceGoTo" xml:space="preserve"><value>定位</value></data>
+  <data name="PreviousDifferenceShort" xml:space="preserve"><value>上一处 F7</value></data>
+  <data name="NextDifferenceShort" xml:space="preserve"><value>下一处 F8</value></data>
+  <data name="FilePicker" xml:space="preserve"><value>查看或筛选文件页签</value></data>
+  <data name="FileOverflowFormat" xml:space="preserve"><value>+{0} 个文件</value></data>
+  <data name="ComparisonRailHint" xml:space="preserve"><value>单击定位 · 拖动视窗带滚动 · 滚轮逐行滚动</value></data>
+  <data name="SpreadsheetSummaryDetailsFormat" xml:space="preserve"><value>结构 {0} 个 · 内容单元格 {1} 个 · 仅格式单元格 {2} 个</value></data>
   <data name="PreviewIntegrationReadOnly" xml:space="preserve"><value>隔离预览禁止修改 TortoiseSVN 设置。</value></data>
+  <data name="MinimizeWindow" xml:space="preserve"><value>最小化</value></data>
+  <data name="MaximizeWindow" xml:space="preserve"><value>最大化</value></data>
+  <data name="RestoreWindow" xml:space="preserve"><value>向下还原</value></data>
+  <data name="CloseWindow" xml:space="preserve"><value>关闭</value></data>
 </root>

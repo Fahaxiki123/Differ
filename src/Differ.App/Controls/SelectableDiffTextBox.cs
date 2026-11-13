@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Differ.App.ViewModels;
 using Differ.Core.Algorithms;
 using Differ.Core.Models;
 
@@ -15,6 +16,10 @@ namespace Differ.App.Controls;
 /// </summary>
 public sealed class SelectableDiffTextBox : RichTextBox
 {
+    public static readonly DependencyProperty DiffContentProperty = DependencyProperty.Register(
+        nameof(DiffContent), typeof(InlineDiffContent), typeof(SelectableDiffTextBox),
+        new FrameworkPropertyMetadata(null, OnVisualPropertyChanged));
+
     public static readonly DependencyProperty SegmentsProperty =
         DependencyProperty.Register(
             nameof(Segments),
@@ -53,6 +58,12 @@ public sealed class SelectableDiffTextBox : RichTextBox
         set => SetValue(SegmentsProperty, value);
     }
 
+    public InlineDiffContent? DiffContent
+    {
+        get => (InlineDiffContent?)GetValue(DiffContentProperty);
+        set => SetValue(DiffContentProperty, value);
+    }
+
     public DiffKind DiffKind
     {
         get => (DiffKind)GetValue(DiffKindProperty);
@@ -73,7 +84,9 @@ public sealed class SelectableDiffTextBox : RichTextBox
             Margin = new Thickness(0)
         };
 
-        if (Segments is IReadOnlyList<InlineDiffSegment> segments
+        var content = DiffContent;
+        var kind = content?.Kind ?? DiffKind;
+        if ((content?.Segments ?? Segments as IReadOnlyList<InlineDiffSegment>) is { } segments
             && segments.Count > 0)
         {
             foreach (var segment in segments)
@@ -81,7 +94,7 @@ public sealed class SelectableDiffTextBox : RichTextBox
                 var run = new Run(segment.Text);
                 if (segment.IsChanged)
                 {
-                    InlineDiffPalette.ApplyChangedStyle(run, DiffKind);
+                    InlineDiffPalette.ApplyChangedStyle(run, kind);
                 }
 
                 paragraph.Inlines.Add(run);

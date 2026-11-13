@@ -13,16 +13,22 @@
         MinHeight="620"
         WindowStartupLocation="CenterScreen"
         UseLayoutRounding="True"
+        Background="{DynamicResource Dui.Surface.Window}"
         SnapsToDevicePixels="True">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="6" GlassFrameThickness="0,0,0,1" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Controls.xaml" />
+                <ResourceDictionary Source="Themes/ThemeMist.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
             <Style x:Key="FileTabItemStyle" TargetType="ListBoxItem">
-                <Setter Property="Margin" Value="0,0,2,0" />
+                <Setter Property="Margin" Value="0,6,5,3" />
+                <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -33,20 +39,15 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="ListBoxItem">
                             <Border x:Name="TabChrome"
-                                    MinWidth="128"
-                                    MaxWidth="300"
-                                    MinHeight="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
-                                    Padding="8,0,2,0"
-                                    Background="{DynamicResource Dui.Surface.Tabs}"
-                                    BorderBrush="{DynamicResource Dui.Surface.Tabs}"
-                                    BorderThickness="1,1,1,0"
-                                    CornerRadius="{StaticResource Dui.Metrics.TabRadius}">
+                                    MaxWidth="235"
+                                    MinHeight="28"
+                                    Padding="10,0,4,0"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1"
+                                    CornerRadius="7">
                                 <Grid>
-                                    <Border x:Name="ActiveTabIndicator" Width="2" Height="14"
-                                            Margin="-4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                            Background="{DynamicResource Dui.Accent}" CornerRadius="{StaticResource Dui.Metrics.SmallRadius}"
-                                            Visibility="Collapsed" IsHitTestVisible="False" />
-                                    <ContentPresenter Margin="3,0,0,0" />
+                                    <ContentPresenter />
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -56,18 +57,14 @@
                                             Value="{DynamicResource Dui.State.Hover}" />
                                 </Trigger>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="ActiveTabIndicator" Property="Visibility" Value="Visible" />
                                     <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
                                     <Setter Property="FontWeight" Value="SemiBold" />
                                     <Setter TargetName="TabChrome"
                                             Property="Background"
-                                            Value="{DynamicResource Dui.Surface.Content}" />
+                                            Value="{DynamicResource Dui.State.Selected}" />
                                     <Setter TargetName="TabChrome"
                                             Property="BorderBrush"
                                             Value="{DynamicResource Dui.Border.Subtle}" />
-                                    <Setter TargetName="TabChrome"
-                                            Property="BorderThickness"
-                                            Value="1,1,1,0" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -75,6 +72,101 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="WideToolbarLabel" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsCompactToolbar, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="CaptionButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="46" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="UseLayoutRounding" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Chrome"
+                                    Background="{TemplateBinding Background}"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Dui.State.Hover}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                                </Trigger>
+                                <Trigger Property="local:DiffWindow.IsCaptionHovered" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Dui.State.Hover}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Dui.State.Pressed}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                                </Trigger>
+                                <Trigger Property="local:DiffWindow.IsCaptionPressed" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Dui.State.Pressed}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="CaptionCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Chrome"
+                                    Background="{TemplateBinding Background}"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Caption.CloseHoverBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Caption.CloseActiveForegroundBrush}" />
+                                </Trigger>
+                                <Trigger Property="local:DiffWindow.IsCaptionHovered" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Caption.CloseHoverBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Caption.CloseActiveForegroundBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Caption.ClosePressedBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Caption.CloseActiveForegroundBrush}" />
+                                </Trigger>
+                                <Trigger Property="local:DiffWindow.IsCaptionPressed" Value="True">
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Caption.ClosePressedBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Caption.CloseActiveForegroundBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
             <DataTemplate x:Key="SpreadsheetFormatTemplate">
                 <local:SpreadsheetDiffView />
@@ -100,7 +192,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="{StaticResource Dui.Metrics.StatusBarRowHeight}" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0"
@@ -123,11 +215,10 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource Ui.OverviewColumnWidth}" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <local:DiffOverviewView Grid.Row="2" Grid.Column="0" />
-                        <ContentControl x:Name="FormatContent" Grid.Row="2" Grid.Column="1" Content="{Binding}">
+                        <ContentControl x:Name="FormatContent" Grid.Row="2" Grid.Column="0" Content="{Binding}">
                             <ContentControl.Style>
                                 <Style TargetType="ContentControl">
                                     <Setter Property="ContentTemplate" Value="{StaticResource TextFormatTemplate}" />
@@ -144,6 +235,7 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsSpreadsheetView}" Value="True">
                                             <Setter Property="ContentTemplate" Value="{StaticResource SpreadsheetFormatTemplate}" />
+                                            <Setter Property="LayoutTransform"><Setter.Value><ScaleTransform ScaleX="1" ScaleY="1" /></Setter.Value></Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsWordView}" Value="True">
                                             <Setter Property="ContentTemplate" Value="{StaticResource WordFormatTemplate}" />
@@ -152,6 +244,20 @@
                                 </Style>
                             </ContentControl.Style>
                         </ContentControl>
+                        <local:DiffOverviewView Grid.Row="2" Grid.Column="1" Width="{StaticResource Ui.OverviewWidth}">
+                            <local:DiffOverviewView.Style>
+                                <Style TargetType="local:DiffOverviewView">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditableText}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsSpreadsheetView}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </local:DiffOverviewView.Style>
+                        </local:DiffOverviewView>
 
                         <Border x:Name="FindPanel" Grid.Row="0" Grid.ColumnSpan="2"
                                 Padding="12,6" Background="{DynamicResource Dui.Surface.Toolbar}"
@@ -169,16 +275,16 @@
                                              ToolTip="{x:Static resources:Strings.Find}" IsVisibleChanged="LocalInput_IsVisibleChanged" />
                                     <Button Grid.Column="1" Margin="0,0,4,0" Style="{StaticResource Dui.Button.Icon}"
                                             Command="{Binding FindPreviousCommand}" ToolTip="{x:Static resources:Strings.FindPrevious}">
-                                    <dui:AppIcon Kind="Previous" />
-                                </Button>
+                                        <dui:AppIcon Kind="Previous" />
+                                    </Button>
                                     <Button Grid.Column="2" Margin="0,0,4,0" Style="{StaticResource Dui.Button.Icon}"
                                             Command="{Binding FindNextCommand}" ToolTip="{x:Static resources:Strings.FindNext}">
-                                    <dui:AppIcon Kind="Next" />
-                                </Button>
+                                        <dui:AppIcon Kind="Next" />
+                                    </Button>
                                     <Button Grid.Column="3" Style="{StaticResource Dui.Button.Icon}"
                                             Command="{Binding CloseFindCommand}" ToolTip="{x:Static resources:Strings.ClosePanel}">
-                                    <dui:AppIcon Kind="Close" />
-                                </Button>
+                                        <dui:AppIcon Kind="Close" />
+                                    </Button>
                                 </Grid>
                             </DockPanel>
                         </Border>
@@ -198,65 +304,110 @@
                                             Content="{x:Static resources:Strings.GoToAction}" Command="{Binding GoToCommand}" />
                                     <Button Grid.Column="2" Style="{StaticResource Dui.Button.Icon}"
                                             Command="{Binding CloseGoToCommand}" ToolTip="{x:Static resources:Strings.ClosePanel}">
-                                    <dui:AppIcon Kind="Close" />
-                                </Button>
+                                        <dui:AppIcon Kind="Close" />
+                                    </Button>
                                 </Grid>
                             </DockPanel>
                         </Border>
                     </Grid>
 
-                    <Border x:Name="ComparisonStatusBar" Grid.Row="2" Style="{StaticResource Dui.StatusBar}">
+                    <Border x:Name="ComparisonStatusBar" Grid.Row="2">
+                        <Border.Style>
+                            <Style TargetType="Border" BasedOn="{StaticResource Dui.StatusBar}">
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding HasRoutineSpreadsheetStatus}" Value="True" />
+                                            <Condition Binding="{Binding IsBusy}" Value="False" />
+                                            <Condition Binding="{Binding HasWarnings}" Value="False" />
+                                            <Condition Binding="{Binding HasError}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" MaxWidth="390" />
                             </Grid.ColumnDefinitions>
-                            <DockPanel Grid.Column="0">
-                                <ProgressBar Width="84" Style="{StaticResource Dui.ProgressBar}"
-                                             Height="6"
-                                             Margin="0,0,9,0"
-                                             VerticalAlignment="Center"
+                            <DockPanel LastChildFill="True">
+                                <Ellipse DockPanel.Dock="Left" Width="6" Height="6" Margin="0,0,7,0"
+                                         VerticalAlignment="Center">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{DynamicResource Dui.Status.Info}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasError}" Value="True">
+                                                    <Setter Property="Fill" Value="{DynamicResource Dui.Status.Error}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <ProgressBar DockPanel.Dock="Left" Width="52" Height="4" Margin="0,0,9,0"
+                                             Style="{StaticResource Dui.ProgressBar}" VerticalAlignment="Center"
                                              IsIndeterminate="{Binding IsBusy}"
                                              Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <TextBlock VerticalAlignment="Center"
-                                           ToolTip="{Binding SnapshotTimeText}"
+                                <TextBlock x:Name="EditorLocationStatus" VerticalAlignment="Center"
                                            Foreground="{DynamicResource Dui.Text.Secondary}"
                                            FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
-                                           TextTrimming="CharacterEllipsis"
-                                           x:Name="EditorLocationStatus">
+                                           TextTrimming="CharacterEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel MaxWidth="500">
+                                                <TextBlock Text="{Binding PlacementTarget.Text, RelativeSource={RelativeSource AncestorType=ToolTip}}" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding SnapshotTimeText}" />
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Text" Value="{Binding StatusText}" />
-                                            <Style.Triggers><DataTrigger Binding="{Binding IsEditableText}" Value="True"><Setter Property="Text" Value="{Binding EditorLocationText}" /></DataTrigger></Style.Triggers>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditableText}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding EditorLocationText}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
                             </DockPanel>
-                            <Border Grid.Column="1"
-                                    Padding="7,1"
-                                    VerticalAlignment="Center"
-                                    Background="{DynamicResource Badge.Warning.Bg}"
-                                    CornerRadius="{StaticResource Dui.Metrics.ControlRadius}"
-                                    ToolTip="{Binding WarningToolTipText}"
+                            <Border Grid.Column="1" Margin="8,0,0,0" Padding="7,2"
+                                    VerticalAlignment="Center" Background="{DynamicResource Dui.Status.WarningSurface}"
+                                    CornerRadius="{StaticResource Dui.Metrics.ControlRadius}" ToolTip="{Binding WarningToolTipText}"
                                     Visibility="{Binding HasWarnings, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <TextBlock Foreground="{DynamicResource Badge.Warning.Text}"
-                                           FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
-                                           Text="{Binding WarningSummaryText}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <dui:AppIcon Kind="Warning" Size="13" Margin="0,0,4,0" Foreground="{DynamicResource Dui.Status.Warning}" />
+                                    <TextBlock Foreground="{DynamicResource Dui.Status.Warning}" Text="{Binding WarningSummaryText}" />
+                                </StackPanel>
                             </Border>
-                            <TextBlock Grid.Column="3"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource Dui.Text.Secondary}"
-                                       FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
-                                       x:Name="EditorFormatStatus">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding SummaryText}" />
-                                        <Style.Triggers><DataTrigger Binding="{Binding IsEditableText}" Value="True"><Setter Property="Text" Value="{Binding EditorFormatText}" /></DataTrigger></Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <Border Grid.Column="2" Margin="10,0,0,0" Padding="10,0,0,0"
+                                    BorderThickness="1,0,0,0" BorderBrush="{DynamicResource Dui.Border.Subtle}">
+                                <TextBlock x:Name="EditorFormatStatus" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"
+                                           Foreground="{DynamicResource Dui.Text.Secondary}"
+                                           FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding FileKindText}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsWordView}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding OfficeSummaryDetail}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSpreadsheetView}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding OfficeSummaryDetail}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsEditableText}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding EditorFormatText}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
                         </Grid>
                     </Border>
                 </Grid>
@@ -264,62 +415,277 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Background="{DynamicResource Dui.Surface.Window}">
+    <Grid x:Name="ComparisonRoot">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{StaticResource Dui.Metrics.ToolbarRowHeight}" />
-            <RowDefinition Height="Auto" MinHeight="{StaticResource Dui.Metrics.FileTabHeight}" />
+            <RowDefinition Height="38" />
+            <RowDefinition Height="40" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border x:Name="ComparisonToolbar" Grid.Row="0"
-                Background="{DynamicResource Dui.Surface.Toolbar}"
+        <Border x:Name="FileTabBar" Grid.Row="0"
+                Background="{DynamicResource Dui.Surface.Tabs}"
                 BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="0,0,0,1">
-            <Grid Margin="{StaticResource Dui.Metrics.PanePadding}" DataContext="{Binding SelectedTab}">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <RadioButton x:Name="DisplayAllButton" GroupName="DisplayMode" Style="{StaticResource Dui.Radio.Segment}" MinWidth="44"
-                                 Content="{x:Static resources:ChromeStrings.DisplayAll}" IsChecked="{Binding IsDisplayAll, Mode=TwoWay}"
-                                 AutomationProperties.Name="{x:Static resources:ChromeStrings.DisplayAll}" ToolTip="{x:Static resources:Strings.DisplayAll}" />
-                    <RadioButton x:Name="DisplayDifferencesButton" GroupName="DisplayMode" Style="{StaticResource Dui.Radio.Segment}" MinWidth="44" Margin="2,0,0,0"
-                                 Content="{x:Static resources:ChromeStrings.DisplayDifferences}" IsChecked="{Binding IsDisplayDifferences, Mode=TwoWay}"
-                                 AutomationProperties.Name="{x:Static resources:ChromeStrings.DisplayDifferences}" ToolTip="{x:Static resources:Strings.DisplayDifferences}" />
-                    <RadioButton x:Name="DisplayContextButton" GroupName="DisplayMode" Style="{StaticResource Dui.Radio.Segment}" MinWidth="58" Margin="2,0,0,0"
-                                 Content="{x:Static resources:ChromeStrings.DisplayContext}" IsChecked="{Binding IsDisplayContext, Mode=TwoWay}"
-                                 AutomationProperties.Name="{x:Static resources:ChromeStrings.DisplayContext}" ToolTip="{x:Static resources:Strings.DisplayContext}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="62" />
+                    <ColumnDefinition Width="138" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="CaptionDragArea" Grid.Column="1" Background="Transparent" />
+                <DockPanel Grid.Column="0" Margin="12,0,0,0" HorizontalAlignment="Left">
+                    <Border DockPanel.Dock="Right" Width="90">
+                        <Button x:Name="FilterTabsButton" Margin="4,6,0,2" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                WindowChrome.IsHitTestVisibleInChrome="True"
+                                Style="{StaticResource Dui.Button.Toolbar}" Padding="7,0" MinHeight="26"
+                                ToolTip="{x:Static resources:ChromeStrings.FilePicker}"
+                                AutomationProperties.Name="{x:Static resources:ChromeStrings.FilePicker}" Click="FilterTabs_Click">
+                            <Button.RenderTransform>
+                                <TranslateTransform x:Name="FilePickerOffset" />
+                            </Button.RenderTransform>
+                            <StackPanel Orientation="Horizontal">
+                                <dui:AppIcon x:Name="TabFilterIcon" Kind="Filter" Size="13" />
+                                <TextBlock x:Name="OverflowLabel" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <dui:AppIcon x:Name="OverflowChevron" Kind="ChevronDown" Size="10" Margin="4,0,0,0" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                    </Border>
+                    <ListBox x:Name="FileTabs" Background="Transparent"
+                             AutomationProperties.Name="{x:Static resources:ChromeStrings.WorkspaceFiles}"
+                             Padding="0"
+                             BorderThickness="0"
+                             ItemContainerStyle="{StaticResource FileTabItemStyle}"
+                             ItemsSource="{Binding VisibleTabs}"
+                             SelectionChanged="FileTabs_SelectionChanged"
+                             SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
+                             PreviewMouseWheel="FileTabs_PreviewMouseWheel"
+                             ScrollViewer.ScrollChanged="FileTabs_ScrollChanged"
+                             ScrollViewer.CanContentScroll="False"
+                             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.RenderTransform>
+                            <TranslateTransform x:Name="FileTabsOffset" />
+                        </ListBox.RenderTransform>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="0,0,6,0" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Dui.Text.Secondary}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               Text="{Binding FileKindGlyph}" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="0,0,8,0"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding FileName}"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding FileName}" />
+                                    <Border Grid.Column="2" Margin="0,0,4,0" Padding="4,0"
+                                            VerticalAlignment="Center" CornerRadius="7" Background="{DynamicResource Dui.State.Hover}"
+                                            Visibility="{Binding HasChromeTabBadge, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <TextBlock Foreground="{DynamicResource Dui.Text.Secondary}" FontSize="10"
+                                                   Text="{Binding ChromeTabBadge}" />
+                                    </Border>
+                                    <Button Grid.Column="3"
+                                            Style="{StaticResource Dui.Button.Icon}"
+                                            Width="22" Height="24" MinWidth="22" MinHeight="24"
+                                            Padding="0"
+                                            VerticalAlignment="Center"
+                                            BorderThickness="0"
+                                            Command="{Binding CloseTabCommand}"
+                                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                            AutomationProperties.Name="{x:Static resources:Strings.CloseTab}"
+                                            ToolTip="{x:Static resources:Strings.CloseTab}">
+                                        <dui:AppIcon Kind="Close" Size="11" />
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+                <StackPanel x:Name="CaptionButtonsPanel" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="MinimizeCaptionButton"
+                            Style="{StaticResource CaptionButtonStyle}"
+                            ToolTip="{x:Static resources:ChromeStrings.MinimizeWindow}"
+                            AutomationProperties.Name="{x:Static resources:ChromeStrings.MinimizeWindow}"
+                            Click="MinimizeWindow_Click">
+                        <Canvas Width="10" Height="10">
+                            <Path Data="M 0,5.5 L 10,5.5"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="1" />
+                        </Canvas>
+                    </Button>
+                    <Button x:Name="MaximizeRestoreCaptionButton"
+                            Click="MaximizeRestoreWindow_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
+                                <Setter Property="ToolTip" Value="{x:Static resources:ChromeStrings.MaximizeWindow}" />
+                                <Setter Property="AutomationProperties.Name" Value="{x:Static resources:ChromeStrings.MaximizeWindow}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                        <Setter Property="ToolTip" Value="{x:Static resources:ChromeStrings.RestoreWindow}" />
+                                        <Setter Property="AutomationProperties.Name" Value="{x:Static resources:ChromeStrings.RestoreWindow}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <Canvas Width="10" Height="10">
+                            <Path x:Name="MaximizeGlyphPath"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="1">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Data" Value="M 0.5,0.5 L 9.5,0.5 L 9.5,9.5 L 0.5,9.5 Z" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                                <Setter Property="Data" Value="M 0.5,2.5 L 7.5,2.5 L 7.5,9.5 L 0.5,9.5 Z M 2.5,2.5 L 2.5,0.5 L 9.5,0.5 L 9.5,7.5 L 7.5,7.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </Canvas>
+                    </Button>
+                    <Button x:Name="CloseCaptionButton"
+                            Style="{StaticResource CaptionCloseButtonStyle}"
+                            ToolTip="{x:Static resources:ChromeStrings.CloseWindow}"
+                            AutomationProperties.Name="{x:Static resources:ChromeStrings.CloseWindow}"
+                            Click="CloseWindow_Click">
+                        <Canvas Width="10" Height="10">
+                            <Path Data="M 0.5,0.5 L 9.5,9.5 M 9.5,0.5 L 0.5,9.5"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="1"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round" />
+                        </Canvas>
+                    </Button>
                 </StackPanel>
-                    <Border Grid.Column="1" x:Name="DifferenceNavigationGroup" VerticalAlignment="Center" Height="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
-                            Background="{DynamicResource Dui.Surface.Content}" BorderBrush="{DynamicResource Dui.Border.Subtle}"
-                            BorderThickness="1,0" CornerRadius="{StaticResource Dui.Metrics.ControlRadius}">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Style="{StaticResource Dui.Button.Icon}" Command="{Binding PreviousDifferenceCommand}"
-                                    AutomationProperties.Name="{x:Static resources:Strings.PreviousDifference}" ToolTip="{x:Static resources:Strings.PreviousDifferenceShortcut}">
-                                    <dui:AppIcon Kind="Previous" />
-                                </Button>
-                            <TextBlock Width="84" Margin="2,0" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                       Foreground="{DynamicResource Dui.Text.Primary}" FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
-                                       Text="{Binding DifferencePositionText}" ToolTip="{Binding DifferencePositionText}" />
-                            <Button Style="{StaticResource Dui.Button.Icon}" Command="{Binding NextDifferenceCommand}"
-                                    AutomationProperties.Name="{x:Static resources:Strings.NextDifference}" ToolTip="{x:Static resources:Strings.NextDifferenceShortcut}">
-                                    <dui:AppIcon Kind="Next" />
-                                </Button>
+                <Popup x:Name="TabFilterPopup" PlacementTarget="{Binding ElementName=FileTabBar}" Placement="Relative"
+                       StaysOpen="False" AllowsTransparency="True" PopupAnimation="None">
+                    <Border x:Name="TabPickerSurface" Width="310" Margin="0,4,0,0" Padding="12" Style="{StaticResource Dui.Popup}">
+                        <StackPanel>
+                            <TextBlock Margin="0,0,0,7" Text="{x:Static resources:Strings.FilterTabs}" />
+                            <TextBox x:Name="TabFilterInput" Style="{StaticResource Dui.Input.TextBox}" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="{x:Static resources:Strings.FilterTabs}"
+                                     IsVisibleChanged="LocalInput_IsVisibleChanged" PreviewKeyDown="FilterInput_PreviewKeyDown" />
+                            <ListBox x:Name="TabPicker" Margin="0,8,0,0" MaxHeight="280"
+                                     Background="Transparent" BorderThickness="0"
+                                     ItemContainerStyle="{StaticResource FileTabItemStyle}"
+                                     AutomationProperties.Name="{x:Static resources:ChromeStrings.WorkspaceFiles}"
+                                     ItemsSource="{Binding VisibleTabs}" SelectedItem="{Binding SelectedTab, Mode=OneWay}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     PreviewMouseLeftButtonUp="TabPicker_PreviewMouseLeftButtonUp"
+                                     PreviewKeyDown="TabPicker_PreviewKeyDown">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding FileName}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
                         </StackPanel>
                     </Border>
-                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="4,0,0,0">
-                    <Button x:Name="FindButton" Style="{StaticResource Dui.Button.Toolbar}" MinWidth="92" Margin="0,0,4,0" Command="{Binding OpenFindCommand}"
-                            AutomationProperties.Name="{x:Static resources:Strings.Find}" ToolTip="{x:Static resources:Strings.Find}">
+                </Popup>
+            </Grid>
+        </Border>
+
+        <Border x:Name="ComparisonToolbar" Grid.Row="1" Background="{DynamicResource Dui.Surface.Toolbar}">
+            <Grid Margin="{StaticResource Dui.Metrics.PanePadding}" DataContext="{Binding SelectedTab}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Padding="2" Background="{DynamicResource Dui.State.Hover}"
+                            BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="1"
+                            CornerRadius="7">
                         <StackPanel Orientation="Horizontal">
-                            <dui:AppIcon Kind="Search" Margin="0,0,6,0" VerticalAlignment="Center" />
-                            <TextBlock Text="{x:Static resources:ChromeStrings.FindContent}" VerticalAlignment="Center" />
+                            <RadioButton x:Name="DisplayAllButton" GroupName="DisplayMode" Style="{StaticResource Dui.Radio.Segment}" MinWidth="44"
+                                         Content="{x:Static resources:ChromeStrings.DisplayAll}" IsChecked="{Binding IsDisplayAll, Mode=TwoWay}"
+                                         AutomationProperties.Name="{x:Static resources:ChromeStrings.DisplayAll}" ToolTip="{x:Static resources:Strings.DisplayAll}" />
+                            <RadioButton x:Name="DisplayDifferencesButton" GroupName="DisplayMode" Style="{StaticResource Dui.Radio.Segment}" MinWidth="44"
+                                         Content="{x:Static resources:ChromeStrings.DisplayDifferences}" IsChecked="{Binding IsDisplayDifferences, Mode=TwoWay}"
+                                         AutomationProperties.Name="{x:Static resources:ChromeStrings.DisplayDifferences}" ToolTip="{x:Static resources:Strings.DisplayDifferences}" />
+                            <RadioButton x:Name="DisplayContextButton" GroupName="DisplayMode" Style="{StaticResource Dui.Radio.Segment}" MinWidth="54"
+                                         Content="{x:Static resources:ChromeStrings.DisplayContext}" IsChecked="{Binding IsDisplayContext, Mode=TwoWay}"
+                                         AutomationProperties.Name="{x:Static resources:ChromeStrings.DisplayContext}" ToolTip="{x:Static resources:Strings.DisplayContext}" />
                         </StackPanel>
+                    </Border>
+                    <ToggleButton x:Name="IgnoreWhitespaceButton" Margin="8,0,0,0"
+                                  Style="{StaticResource Dui.Toggle.Segment}" MinWidth="74"
+                                  Content="{x:Static resources:Strings.IgnoreWhitespace}"
+                                  AutomationProperties.Name="{x:Static resources:Strings.IgnoreWhitespace}"
+                                  ToolTip="{x:Static resources:Strings.IgnoreWhitespace}"
+                                  IsChecked="{Binding IsIgnoringWhitespace, Mode=OneWay}"
+                                  Command="{Binding ToggleIgnoreWhitespaceCommand}"
+                                  Visibility="{Binding Options.SupportsText, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </StackPanel>
+
+                <Border Grid.Column="1" x:Name="DifferenceNavigationGroup" Margin="8,0" Padding="2"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{DynamicResource Dui.Surface.Content}" BorderBrush="{DynamicResource Dui.Border.Subtle}"
+                        BorderThickness="1" CornerRadius="7">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource Dui.Button.Toolbar}" Height="26" MinHeight="26" BorderThickness="0"
+                                Command="{Binding PreviousDifferenceCommand}"
+                                AutomationProperties.Name="{x:Static resources:Strings.PreviousDifference}" ToolTip="{x:Static resources:Strings.PreviousDifferenceShortcut}">
+                            <StackPanel Orientation="Horizontal">
+                                <dui:AppIcon Kind="ChevronRight" Size="13">
+                                    <dui:AppIcon.LayoutTransform><ScaleTransform ScaleX="-1" /></dui:AppIcon.LayoutTransform>
+                                </dui:AppIcon>
+                                <TextBlock Margin="4,0,0,0" Text="{x:Static resources:ChromeStrings.PreviousDifferenceShort}" Style="{StaticResource WideToolbarLabel}" />
+                            </StackPanel>
+                        </Button>
+                        <Border Width="1" Height="14" Margin="2,0" Background="{DynamicResource Dui.Border.Subtle}" VerticalAlignment="Center" />
+                        <TextBlock Width="88" Margin="4,0" TextAlignment="Center" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Dui.Text.Primary}"
+                                   FontSize="12.5" FontWeight="SemiBold" Text="{Binding DifferencePositionText}" ToolTip="{Binding DifferencePositionText}" />
+                        <Border Width="1" Height="14" Margin="2,0" Background="{DynamicResource Dui.Border.Subtle}" VerticalAlignment="Center" />
+                        <Button Style="{StaticResource Dui.Button.Toolbar}" Height="26" MinHeight="26" Padding="8,0" BorderThickness="0"
+                                Command="{Binding NextDifferenceCommand}" AutomationProperties.Name="{x:Static resources:Strings.NextDifference}"
+                                ToolTip="{x:Static resources:Strings.NextDifferenceShortcut}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="0,0,4,0" Text="{x:Static resources:ChromeStrings.NextDifferenceShort}" Style="{StaticResource WideToolbarLabel}" />
+                                <dui:AppIcon Kind="ChevronRight" Size="13" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <Border Background="{DynamicResource Dui.Surface.Content}" BorderBrush="{DynamicResource Dui.Border.Subtle}"
+                            BorderThickness="1" CornerRadius="7" Margin="0,0,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="FindButton" Style="{StaticResource Dui.Button.Toolbar}" Command="{Binding OpenFindCommand}"
+                                    AutomationProperties.Name="{x:Static resources:Strings.Find}" ToolTip="{x:Static resources:Strings.Find}">
+                                <StackPanel Orientation="Horizontal">
+                                    <dui:AppIcon Kind="Search" Size="14" />
+                                    <TextBlock Margin="5,0,0,0" Text="{x:Static resources:ChromeStrings.WorkspaceFind}" Style="{StaticResource WideToolbarLabel}" />
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="GoToButton" Style="{StaticResource Dui.Button.Toolbar}" Command="{Binding OpenGoToCommand}"
+                                    Content="{x:Static resources:ChromeStrings.WorkspaceGoTo}"
+                                    AutomationProperties.Name="{x:Static resources:Strings.GoTo}" ToolTip="{x:Static resources:Strings.GoTo}" />
+                        </StackPanel>
+                    </Border>
+                    <Button x:Name="RefreshMineButton" Style="{StaticResource Dui.Button.Icon}" Command="{Binding RefreshMineCommand}"
+                            AutomationProperties.Name="{x:Static resources:Strings.RefreshMine}" ToolTip="{Binding EditorRefreshHint}">
+                        <dui:AppIcon Kind="Refresh" />
                     </Button>
-                    <Button Style="{StaticResource Dui.Button.Icon}" Command="{Binding RefreshMineCommand}"
-                            AutomationProperties.Name="{x:Static resources:Strings.RefreshMine}" ToolTip="{x:Static resources:Strings.RefreshMine}">
-                                    <dui:AppIcon Kind="Refresh" />
-                                </Button>
                     <Button x:Name="ThemeToggleButton" Style="{StaticResource Dui.Button.Icon}" Click="ToggleTheme_Click"
                             AutomationProperties.Name="{x:Static resources:Strings.ToggleThemeShortcut}" ToolTip="{x:Static resources:Strings.ToggleThemeShortcut}">
-                                    <dui:AppIcon Kind="Theme" />
-                                </Button>
+                        <dui:AppIcon Kind="Theme" />
+                    </Button>
                     <Button x:Name="MoreActionsButton" Style="{StaticResource Dui.Button.Icon}"
                             AutomationProperties.Name="{x:Static resources:Strings.MoreActions}" ToolTip="{x:Static resources:Strings.MoreActions}" Click="ComparisonOptions_Click"
                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
@@ -366,26 +732,24 @@
                                 </MenuItem>
                                 <Separator />
 
-                                    <MenuItem Header="{x:Static resources:Strings.GoTo}" Command="{Binding SelectedTab.OpenGoToCommand}" />
-                                    <Separator />
-                                    <MenuItem IsHitTestVisible="False" Focusable="False">
-                                        <MenuItem.Header>
-                                            <TextBlock Text="{Binding Preferences.ReadingScale, StringFormat={}{0:P0}}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem Header="{x:Static resources:Strings.ZoomIn}" Click="ZoomIn_Click" />
-                                    <MenuItem Header="{x:Static resources:Strings.ZoomOut}" Click="ZoomOut_Click" />
-                                    <MenuItem Header="{x:Static resources:Strings.ZoomReset}" Click="ZoomReset_Click" />
-                                    <Separator />
-                                    <MenuItem Header="{x:Static resources:Strings.ExportHtml}" Click="ExportHtml_Click" IsEnabled="{Binding SelectedTab.CanExport}" />
-                                    <MenuItem Header="{x:Static resources:Strings.ExportSelectedText}" Click="ExportSelectedText_Click" IsEnabled="{Binding SelectedTab.CanExport}" />
-                                    <Separator />
-                                    <MenuItem Header="{x:Static resources:Strings.SaveRules}" Command="{Binding SelectedTab.SaveRulesCommand}" />
-                                    <MenuItem Header="{x:Static resources:Strings.RestoreRules}" Command="{Binding SelectedTab.RestoreRulesCommand}" />
-                                    <Separator />
-                                    <MenuItem Header="{x:Static resources:Strings.FilterTabs}" Click="FilterTabs_Click" />
-                                    <MenuItem Header="{x:Static resources:Strings.CloseOtherTabs}" Command="{Binding CloseOtherTabsCommand}" />
-                                    <MenuItem Header="{x:Static resources:Strings.CloseAllTabs}" Command="{Binding CloseAllTabsCommand}" />
+                                <MenuItem IsHitTestVisible="False" Focusable="False">
+                                    <MenuItem.Header>
+                                        <TextBlock Text="{Binding Preferences.ReadingScale, StringFormat={}{0:P0}}" />
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.ZoomIn}" Click="ZoomIn_Click" />
+                                <MenuItem Header="{x:Static resources:Strings.ZoomOut}" Click="ZoomOut_Click" />
+                                <MenuItem Header="{x:Static resources:Strings.ZoomReset}" Click="ZoomReset_Click" />
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.ExportHtml}" Click="ExportHtml_Click" IsEnabled="{Binding SelectedTab.CanExport}" />
+                                <MenuItem Header="{x:Static resources:Strings.ExportSelectedText}" Click="ExportSelectedText_Click" IsEnabled="{Binding SelectedTab.CanExport}" />
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.SaveRules}" Command="{Binding SelectedTab.SaveRulesCommand}" />
+                                <MenuItem Header="{x:Static resources:Strings.RestoreRules}" Command="{Binding SelectedTab.RestoreRulesCommand}" />
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.FilterTabs}" Click="FilterTabs_Click" />
+                                <MenuItem Header="{x:Static resources:Strings.CloseOtherTabs}" Command="{Binding CloseOtherTabsCommand}" />
+                                <MenuItem Header="{x:Static resources:Strings.CloseAllTabs}" Command="{Binding CloseAllTabsCommand}" />
 
                             </ContextMenu>
                         </Button.ContextMenu>
@@ -393,107 +757,17 @@
                 </StackPanel>
             </Grid>
         </Border>
-        <Border Grid.Row="1"
-                Background="{DynamicResource Dui.Surface.Tabs}"
-                BorderBrush="{DynamicResource Dui.Border.Subtle}"
-                BorderThickness="0,0,0,1">
-            <Grid Margin="9,0">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                <ListBox x:Name="FileTabs" Background="Transparent"
-                         Padding="0"
-                         BorderThickness="0"
-                         ItemContainerStyle="{StaticResource FileTabItemStyle}"
-                         ItemsSource="{Binding VisibleTabs}"
-                         SelectionChanged="FileTabs_SelectionChanged"
-                         SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Border Width="18"
-                                        Height="18"
-                                        Margin="0,0,6,0"
-                                        VerticalAlignment="Center"
-                                        Background="{DynamicResource Dui.State.Hover}"
-                                        CornerRadius="{StaticResource Dui.Metrics.ControlRadius}">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Foreground="{DynamicResource Dui.Text.Secondary}"
-                                               FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
-                                               FontWeight="SemiBold"
-                                               Text="{Binding FileKindGlyph}" />
-                                </Border>
-                                <TextBlock Grid.Column="1"
-                                           Margin="0,0,8,0"
-                                           VerticalAlignment="Center"
-                                           Text="{Binding FileName}"
-                                           TextTrimming="CharacterEllipsis"
-                                           ToolTip="{Binding FileName}" />
-                                <Border Grid.Column="2"
-                                        MinWidth="16"
-                                        Margin="0,0,6,0"
-                                        Padding="3,0"
-                                        VerticalAlignment="Center"
-                                        Background="Transparent"
-                                        Visibility="{Binding HasChromeTabBadge, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               Foreground="{DynamicResource Dui.Text.Secondary}"
-                                               FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
-                                               Text="{Binding ChromeTabBadge}" />
-                                </Border>
-                                <Button Grid.Column="3"
-                                        Style="{StaticResource Dui.Button.Icon}"
-                                        Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
-                                        Height="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
-                                        Padding="0"
-                                        VerticalAlignment="Center"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Command="{Binding CloseTabCommand}"
-                                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                        AutomationProperties.Name="{x:Static resources:Strings.CloseTab}"
-                                        ToolTip="{x:Static resources:Strings.CloseTab}">
-                                    <dui:AppIcon Kind="Close" />
-                                </Button>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <Button x:Name="FilterTabsButton" Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center" Style="{StaticResource Dui.Button.Icon}"
-                        ToolTip="{x:Static resources:Strings.FilterTabs}" AutomationProperties.Name="{x:Static resources:Strings.FilterTabs}" Click="FilterTabs_Click">
-                    <dui:AppIcon Kind="Filter" />
-                </Button>
-                <Popup x:Name="TabFilterPopup" PlacementTarget="{Binding ElementName=FilterTabsButton}" Placement="Bottom"
-                       StaysOpen="False" AllowsTransparency="True" PopupAnimation="None">
-                    <Border Width="310" Margin="0,4,0,0" Padding="12" Style="{StaticResource Dui.Popup}">
-                        <StackPanel>
-                            <TextBlock Margin="0,0,0,7" Text="{x:Static resources:Strings.FilterTabs}" />
-                            <TextBox x:Name="TabFilterInput" Style="{StaticResource Dui.Input.TextBox}" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-                                     IsVisibleChanged="LocalInput_IsVisibleChanged" PreviewKeyDown="FilterInput_PreviewKeyDown" />
-                        </StackPanel>
-                    </Border>
-                </Popup>
-            </Grid>
-        </Border>
 
-        <controls:PersistentContentHost x:Name="ComparisonContentHost"
-                                        Grid.Row="2"
-                                        Background="{DynamicResource Dui.Surface.Content}"
-                                        ContentTemplate="{StaticResource ComparisonContentTemplate}"
-                                        ItemsSource="{Binding Tabs}"
-                                        SelectedItem="{Binding SelectedTab}"
-                                        TraceCategory="file-tab-switch" />
+        <Border Grid.Row="2" Background="{DynamicResource Dui.Surface.Window}" />
+        <Border x:Name="ComparisonCanvas" Grid.Row="2" Margin="12,0,12,10"
+                CornerRadius="12" BorderThickness="1" BorderBrush="{DynamicResource Dui.Border.Subtle}"
+                Background="{DynamicResource Dui.Surface.Content}" SizeChanged="ComparisonCanvas_SizeChanged">
+            <controls:PersistentContentHost x:Name="ComparisonContentHost"
+                                            ContentTemplate="{StaticResource ComparisonContentTemplate}"
+                                            ItemsSource="{Binding Tabs}"
+                                            SelectedItem="{Binding SelectedTab}"
+                                            TraceCategory="file-tab-switch" />
+        </Border>
+        <controls:ThemeMistOverlay x:Name="ThemeMist" Grid.RowSpan="3" />
     </Grid>
 </Window>

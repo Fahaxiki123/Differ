@@ -1,27 +1,27 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="Dui.Color.Accent">#4F46E5</Color>
-    <SolidColorBrush x:Key="Dui.Surface.Window" Color="#F4F5F7" />
+    <Color x:Key="Dui.Color.Accent">#1D1D1F</Color>
+    <SolidColorBrush x:Key="Dui.Surface.Window" Color="#EBECEE" />
     <SolidColorBrush x:Key="Dui.Surface.Content" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="Dui.Surface.Toolbar" Color="#F8F9FB" />
-    <SolidColorBrush x:Key="Dui.Surface.Tabs" Color="#E9ECF1" />
-    <SolidColorBrush x:Key="Dui.Surface.PaneHeader" Color="#F8F9FB" />
-    <SolidColorBrush x:Key="Dui.Surface.Status" Color="#F4F5F7" />
-    <SolidColorBrush x:Key="Dui.Text.Primary" Color="#1F2329" />
-    <SolidColorBrush x:Key="Dui.Text.Secondary" Color="#5F6B7A" />
+    <SolidColorBrush x:Key="Dui.Surface.Toolbar" Color="#EBECEE" />
+    <SolidColorBrush x:Key="Dui.Surface.Tabs" Color="#EBECEE" />
+    <SolidColorBrush x:Key="Dui.Surface.PaneHeader" Color="#FAFBFB" />
+    <SolidColorBrush x:Key="Dui.Surface.Status" Color="#FAFAFB" />
+    <SolidColorBrush x:Key="Dui.Text.Primary" Color="#1D1D1F" />
+    <SolidColorBrush x:Key="Dui.Text.Secondary" Color="#58585E" />
     <SolidColorBrush x:Key="Dui.Text.OnAccent" Color="#FFFFFF" />
     <SolidColorBrush x:Key="Dui.Text.Disabled" Color="#687482" />
-    <SolidColorBrush x:Key="Dui.Border.Subtle" Color="#DADFE7" />
-    <SolidColorBrush x:Key="Dui.Border.Control" Color="#828D9D" />
+    <SolidColorBrush x:Key="Dui.Border.Subtle" Color="#DFE1E6" />
+    <SolidColorBrush x:Key="Dui.Border.Control" Color="#76767E" />
     <SolidColorBrush x:Key="Dui.Accent" Color="{StaticResource Dui.Color.Accent}" />
-    <SolidColorBrush x:Key="Dui.Accent.Hover" Color="#4038CB" />
-    <SolidColorBrush x:Key="Dui.Accent.Pressed" Color="#3730A3" />
+    <SolidColorBrush x:Key="Dui.Accent.Hover" Color="#2C2C2E" />
+    <SolidColorBrush x:Key="Dui.Accent.Pressed" Color="#3A3A3C" />
     <SolidColorBrush x:Key="Dui.Focus" Color="{StaticResource Dui.Color.Accent}" />
-    <SolidColorBrush x:Key="Dui.State.Hover" Color="#E9EDF4" />
-    <SolidColorBrush x:Key="Dui.State.Pressed" Color="#DDE3ED" />
-    <SolidColorBrush x:Key="Dui.State.Selected" Color="#ECEEFF" />
-    <SolidColorBrush x:Key="Dui.State.Disabled" Color="#E9ECF0" />
-    <SolidColorBrush x:Key="Dui.State.ReadOnly" Color="#F1F3F7" />
+    <SolidColorBrush x:Key="Dui.State.Hover" Color="#E2E4E9" />
+    <SolidColorBrush x:Key="Dui.State.Pressed" Color="#D8DBE2" />
+    <SolidColorBrush x:Key="Dui.State.Selected" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Dui.State.Disabled" Color="#E5E6EB" />
+    <SolidColorBrush x:Key="Dui.State.ReadOnly" Color="#F3F4F6" />
     <SolidColorBrush x:Key="Dui.Status.Info" Color="#2556A3" />
     <SolidColorBrush x:Key="Dui.Status.InfoSurface" Color="#EAF1FF" />
     <SolidColorBrush x:Key="Dui.Status.Warning" Color="#835000" />
@@ -32,7 +32,7 @@
     <SolidColorBrush x:Key="Dui.Danger.Hover" Color="#861F30" />
     <SolidColorBrush x:Key="Dui.Danger.Pressed" Color="#6D1625" />
     <SolidColorBrush x:Key="Dui.Text.OnDanger" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="Dui.Scroll.Thumb" Color="#8B96A6" />
-    <SolidColorBrush x:Key="Dui.Scroll.ThumbHover" Color="#657389" />
-    <SolidColorBrush x:Key="Dui.Scroll.ThumbPressed" Color="#536076" />
+    <SolidColorBrush x:Key="Dui.Scroll.Thumb" Color="#A1A1AA" />
+    <SolidColorBrush x:Key="Dui.Scroll.ThumbHover" Color="#71717A" />
+    <SolidColorBrush x:Key="Dui.Scroll.ThumbPressed" Color="#52525B" />
 </ResourceDictionary>

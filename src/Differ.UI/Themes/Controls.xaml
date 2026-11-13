@@ -164,7 +164,7 @@
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
                 <Setter Property="Background" Value="{DynamicResource Dui.State.Selected}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource Dui.Accent}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource Dui.Border.Subtle}" />
                 <Setter Property="Foreground" Value="{DynamicResource Dui.Accent}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
             </Trigger>

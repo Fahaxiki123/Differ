@@ -23,9 +23,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <Version>0.21.0</Version>
-    <AssemblyVersion>0.21.0.0</AssemblyVersion>
-    <FileVersion>0.21.0.0</FileVersion>
+    <Version>0.21.18</Version>
+    <AssemblyVersion>0.21.18.0</AssemblyVersion>
+    <FileVersion>0.21.18.0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
     <ApplicationIcon>Assets\Differ.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
@@ -35,7 +35,7 @@
 
   <PropertyGroup Condition="'$(DifferIsolatedPreview)' == 'true'">
     <DefineConstants>$(DefineConstants);DIFFER_ISOLATED_PREVIEW</DefineConstants>
-    <InformationalVersion>$(Version)-ui-phase1</InformationalVersion>
+    <InformationalVersion>$(Version)-ui-workspace</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>

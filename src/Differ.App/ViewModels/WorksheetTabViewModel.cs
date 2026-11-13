@@ -263,7 +263,10 @@ public sealed class WorksheetTabViewModel : ObservableObject
             mineCell.DetailsText,
             baseCell.Kind,
             baseCell.DetailsSegments,
-            mineCell.DetailsSegments);
+            mineCell.DetailsSegments)
+        {
+            IsContentReplacement = baseCell.IsContentReplacement
+        };
     }
 
     public void MoveDifference(int offset)

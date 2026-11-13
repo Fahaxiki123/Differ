@@ -1,6 +1,103 @@
 # Design QA
 
+> 2026-11-13：源码与唯一固定开发预览已更新至 0.21.18，本轮旧预览运行副本已删除。两处测试缓存已由用户手动删除并经代理复核；验证结果、限制及清理核验见 [0.21.18交付记录](docs/UI-0.21.18.md) 和 [项目状态](docs/PROJECT_STATUS.md)。下方各版记录保留原测试条件，不代表全部页面或环境已验收；历史证据按 [归档映射](docs/ARCHIVE_INDEX.md) 查找。
+
 > 2026-10-24 目录整理：历史验证材料已迁到项目外，旧路径映射见 [归档索引](docs/ARCHIVE_INDEX.md)；正式程序与安装包仍保留原路径。
+
+## 0.21.18 统一标题栏与主题收尾，2026-11-13
+
+- 标题栏改为同一全宽 WPF 底板与自绘按钮，消除原来右侧 156 DIP 的 DWM/WPF 分界；补齐按钮捕获、拖出取消和回入释放。真实前台已验证最小化、最大化/还原、Snap Layouts、系统菜单及未保存关闭保护。新增取证门禁等待真实 Monaco 正文与字号就绪，初始化占位图不再算通过。
+- WPF 使用共同起点的本地绘制时钟；浏览器调色板按同一插值规则直接提交。语法颜色采用稳定 token 类的临时规则，覆盖 Monaco 重建的可见节点；3项真实WebView2专项及最终前台复测通过，旧色残留已消除。原右侧接缝采样最大3个RGB色阶；跨WPF/浏览器仍非零相位，深→浅首个样本约6.02个百分点（约15个RGB色阶），中途仍有短时低对比，不宣称全过程零色差。
+- 同内容 720×620、1500×860 前后自然播放截图、150%阅读缩放和120行中文长行查找均已补齐；实际最小化、最大化/还原、Snap Layouts、系统菜单和关闭保护通过。最新源码Release构建、713/713测试（0跳过）、格式及发布后Apply/Check通过；固定预览已替换为0.21.18，旧运行副本已清除。证据集中在 `D:\项目归档\Differ\2026-11-13-caption-finish`，截图链接与用户手动删除缓存后的核验见 [交付记录](docs/UI-0.21.18.md)。
+- 本轮构建保留 NuGet 审计，仅在验证进程将既有 NU1902/NU1903 按警告处理。更高系统 DPI、跨屏与 Windows 10 未实测，不将应用内阅读缩放算作系统 DPI 验收。
+
+## 0.21.15 方案 2 真实播放同步，2026-11-11
+
+- 正常工具栏入口复现了 0.21.14 的正文落后。此前按指定进度冻结两边的截图检查漏掉了自然启动偏差。按用户选定 HTML 的 `runDuskSolution` 统一为 EaseInOutCubic，底色与流光半径使用同一进度，单层幽蓝径向流光从零透明度显现再消散。 [改前自然点击记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk-sync/before/actual-window-report.json)
+- 正文先准备配色，窗口收到就绪后统一发布起点。浏览器每帧发送实际进度，WPF 配色和雾光按该帧更新。实际工具栏入口、应用级资源、1500×860 与 720×620、150% 阅读缩放、浅深两向自然播放验证通过。逐帧对应的背景 RGB 差值均为 0。F9、连续反向切换、窗口变化取消及文档/选区/滚动保持通过。 [逐帧对照](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk-sync/frame-color-comparison.json) · [完整运行记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk-sync/frame-driven/actual-window-report.json)
+- 空间画面从已完成的一帧暂停后截取，时序数据独立自然采集。运行窗口位于屏幕外，活动状态仅作测试模拟。前台物理点击、高系统 DPI 和 Windows 10 待实机验证。Release 构建、678 项测试和格式通过，验证进程临时关闭现有依赖的 NuGet 审计。 [实际窗口中段](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk-sync/delivery/1500-dark-matched-frame.png) · [工程验证](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk-sync/validation-release/summary.json) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+
+## 0.21.14 暮色夜降方案 B，2026-11-11
+
+- 按用户选定的 `theme_seamless_transition.html` 方案 2，整体配色在 680 ms 内平滑变化，叠加低透明度暮蓝与月青流光。WPF、原生标题栏和 Monaco 使用同一目标与时序。连续切换从当前显示颜色接续，取消时收束到最新主题。
+- 夜雾采用用户提供的 XAML 最终 RGBA，并按同一透明度同步到 JavaScript，修正示例中重复叠乘和颜色字符串的问题。主层最大原始透明度为 58/255，亮度包络再按 0.85×(1−progress)^1.8 衰减。
+- 实际比较窗口的宽窄两种尺寸、150% 阅读缩放及浅深两向通过。切深色首帧 WPF 和 Monaco 背景均为 `#FFFFFF`，100 ms 均为 `#919193`，306 ms 均为 `#2D2E31`，最终到 `#17181C`。自然播放取样未出现亮度回升，模型、选区和双侧滚动保持，F9、快速反向和窗口变化取消通过。 [实际窗口记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk/actual-window/actual-window-report.json) · [首帧](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk/actual-window/1500-dark-0-window.png) · [中段](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk/actual-window/1500-dark-100-window.png)
+- Release 构建、678 项测试通过，格式和清理分别留有记录。验证进程临时关闭现有依赖的 NuGet 审计。运行验证采用离屏实际窗口，前台物理点击、高系统 DPI 和 Windows 10 待实机复核。 [测试日志](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk/validation-final/test.log) · [格式检查](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/dusk/format-final.log) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+
+## 0.21.13 夜间持续收暗，2026-11-11
+
+- 切深色时，夜雾从换色首帧开始按单调曲线衰减，并沿原圆心收拢。WPF 在资源换色前准备雾层，Monaco 在同一主题消息内同步画出首帧。切浅色继续使用晨光扩散节奏。
+- 使用同一实际比较窗口、文件与滚动位置对照 0.21.12 和 0.21.13。1500×860、720×620 与 150% 阅读缩放下，WPF 和浏览器各采样 12 个时刻，另核对自然播放。旧版夜间先从零透明度升高，新版取样持续下降，自然播放的背景 RGB 回升从 36/38 个色阶降到 0。浏览器在主题消息处理完成时已有雾光像素。 [亮度对照](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/night-timing/brightness-comparison.json) · [实际窗口记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/night-timing/after/actual-window-report.json)
+- 快速反向切换、F9、窗口变化取消、模型与选区及滚动保持均通过。验证使用实际 WPF/WebView2 的离屏窗口，100% 系统 DPI，实际前台操作与高系统 DPI 待验证。 [首帧](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/night-timing/after/1500-dark-0-window.png) · [100 ms](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/night-timing/after/1500-dark-100-window.png) · [306 ms](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/night-timing/after/1500-dark-306-window.png) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+- Release 构建、676 项测试、格式与工作区清理通过。新增回归按 20 ms 步进检查夜雾取样像素的亮度持续下降及结束清空。验证进程临时关闭已有依赖的 NuGet 审计。 [验证记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/night-timing/validation/summary.json)
+
+## 0.21.12 标题栏雾光连续性复查，2026-11-11
+
+- 重新检查发现，逐帧 DWM 纯色、矩形补色和渐变雾层在空间及呈现时序上各自变化。前几轮固定时刻的边缘色差检查不足以证明整个区域连续。现改为同一半透明雾层覆盖完整 WPF 客户区，原生按钮继续由系统绘制和命中，图标在过渡中接受同样的光色叠加。清除标题栏专用遮罩、纯色采样和补色绘制。
+- 用实际 `DiffWindow`、真实模板和离线 Monaco 加载同一 `LongThemeFixture.cs`，定位到 129 行。1500×860、720×620 与后者 150% 阅读缩放，浅深两向各检查 11 个时刻。检查整块区域的空间变化、选区与双侧滚动，工具栏事件、浏览器 F9、快速反向切换和窗口尺寸变化取消均通过。 [实际窗口后半段](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-root-review/actual-window/1500-dark-500-window.png) · [工具栏入口验证](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-root-review/actual-window/actual-window-report.json)
+- 实际窗口离屏自然播放采到 83 帧，右上区域跨边界差值为 0～2 色阶，结束后 WPF 与浏览器雾层均清空。原生命中返回最小化、最大化和关闭。自然播放测试直接驱动实际主题服务和视图桥接，窗口保持非活动，原生标题栏活动外观通过消息模拟。它验证运行时绘制，实际前台鼠标操作、Windows 10 和高系统 DPI 仍待验证。 [自然播放与恢复](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-root-review/actual-window-live/actual-window-report.json)
+- Release 构建、674 项测试、格式和工作区清理通过。验证进程临时关闭已有依赖的 NuGet 审计。 [验证结果](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-root-review/validation/summary.json) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+
+## 0.21.11 标签栏右侧分隔线，2026-11-11
+
+- 用户截图中，标签栏底部右侧连续 155 个像素为深色分隔线原色 `#272930`，左段随雾光变化。保护区以标签栏内容区的实际底边为准，整条 WPF 分隔线参与过渡。 [用户截图](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-divider/evidence/reported-0.21.10.png)
+- 离屏探针使用真实 1 DIP 分隔线、实际 DWM 按钮及同内容合成窗口。1500×860 切深色 306 ms 时，分隔线跨界色差由 110 降到 1 个 RGB 色阶，720×620 浅深两向均降到 1。原生按钮命中和过渡结束后的底色恢复已复核。测试为 100% 系统 DPI，实际桌面点击、跨屏及高 DPI 待验证。 [改前](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-divider/evidence/divider-before-dark-1500-306.png) · [改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-divider/evidence/divider-after-dark-1500-306.png) · [像素记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-divider/evidence/divider-dark-1500-306.txt) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+- Release 构建、673 项测试和格式检查通过。实际窗口模板的 720、980、1500 DIP 布局回归均检查原生按钮保护区和分隔线的边界。验证进程临时关闭现有依赖的 NuGet 审计。 [验证记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-divider/validation/summary.json)
+
+## 0.21.10 原生按钮区跟随雾光，2026-11-11
+
+- 0.21.9 虽已柔化裁切边缘，切深色时原生按钮区仍提前显示深色底。0.21.10 从同一帧的雾光计算 Windows 标题栏底色，用邻近 WPF 雾层与之衔接。支持系统着色时应用这一路径，取消或完成时恢复主题底色。 [用户复核截图](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-continuity/evidence/reported-0.21.9.png)
+- 1500×860 切深色 306 ms 时，旧版按钮区为 `#111215`，新版为 `#8B8D8F`，紧邻 WPF 像素为 `#898C8E`。离屏探针同时复核深色 500 ms 与浅色 720×620，完成后原生按钮区像素恢复，三种原生命中均有效。探针使用同内容合成 WPF 窗口和实际 DWM 按钮。桌面实点、实际前台逐帧同步和更高系统 DPI 待验证。 [切深色改前](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-continuity/evidence/v0219-dark-1500-306.png) · [切深色改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-continuity/evidence/sampled-dark-1500-306.png) · [像素记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-continuity/evidence/continuity-dark-1500-306.txt) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+
+## 0.21.9 标题栏按钮区雾光，2026-11-11
+
+- 用平滑透明度渐变取代右上按钮区的矩形硬裁切。系统按钮区域保持透明，雾光在其左侧和下方渐隐。用户截图中可见的左侧和下方突变在 1500×860 同内容 WPF 离屏对照中消失。原生按钮图标像素一致，命中结果分别为最小化、最大化、关闭。 [用户截图](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-fix/evidence/reported-0.21.8.png) · [离屏改前](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-fix/evidence/caption-hard-clip.png) · [离屏改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-fix/evidence/caption-feathered.png) · [像素与命中记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-fix/evidence/caption-probe.txt)
+- WPF 回归覆盖 1500×860 和 720×620 两种尺寸的雾光渐隐，720×620 离屏复核浅深两向。Release 构建、670 项测试及格式检查通过，验证进程临时关闭现有依赖的 NuGet 审计。离屏探针使用合成文本，桌面物理点击、系统贴靠菜单、125% 及更高系统 DPI 和跨屏待实机确认。 [浅色窄窗](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-fix/evidence/caption-feathered-720-light.png) · [测试日志](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/caption-fix/validation/test.log)
+
+## 0.21.8 晨光与月雾，2026-11-11
+
+- 双栏文本比较手动换色时，晨雾扩散、月雾收拢，中心固定于主题按钮。WPF 客户区和 Monaco 各自绘制低透明度雾光，共用 680 ms 时间轴。窗口变化和活动页签切换会清理当前雾光。
+- Monaco 隔离浏览器验证覆盖双向雾光、F9、连续切换、长行、选区和滚动位置、720 CSS px 与模拟 125% 缩放。桌面电脑操作由用户停止，跨 WPF/WebView2 接缝、真实系统 DPI、原生按键和同条件桌面前后截图待实机复核。 [Monaco 验证](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/screenshots/monaco/editor-theme-mist-qa.json)
+- Release 构建、668 项测试及格式检查通过。验证进程单独关闭现有传递依赖的 NuGet 审计，项目配置保留原有审计行为。 [测试日志](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/validation-final/test.log) · [格式日志](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/format-final.log)
+- 同日按用户要求清理旧 HTML、历史合成输入和重复预览构建。以下历史验收中的合成输入与部分中间构建已清理，运行记录和最终预览可供回查。 [清理清单](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Mist-QA-20261111/legacy-cleanup.csv)
+
+## 0.21.7 主题切换响应，2026-11-10
+
+- 用户录屏为 30 fps，四次切换均在正文更新后 8 帧才更新工具栏与状态栏。比较窗口将 WPF 布局、原生标题栏和当前 Monaco 的换色提交靠拢，缓存编辑器随后刷新。 [录屏帧索引](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/recording-theme-frames.json)
+- Windows 11 桌面用同一 1500×860 窗口、七个混合页签和相同代码位置，单次抓取一帧内的正文及外壳像素。0.21.6 三次相差 438–464 ms，0.21.7 两次落在同一采样帧、一次相差 29 ms。采样间隔限制了可辨认的时间差。 [改前采样](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/baseline-code-frames.csv) · [改后采样](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/candidate-code-frames.csv)
+- 万行 Excel 的单变量离屏对照中，去掉未使用的原生网格线画刷更新后，布局稳定耗时中位数从 534 ms 降到 70 ms，九次切换的 360 个行容器引用全部保留。桌面复核压力样例的两侧选格、103 处差异与浅深主题。 [离屏测量](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/wpf/MEASUREMENTS.md) · [打开当前开发版](D:/Diff/打开开发版.cmd)
+- 宽窗与 720×620 DIP、应用内 150% 阅读缩放均保存同内容前后截图。窄窗实测切换后保留 F8 当前块和双侧位置。自动测试覆盖 130% 缩放、背景页签更新、Monaco 撤销链与冻结表头容器。Windows 10、更高系统 DPI、跨屏及系统自动主题切换未桌面实测。 [窄窗深色改前](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/screenshots/baseline-code-narrow-dark-150.jpg) · [改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/screenshots/candidate-code-narrow-dark-150.jpg)
+- Release 构建、668 项串行测试、格式与项目目录清理通过。验证进程按隔离预览流程单独关闭 NuGet 审计。 [验证日志](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Theme-QA-20261110/validation-serial)
+
+## 0.21.6 标题栏文件页签，2026-11-10
+
+- 顶部使用 38 DIP 文件页签标题栏和 40 DIP 工具栏。右侧由 Windows 绘制窗口按钮，标题栏空白区保留系统命中行为。溢出页签通过文件列表、横向滚动和键盘访问。筛选时弹层固定在打开位置。
+- 以 0.21.5 工作区快照为基线，同一份合成文件、当前页签和正文位置复拍。Windows 捕获的可见窗口尺寸一致。 [1500×860 浅色改前](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-TitleTabs-QA-20261110/screenshots/before-wide-light-1500x860.jpg) · [改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-TitleTabs-QA-20261110/screenshots/delivery-wide-light-1500x860.jpg) · [720×620 窄窗改前](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-TitleTabs-QA-20261110/screenshots/before-narrow-150-720x620.jpg) · [改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-TitleTabs-QA-20261110/screenshots/delivery-narrow-150-720x620.jpg)
+- 八个文件的同尺寸截图中，比较区起点上移 50 像素。窄窗使用长中文名和应用内 150% 阅读缩放，溢出裁切会隐藏不完整的页签及其关闭按钮。桌面实测溢出选文件、独立关闭、F8、Ctrl+Tab、拖动、最大化与还原、最小化及系统菜单。16 份样例文件校验值一致。更高系统 DPI、跨屏、Windows 10、悬停贴靠布局和真实 SVN 调用未实测。
+- Release 构建、串行全量 667 项测试、格式和工作区清理检查均通过。常规 NuGet 审计因基线传递依赖告警阻断，验证进程单独关闭审计。工作表切换计时在首轮全量验证中波动，基线与候选单测复跑均通过。 [打开当前开发版](D:/Diff/打开开发版.cmd) · [工程验证日志](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-TitleTabs-QA-20261110/validation-serial)
+
+## 0.21.3 Excel 滑块桌面验证，2026-11-10
+
+- 使用 10,000 行 × 40 列样本，保持同输入、同窗口和同起点，通过 Windows 桌面实际拖动右侧滑块。纵向首次双侧对齐绘制从 178–272 ms 降到约 16 ms，横向从 251 ms 降到约 17 ms。最终程序从左侧发起时也确认双栏在结束前更新。
+- 用三张各 12,000 行 × 20 列的合成工作簿验证 720×620 DIP、应用内 150% 缩放和冻结首行首列。横纵拖动期间两侧都显示同一位置，松手后实际网格偏移对齐。 [按住期间横拖画面](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Excel-Drag-20261110/desktop/narrow-frozen/gesture-02-held-01.png) · [同条件改前改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Excel-Drag-20261110/narrow-frozen-before-after.png)
+- 桌面工具每个手势产生一个移动事件，记录的是应用在拖动结束前的首个对齐绘制，不是持续帧率。多次中间偏移由 WPF 回归验证。大跨度松手后原生网格接回仍有可测延迟，过渡期持续显示对齐后的真实数据。 [验收记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Excel-Drag-20261110/验收记录.md)
+
+## 0.21.2 Excel 性能复测，2026-11-10
+
+- 三张各 12,000 行 × 20 列的合成工作簿，后两张首次切换由 662–773 ms 降至 560–592 ms。三张各 3,000 行 × 40 列的样本经倒序复测，热切表 p95 从 32–34 ms 降至 18–23 ms。
+- 同一 10,000 行 × 40 列样本连续大跨度跳滚的中位耗时下降，p95 两轮结果波动，仍有明显的长尾。真实鼠标连续拖动未完成桌面复核。
+- 同尺寸同数据 WPF 运行时截图核对双侧行列、选择框、展开详情和底栏。桌面捕获遇到会话不可用，采用离屏 WPF 证据，未将其计为原生桌面截图。 [720 DIP 改前改后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Excel-Perf-20261110/excel-720-before-after-wpf.png) · [验证与原始数据](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-Excel-Perf-20261110/验收记录.md)
+
+## 0.21.1 隔离样板，2026-11-10
+
+视觉基准为用户提供的四张 V3 效果图。对照实际桌面的文本浅色、编辑态、深色和 Excel，基准为 1440×900 像素，1440×900 DIP 的 Windows 窗口实际截取为 1426×893 像素。并排图保留原比例，窗口边框外的像素不计入。窄窗改前改后均使用同一份工作簿、同一单元格和 720×620 DIP 窗口。 [视觉基准与并排图](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/comparisons)
+
+- 外框、底板、标题和底栏按同一间距与浅深色体系调整。窗口使用原生标题栏和现有矢量图标，正文使用系统字体与等宽字体。保留 24 DIP 文本行高。测试样例的真实路径、修订和保存权限与效果图占位文案分别呈现。
+- 首轮实测长列占满宽度，遮住 Excel 的 D 列标题，短值与地址之间空白过大。限制长列宽度并收紧对照组后复拍，A–D 四列可见，720 DIP 窄窗仍保留两个长值预览、复制和展开按钮。相同值回到正文色。 [Excel 复拍](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/after-excel-1440-light-C3-collapsed.jpg) · [窄窗前后](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/comparisons/excel-720-C5-before-after.png)
+- 文本浅红、浅绿差异与斜纹对齐空位按参考图调整。浅深主题差异正文颜色通过 4.5∶1 对比度校验。已核实只读与编辑按钮文案、圆角画布、定位、忽略空白与真实另存。 [浅色](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/comparisons/text-light-reference-and-final.png) · [编辑](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/comparisons/text-edit-reference-and-final.png) · [深色](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/comparisons/text-dark-reference-and-final.png)
+- Excel 测试样例存在解析提示，因此底部另显示紧凑状态。继续保留真实工作簿长值、列滚动条、完整路径和状态提示。系统 DPI 与混合显示器未复测。 [验收记录](D:/项目归档/Differ/2026-11-12-consolidation/history/Differ-UI-V3-Fix-20261110/验收记录.md)
+
+final result: passed
 
 ## 0.15.0 — 2026-09-25: application icon and offline installer
 

@@ -34,6 +34,11 @@ public sealed class EditorOverviewContinuityTests
         owner.OverviewScrollRequested += (_, _) => overviewRequests++;
 
         owner.InvalidateEditorResults(editor.Id.ToString("N"));
+        // Pending input now clears stale find feedback; overview commands must still stay blocked.
+        var clearFind = JsonSerializer.SerializeToElement(Assert.Single(commands));
+        Assert.Equal("clearFind", clearFind.GetProperty("type").GetString());
+        Assert.Equal(editor.Id.ToString("N"), clearFind.GetProperty("session").GetString());
+        commands.Clear();
         Assert.False(owner.EditorResultsCurrent);
         Assert.Null(owner.CurrentDocument);
         Assert.Empty(owner.DiffRows);
@@ -103,9 +108,17 @@ public sealed class EditorOverviewContinuityTests
         try
         {
             var oldInline = owner.RequestEditorInlineAsync(editor.Version, 1, 1, 1, 1);
+            var stateWhenInlineCompletes = oldInline.ContinueWith(_ => (
+                owner.CurrentHunk, owner.EditorResultsCurrent, owner.CanEditorAdopt, owner.CurrentDocument),
+                CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
             owner.Options.IgnoreCase = true;
             var reload = owner.ReloadAsync();
             await oldInline.WaitAsync(TimeSpan.FromSeconds(5));
+            var cancelledState = await stateWhenInlineCompletes.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.Equal(-1, cancelledState.CurrentHunk);
+            Assert.False(cancelledState.EditorResultsCurrent);
+            Assert.False(cancelledState.CanEditorAdopt);
+            Assert.Null(cancelledState.CurrentDocument);
             Assert.Equal(-1, owner.CurrentHunk);
             Assert.DoesNotContain(messages, item => item.GetProperty("type").GetString() == "inline");
             Assert.Equal(1, editor.Version);

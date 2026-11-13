@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Differ.App.Presentation.Theme;
 using Differ.App.Resources;
@@ -17,6 +18,9 @@ namespace Differ.App;
 
 public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
 {
+    internal static readonly RoutedEvent ThemeToggleRequestedEvent = EventManager.RegisterRoutedEvent(
+        "ThemeToggleRequested", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(CodeEditorView));
+
     public static readonly DependencyProperty ReadingScaleProperty = DependencyProperty.Register(
         nameof(ReadingScale), typeof(double), typeof(CodeEditorView),
         new FrameworkPropertyMetadata(1.0, OnReadingScaleChanged));
@@ -34,6 +38,7 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     private static void OnReadingScaleChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
     {
         var editor = (CodeEditorView)source;
+        editor.ThemeMistInvalidated?.Invoke(editor, EventArgs.Empty);
         if (editor._ready && !editor._disposed) editor.UpdateTheme();
     }
 
@@ -49,18 +54,19 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     private string? _modeChangeId;
 
     private DispatcherOperation? _pendingThemeUpdate;
+    private bool _themeRenderQueued;
+    private (bool Dark, object Payload)? _pendingThemeMist;
+
+    internal event EventHandler? ThemeMistInvalidated;
+    internal event Action<long>? ThemeTransitionReady;
+    internal event Action<long, double>? ThemeTransitionFrame;
 
     public CodeEditorView()
     {
         InitializeComponent();
         SetResourceReference(ThemeRevisionProperty, ThemeService.ThemeRevisionKey);
-    }
-
-    private void OnHeaderSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        // At narrow widths the tab badge and header tooltip retain the save state;
-        // commands keep their full hit targets beside the document they affect.
-        MineSaveStatus.Visibility = ActualWidth >= 1000 ? Visibility.Visible : Visibility.Collapsed;
+        IsVisibleChanged += OnEditorVisibilityChanged;
+        Browser.SizeChanged += (_, _) => ThemeMistInvalidated?.Invoke(this, EventArgs.Empty);
     }
 
     private void SaveOptions_Click(object sender, RoutedEventArgs e)
@@ -117,7 +123,11 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
                     args.Response = environment.CreateWebResourceResponse(null, 403, "Offline editor", "");
             };
             core.WebMessageReceived += OnMessage;
-            core.ProcessFailed += (_, _) => ShowFailure(Strings.EditorProcessFailed);
+            core.ProcessFailed += (_, _) =>
+            {
+                ThemeMistInvalidated?.Invoke(this, EventArgs.Empty);
+                ShowFailure(Strings.EditorProcessFailed);
+            };
             core.Navigate(EditorOrigin + "/index.html");
         }
         catch (Exception exception) when (exception is WebView2RuntimeNotFoundException or InvalidOperationException or IOException or System.Runtime.InteropServices.COMException)
@@ -129,6 +139,7 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     private void LoadDocument()
     {
         if (_owner?.EditorSession is not { } editor) return;
+        ThemeMistInvalidated?.Invoke(this, EventArgs.Empty);
         Send(new
         {
             type = "load",
@@ -158,7 +169,11 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
                 location = CodeReviewStrings.Location,
                 adoptCurrent = CodeReviewStrings.AdoptCurrent,
                 readOnlyBase = CodeReviewStrings.ReadOnlyBaseMessage,
-                readOnlyMine = CodeReviewStrings.ReadOnlyMineMessage
+                readOnlyMine = CodeReviewStrings.ReadOnlyMineMessage,
+                overviewRail = Strings.OverviewLabel,
+                overviewHint = ChromeStrings.ComparisonRailHint,
+                overviewBase = Strings.OverviewBase,
+                overviewMine = Strings.OverviewMine
             }
         });
         _owner.PublishEditorProjection();
@@ -200,6 +215,17 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
                 case "save": await SaveAsync(false); break;
                 case "saveAs": await SaveAsync(true); break;
                 case "close": _owner.CloseTabCommand.Execute(null); break;
+                case "toggleTheme":
+                    if (_ready && IsVisible) RaiseEvent(new RoutedEventArgs(ThemeToggleRequestedEvent, this));
+                    break;
+                case "themeTransitionReady":
+                    if (_ready && IsVisible) ThemeTransitionReady?.Invoke(message.GetProperty("id").GetInt64());
+                    break;
+                case "themeTransitionFrame":
+                    var elapsed = message.GetProperty("elapsed").GetDouble();
+                    if (_ready && IsVisible && double.IsFinite(elapsed))
+                        ThemeTransitionFrame?.Invoke(message.GetProperty("id").GetInt64(), Math.Clamp(elapsed, 0, 680));
+                    break;
                 case "navigate": _owner.MoveEditorDifference(message.GetProperty("direction").GetInt32()); break;
                 case "metric":
                     var operation = message.GetProperty("operation").GetString()!;
@@ -259,31 +285,98 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
         Browser.Focus();
         Send(new { type = "focus", mine });
     }
-    public void UpdateTheme() => Send(new
+    public void UpdateTheme() => SendTheme();
+
+    private void SendTheme(object? mist = null) => Send(new
     {
         type = "theme",
         dark = EditorThemeAdapter.IsDark(this),
-        palette = EditorThemeAdapter.CreatePalette(this, ReadingScale)
+        palette = EditorThemeAdapter.CreatePalette(this, ReadingScale),
+        mist
     });
+
+    internal bool PrepareThemeMist(FrameworkElement root, Point origin, Size area, bool dark, long startedAt, long? transitionId = null)
+    {
+        var viewport = Browser.RenderSize;
+        if (!_ready || _disposed || !Browser.IsVisible || !Browser.IsEnabled || !root.IsAncestorOf(Browser) ||
+            viewport.Width <= 0 || viewport.Height <= 0 || area.Width <= 0 || area.Height <= 0) return false;
+
+        var offset = Browser.TranslatePoint(new Point(), root);
+        _pendingThemeMist = (dark, new
+        {
+            x = (origin.X - offset.X) / viewport.Width,
+            y = (origin.Y - offset.Y) / viewport.Height,
+            width = area.Width / viewport.Width,
+            height = area.Height / viewport.Height,
+            startedAt,
+            waitForStart = transitionId is not null,
+            transitionId
+        });
+        return true;
+    }
+
+    internal void StartPreparedTheme(long id, long startedAt) => Send(new { type = "themeTransitionStart", id, startedAt });
+
+    internal void StopThemeMist(bool completePalette = true)
+    {
+        _pendingThemeMist = null;
+        try
+        {
+            Send(new { type = "themeMistStop", completePalette });
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or System.Runtime.InteropServices.COMException)
+        {
+            // A disconnected editor has no visible fog to clear.
+        }
+    }
 
     private static void OnThemeRevisionChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
     {
         var view = (CodeEditorView)sender;
-        if (!view._ready || view._disposed || view._pendingThemeUpdate is not null)
+        if (view._ready && !view._disposed) view.QueueThemeUpdate();
+    }
+
+    private void OnEditorVisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (!IsVisible) ThemeMistInvalidated?.Invoke(this, EventArgs.Empty);
+        if (_themeRenderQueued || _pendingThemeUpdate is not null) QueueThemeUpdate();
+    }
+
+    private void QueueThemeUpdate()
+    {
+        if (IsVisible)
         {
+            _pendingThemeUpdate?.Abort();
+            _pendingThemeUpdate = null;
+            if (_themeRenderQueued) return;
+            // Submit the palette after WPF layout, alongside the frame that paints the new chrome.
+            _themeRenderQueued = true;
+            CompositionTarget.Rendering += OnThemeRendering;
             return;
         }
 
-        // Read the new palette after all DynamicResource invalidations have completed.
-        // Collapsed cached editors stay attached to the persistent content host.
-        view._pendingThemeUpdate = view.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        StopThemeRendering();
+        // A cached editor can apply the latest palette after the visible frame is submitted.
+        _pendingThemeUpdate ??= Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () =>
         {
-            view._pendingThemeUpdate = null;
-            if (!view._disposed)
-            {
-                view.UpdateTheme();
-            }
+            _pendingThemeUpdate = null;
+            UpdateTheme();
         });
+    }
+
+    private void OnThemeRendering(object? sender, EventArgs e)
+    {
+        StopThemeRendering();
+        var pendingMist = _pendingThemeMist;
+        _pendingThemeMist = null;
+        SendTheme(pendingMist is { } mist && mist.Dark == EditorThemeAdapter.IsDark(this) ? mist.Payload : null);
+    }
+
+    private void StopThemeRendering()
+    {
+        if (!_themeRenderQueued) return;
+        _themeRenderQueued = false;
+        CompositionTarget.Rendering -= OnThemeRendering;
     }
 
     private async Task FlushAsync()
@@ -388,6 +481,9 @@ public partial class CodeEditorView : UserControl, IComparisonPaneFocusTarget
     {
         if (_disposed) return;
         _disposed = true;
+        ThemeMistInvalidated?.Invoke(this, EventArgs.Empty);
+        IsVisibleChanged -= OnEditorVisibilityChanged;
+        StopThemeRendering();
         _pendingThemeUpdate?.Abort();
         _pendingThemeUpdate = null;
         ClearValue(ThemeRevisionProperty);

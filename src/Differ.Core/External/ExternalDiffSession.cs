@@ -37,7 +37,8 @@ public sealed record ExternalDiffSession
         NormalizePath(Request.MineFilePath),
         Request.BaseRevision ?? string.Empty,
         BaseSha256,
-        MineSha256);
+        MineSha256,
+        Request.HasExplicitLocalSaveTarget ? NormalizePath(Request.BaseFilePath) : string.Empty);
 
     public static ExternalDiffSession CreateFailed(
         ExternalDiffRequest request,

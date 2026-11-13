@@ -1,9 +1,13 @@
 using System.ComponentModel;
+using System.Globalization;
+using Differ.App.Resources;
 
 namespace Differ.App.ViewModels;
 
 public sealed partial class DiffWindowViewModel
 {
+    private string _officeSummaryDetail = string.Empty;
+
     public bool IsDisplayAll
     {
         get => DisplayMode == DiffDisplayMode.All;
@@ -22,9 +26,18 @@ public sealed partial class DiffWindowViewModel
         set { if (value) DisplayMode = DiffDisplayMode.Context; }
     }
 
-    public string ChromeTabBadge => HasError ? "!" : IsEditableText ? (IsEditorDirty ? "●" : string.Empty) : HasTabBadge ? TabBadgeText : string.Empty;
+    public string ChromeTabBadge => HasTabBadge ? TabBadgeText : string.Empty;
 
     public bool HasChromeTabBadge => ChromeTabBadge.Length != 0;
+
+    public string OfficeSummaryDetail
+    {
+        get => _officeSummaryDetail;
+        private set => SetProperty(ref _officeSummaryDetail, value);
+    }
+
+    public bool HasRoutineSpreadsheetStatus => IsSpreadsheetView && (StatusText == Strings.ComparisonIdentical
+        || StatusText == string.Format(CultureInfo.CurrentCulture, Strings.ComparisonCompleteEventsFormat, DifferenceCount));
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
@@ -39,6 +52,14 @@ public sealed partial class DiffWindowViewModel
         {
             OnPropertyChanged(nameof(ChromeTabBadge));
             OnPropertyChanged(nameof(HasChromeTabBadge));
+        }
+        else if (e.PropertyName is nameof(StatusText) or nameof(IsSpreadsheetView) or nameof(DifferenceCount))
+        {
+            OnPropertyChanged(nameof(HasRoutineSpreadsheetStatus));
+        }
+        else if (e.PropertyName == nameof(IsBusy))
+        {
+            _toggleIgnoreWhitespaceCommand.NotifyCanExecuteChanged();
         }
     }
 }

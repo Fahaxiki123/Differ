@@ -25,10 +25,13 @@ public sealed partial class DiffWindowViewModel
     private AsyncRelayCommand _refreshMineCommand = null!;
     private AsyncRelayCommand _saveRulesCommand = null!;
     private AsyncRelayCommand _restoreRulesCommand = null!;
+    private AsyncRelayCommand _toggleIgnoreWhitespaceCommand = null!;
 
     public IAsyncRelayCommand RefreshMineCommand => _refreshMineCommand;
     public IAsyncRelayCommand SaveRulesCommand => _saveRulesCommand;
     public IAsyncRelayCommand RestoreRulesCommand => _restoreRulesCommand;
+    public IAsyncRelayCommand ToggleIgnoreWhitespaceCommand => _toggleIgnoreWhitespaceCommand;
+    public bool IsIgnoringWhitespace => _lastAppliedOptions?.IgnoreWhitespace == true;
     public bool CanExport => CurrentDocument is not null && (!IsEditableText || EditorResultsCurrent);
     public bool HasPendingOptions => Options.HasPendingChanges;
     public string SnapshotTimeText => string.Format(CultureInfo.CurrentCulture,
@@ -49,6 +52,8 @@ public sealed partial class DiffWindowViewModel
         _refreshMineCommand = new AsyncRelayCommand(RefreshMineAsync, () => _sessionStore is not null && !_isDisposed);
         _saveRulesCommand = new AsyncRelayCommand(SaveRulesAsync, () => _preferences is not null && !_isDisposed);
         _restoreRulesCommand = new AsyncRelayCommand(RestoreRulesAsync, () => _preferences is not null && !_isDisposed);
+        _toggleIgnoreWhitespaceCommand = new AsyncRelayCommand(ToggleIgnoreWhitespaceAsync,
+            () => Options.SupportsText && _lastAppliedOptions is not null && !IsBusy && !_isDisposed);
     }
 
     internal void ConfigureActions(ExternalDiffSessionStore store, Action<ExternalDiffSession> release,
@@ -69,6 +74,7 @@ public sealed partial class DiffWindowViewModel
         _refreshMineCommand.Cancel();
         _saveRulesCommand.Cancel();
         _restoreRulesCommand.Cancel();
+        _toggleIgnoreWhitespaceCommand.Cancel();
         _loadCancellation?.Cancel();
         if (_pendingRefreshSession is { } pending)
         {
@@ -79,6 +85,9 @@ public sealed partial class DiffWindowViewModel
 
     private void OnSessionOptionsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(ComparisonOptionsViewModel.SupportsText))
+            _toggleIgnoreWhitespaceCommand.NotifyCanExecuteChanged();
+
         if (e.PropertyName is nameof(ComparisonOptionsViewModel.IgnoreWhitespace)
             or nameof(ComparisonOptionsViewModel.IgnoreCase) or nameof(ComparisonOptionsViewModel.IgnoreLineEndings)
             or nameof(ComparisonOptionsViewModel.CompareFormatting) or nameof(ComparisonOptionsViewModel.TextEncodingName)
@@ -100,6 +109,23 @@ public sealed partial class DiffWindowViewModel
             || !current.KeyColumns.SequenceEqual(applied.KeyColumns, StringComparer.OrdinalIgnoreCase)
             || !current.SpreadsheetRules.SequenceEqual(applied.SpreadsheetRules));
         OnPropertyChanged(nameof(HasPendingOptions));
+        OnPropertyChanged(nameof(IsIgnoringWhitespace));
+    }
+
+    private async Task ToggleIgnoreWhitespaceAsync(CancellationToken cancellationToken)
+    {
+        if (!Options.SupportsText || _lastAppliedOptions is not { } applied || IsBusy || _isDisposed) return;
+        var toggled = applied with { IgnoreWhitespace = !applied.IgnoreWhitespace };
+        // Keep other staged advanced rules separate from the rules used by the current comparison.
+        Options.IgnoreWhitespace = toggled.IgnoreWhitespace;
+        try
+        {
+            await LoadCoreAsync(refreshMine: false, cancellationToken, toggled);
+        }
+        finally
+        {
+            if (!_isDisposed) OnPropertyChanged(nameof(IsIgnoringWhitespace));
+        }
     }
 
     private void ReleaseSession(ExternalDiffSession session)

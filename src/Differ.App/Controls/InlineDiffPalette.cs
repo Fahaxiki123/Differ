@@ -20,7 +20,7 @@ internal static class InlineDiffPalette
         run.SetResourceReference(TextElement.ForegroundProperty, GetForegroundKey(kind));
     }
 
-    private static string GetForegroundKey(DiffKind kind)
+    internal static string GetForegroundKey(DiffKind kind)
     {
         return kind switch
         {

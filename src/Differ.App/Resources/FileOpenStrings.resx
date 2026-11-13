@@ -17,7 +17,7 @@
   <data name="SelectOutput" xml:space="preserve"><value>选择合并结果的保存位置</value></data>
   <data name="AllFiles" xml:space="preserve"><value>所有文件 (*.*)|*.*</value></data>
   <data name="MergeHint" xml:space="preserve"><value>三个来源只读。合并结果只有在你主动保存时才写入结果文件。</value></data>
-  <data name="CompareHint" xml:space="preserve"><value>左侧作为基础只读，右侧为当前文件。打开后可选择开启文本编辑。</value></data>
+  <data name="CompareHint" xml:space="preserve"><value>左侧作为只读基础。代码和纯文本开启编辑后，可保存到所选的右侧当前文件。</value></data>
   <data name="MissingPath" xml:space="preserve"><value>请填写全部文件路径。</value></data>
   <data name="InputMissing" xml:space="preserve"><value>找不到输入文件，请检查所选路径。</value></data>
   <data name="LaunchFailed" xml:space="preserve"><value>无法打开所选文件：</value></data>

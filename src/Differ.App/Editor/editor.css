@@ -1,3 +1,322 @@
-html,body{height:100%;width:100%;margin:0;overflow:hidden;background:var(--background)}#editor{height:100%;width:100%;display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr)}#base,#mine{width:100%;height:100%;box-sizing:border-box;position:relative;overflow:hidden}#merge-gutter{position:relative;box-sizing:border-box;border-inline:1px solid var(--border);background:var(--chrome)}#adopt-current{position:absolute;inset-inline:0;width:22px;height:24px;padding:0;border:1px solid var(--border);border-radius:3px;background:var(--background);color:var(--focus);font:600 18px system-ui;cursor:pointer}#adopt-current:hover:enabled,#adopt-current:focus-visible{background:var(--modified);outline:1px solid var(--focus)}#adopt-current:disabled{color:var(--foreground);opacity:.35;cursor:default}#adopt-current[hidden]{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.current-hunk-frame{position:absolute;z-index:15;pointer-events:none;box-sizing:border-box;border:2px solid var(--focus);border-radius:4px}.current-hunk-frame[hidden]{display:none}.monaco-editor .current-hunk-gutter{z-index:1;width:5px!important;pointer-events:none;border-left:0;background:var(--background);box-sizing:border-box}.current-hunk-rail{position:absolute;z-index:16;pointer-events:none;width:5px;background:var(--focus);border-radius:2.5px}.current-hunk-rail[hidden]{display:none}.current-hunk-frame.locating{animation:locate-block .9s ease-out}.current-hunk-frame.locating:after{content:"";position:absolute;inset:0;background:var(--focus);opacity:0;animation:locate-flash .9s ease-out}@keyframes locate-block{0%{border-width:3px}100%{border-width:2px}}@keyframes locate-flash{0%{opacity:.18}100%{opacity:0}}@media(prefers-reduced-motion:reduce){.current-hunk-frame.locating,.current-hunk-frame.locating:after{animation:none}}
-.diff-line.added{background:var(--added)}.diff-line.deleted{background:var(--deleted)}.diff-line.modified{background:var(--modified)}.diff-gutter{border:0;pointer-events:none;--rail-color:var(--focus)}.diff-gutter::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--rail-color)}.diff-gutter.rail-start::before{top:1px;border-top-left-radius:2.5px;border-top-right-radius:2.5px}.diff-gutter.rail-end::before{bottom:1px;border-bottom-left-radius:2.5px;border-bottom-right-radius:2.5px}.diff-gutter.added{--rail-color:var(--addedText)}.diff-gutter.deleted{--rail-color:var(--deletedText)}.diff-gutter.modified{--rail-color:var(--modifiedMarker)}.changed-old{color:var(--deletedText)!important;font-weight:600}.changed-new{color:var(--addedText)!important;font-weight:600}.missing-zone{background:var(--missing)}
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--background);
+}
+
+/* Shared palette variables carry the same sRGB transition as the WPF brushes. */
+.monaco-editor,
+.monaco-editor .monaco-editor-background,
+.monaco-editor .margin,
+.monaco-diff-editor {
+    background-color: var(--background) !important;
+}
+
+.theme-color-transition .monaco-editor .line-numbers { color: var(--lineNumber) !important; }
+.theme-color-transition .monaco-editor .active-line-number { color: var(--focus) !important; }
+#editor {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr) 16px;
+    grid-template-rows: minmax(0, 1fr);
+}
+
+#theme-mist {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+#base, #mine {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+#merge-gutter {
+    position: relative;
+    z-index: 17;
+    background: var(--border);
+}
+
+#adopt-current {
+    --adopt-half-size: 11px;
+    position: absolute;
+    left: 50%;
+    top: clamp(var(--adopt-half-size), var(--adopt-center), calc(100% - var(--adopt-half-size)));
+    transform: translate(-50%, -50%);
+    width: calc(2 * var(--adopt-half-size));
+    height: calc(2 * var(--adopt-half-size));
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: var(--focus);
+    color: var(--background);
+    font: 600 15px system-ui;
+    cursor: pointer;
+}
+
+#adopt-current:hover, #adopt-current:focus-visible {
+    outline: 1px solid var(--focus);
+    outline-offset: 2px;
+}
+
+#adopt-current[hidden] {
+    display: none;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.current-hunk-frame {
+    position: absolute;
+    z-index: 15;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 1px solid var(--focus);
+    border-radius: 4px;
+}
+
+.current-hunk-frame[hidden], .current-hunk-rail[hidden] {
+    display: none;
+}
+
+.monaco-editor .current-hunk-gutter {
+    z-index: 1;
+    width: 5px !important;
+    pointer-events: none;
+    border-left: 0;
+    background: var(--background);
+    box-sizing: border-box;
+}
+
+.current-hunk-rail {
+    position: absolute;
+    z-index: 16;
+    pointer-events: none;
+    width: 5px;
+    background: var(--focus);
+    border-radius: 2.5px;
+}
+
+.current-hunk-frame.locating::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--focus);
+    opacity: 0;
+    animation: locate-flash .9s ease-out;
+}
+
+@keyframes locate-flash {
+    from { opacity: .10; }
+    to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .current-hunk-frame.locating::after { animation: none; }
+}
+
+.diff-line.added, #mine .diff-line.modified {
+    background: var(--added);
+}
+
+.diff-line.deleted, #base .diff-line.modified {
+    background: var(--deleted);
+}
+
+.diff-gutter {
+    border: 0;
+    pointer-events: none;
+    --rail-color: var(--focus);
+}
+
+.diff-gutter::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--rail-color);
+}
+
+.diff-gutter.rail-start::before {
+    top: 1px;
+    border-top-left-radius: 2.5px;
+    border-top-right-radius: 2.5px;
+}
+
+.diff-gutter.rail-end::before {
+    bottom: 1px;
+    border-bottom-left-radius: 2.5px;
+    border-bottom-right-radius: 2.5px;
+}
+
+.diff-gutter.added, #mine .diff-gutter.modified {
+    --rail-color: var(--addedMarker);
+}
+
+.diff-gutter.deleted, #base .diff-gutter.modified {
+    --rail-color: var(--deletedMarker);
+}
+
+.changed-old {
+    color: var(--deletedText) !important;
+    font-weight: 600;
+}
+
+.changed-new {
+    color: var(--addedText) !important;
+    font-weight: 600;
+}
+
+.missing-zone {
+    background: repeating-linear-gradient(135deg, transparent 0 3px, var(--missing) 3px 6px);
+}
+
+#difference-rail {
+    position: relative;
+    align-self: start;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    box-shadow: inset 1px 0 var(--railDivider, var(--border));
+    touch-action: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+#difference-rail:focus-visible {
+    outline: 1px solid var(--focus);
+    outline-offset: -1px;
+}
+
+#rail-viewport, #rail-markers {
+    position: absolute;
+    left: 1px;
+    right: 0;
+    pointer-events: none;
+}
+
+#rail-viewport {
+    box-sizing: border-box;
+    background: var(--railBand, var(--selection));
+    border-block: 1px solid var(--railEdge, var(--border));
+}
+
+#difference-rail:hover #rail-viewport,
+#difference-rail.is-dragging #rail-viewport {
+    background: var(--railBandHover, var(--inactiveSelection));
+}
+
+#difference-rail.is-dragging {
+    cursor: grabbing;
+}
+
+#rail-markers {
+    top: 0;
+    width: calc(100% - 1px);
+    height: 100%;
+}
+
+#rail-current {
+    position: absolute;
+    left: 1px;
+    width: 2px;
+    background: var(--railCurrent, var(--foreground));
+    pointer-events: none;
+}
+
+#rail-preview {
+    position: fixed;
+    z-index: 30;
+    width: min(520px, calc(100vw - 32px));
+    max-height: calc(100vh - 8px);
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 5px 15px var(--railPreviewShadow, var(--border));
+    font: 12px system-ui, sans-serif;
+    pointer-events: none;
+}
+
+#rail-preview[hidden] {
+    display: none;
+}
+
+.rail-preview-title {
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.rail-preview-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    border: 1px solid var(--border);
+}
+
+.rail-preview-side + .rail-preview-side {
+    border-left: 1px solid var(--border);
+}
+
+.rail-preview-heading, .rail-preview-line {
+    padding: 2px 7px;
+    overflow: hidden;
+    white-space: pre;
+    text-overflow: ellipsis;
+}
+
+.rail-preview-heading {
+    background: var(--chrome);
+    color: var(--muted);
+}
+
+.rail-preview-line {
+    font: 11px/15px Consolas, monospace;
+}
+
+.rail-preview-line.old {
+    background: var(--deleted);
+}
+
+.rail-preview-line.new {
+    background: var(--added);
+}
+
+.rail-preview-number, .rail-preview-hint {
+    color: var(--muted);
+}
+
+.rail-preview-hint {
+    margin-top: 6px;
+}
+
+.monaco-editor .host-find-match {
+    outline: 2px solid var(--focus);
+    outline-offset: -1px;
+    border-radius: 2px;
+}

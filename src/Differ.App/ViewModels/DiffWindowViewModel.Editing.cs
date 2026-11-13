@@ -17,12 +17,15 @@ public sealed partial class DiffWindowViewModel
     private static readonly CompositeFormat EditorHunkCountFormat = CompositeFormat.Parse(Strings.EditorHunkCountFormat);
     private static readonly CompositeFormat EditorSummaryFormat = CompositeFormat.Parse(Strings.EditorSummaryFormat);
     private static readonly CompositeFormat EditorPositionFormat = CompositeFormat.Parse(Strings.EditorPositionFormat);
+    private static readonly CompositeFormat SourceFileHintFormat = CompositeFormat.Parse(CodeReviewStrings.SourceFileHint);
+    private static readonly CompositeFormat SaveTargetHintFormat = CompositeFormat.Parse(CodeReviewStrings.SaveTargetHint);
     private EditableTextSession? _editorSession;
     private int _currentHunk = -1;
     private CancellationTokenSource? _editorProjectionCancellation;
     private bool _editorEnabled;
     private bool _editorPendingText;
     private string? _editorLoadedEncoding;
+    private DiffOptions? _editorRequestedOptions;
     private readonly Dictionary<string, object> _editorInlineCache = new(StringComparer.Ordinal);
     private Dictionary<int, DiffNode> _editorOldLines = [];
     private Dictionary<int, DiffNode> _editorNewLines = [];
@@ -64,7 +67,21 @@ public sealed partial class DiffWindowViewModel
     public string EditorSaveActionLabel => _editorSession?.SaveTarget is null ? CodeReviewStrings.SaveAsEllipsis : Strings.EditorSave;
     public string EditorBaseIdentity => long.TryParse(_session.Request.BaseRevision, NumberStyles.None, CultureInfo.InvariantCulture, out var revision)
         ? "BASE · r" + revision.ToString(CultureInfo.InvariantCulture) : "BASE";
-    public string EditorMineIdentity => _editorSession?.Origin switch
+    public bool HasAlternateEditorSaveTarget => _editorSession?.SaveTarget is { } target
+        && !string.Equals(target, MinePath, StringComparison.OrdinalIgnoreCase);
+    public string EditorSaveTargetName => HasAlternateEditorSaveTarget ? Path.GetFileName(_editorSession!.SaveTarget!) : string.Empty;
+    public string EditorMinePathHint => string.Join(Environment.NewLine,
+        string.Format(CultureInfo.CurrentCulture, SourceFileHintFormat, MinePath),
+        EditorSaveTargetHint,
+        HasAlternateEditorSaveTarget ? CodeReviewStrings.RefreshUsesSource : string.Empty).TrimEnd();
+    public string EditorRefreshHint => !IsEditableText ? Strings.RefreshMine : string.Join(Environment.NewLine,
+        Strings.RefreshMine,
+        string.Format(CultureInfo.CurrentCulture, SourceFileHintFormat, MinePath),
+        HasAlternateEditorSaveTarget ? EditorSaveTargetHint + Environment.NewLine + CodeReviewStrings.RefreshUsesSource : string.Empty).TrimEnd();
+    public string EditorSaveHint => ChromeStrings.SaveShortcut + Environment.NewLine + EditorSaveTargetHint;
+    private string EditorSaveTargetHint => string.Format(CultureInfo.CurrentCulture, SaveTargetHintFormat,
+        _editorSession?.SaveTarget ?? CodeReviewStrings.SaveTargetUnspecified);
+    public string EditorMineIdentity => HasAlternateEditorSaveTarget ? CodeReviewStrings.ResultCopy : _editorSession?.Origin switch
     {
         TextInputOrigin.SvnWorking => CodeReviewStrings.WorkingCopy,
         TextInputOrigin.LocalFile => CodeReviewStrings.LocalFile,
@@ -157,6 +174,7 @@ public sealed partial class DiffWindowViewModel
         _editorInlineCancellation?.Cancel();
         SendEditorCommand(new { type = "clear" });
         _editorSession = null;
+        _editorRequestedOptions = null;
         ClearEditorOverview();
         _editorModeGeneration++;
         _isEditModeChanging = false;
@@ -190,13 +208,13 @@ public sealed partial class DiffWindowViewModel
         NotifyEditorState();
     }
 
-    private async Task<bool> TryLoadEditorAsync(bool refreshMine, Differ.Core.External.ExternalDiffSession source, CancellationToken token)
+    private async Task<bool> TryLoadEditorAsync(bool refreshMine, Differ.Core.External.ExternalDiffSession source, DiffOptions options, CancellationToken token)
     {
         if (!_editorEnabled || !new TextDiffAdapter(new TextFileReader()).CanHandle(_session.Request.FileTypePath)) return false;
         if (_editorSession is not null && !refreshMine)
         {
             if (SynchronizeEditorAsync is { } synchronize) await synchronize();
-            if (!string.Equals(_editorLoadedEncoding, Options.TextEncodingName, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(_editorLoadedEncoding, options.TextEncodingName, StringComparison.OrdinalIgnoreCase))
             {
                 if (_editorSession.Version != 1)
                 {
@@ -207,13 +225,13 @@ public sealed partial class DiffWindowViewModel
             else
             {
                 // Comparison options operate on the current memory document, never its old disk snapshot.
-                await RecomputeEditorAsync();
+                await RecomputeEditorAsync(options);
                 return true;
             }
         }
         var watch = Stopwatch.StartNew();
         var editor = await Task.Run(() => EditableTextSession.OpenAsync(source.BaseSnapshotPath,
-            source.MineSnapshotPath, source.SessionDirectoryPath, Options.TextEncodingName, token), token);
+            source.MineSnapshotPath, source.SessionDirectoryPath, options.TextEncodingName, token), token);
         token.ThrowIfCancellationRequested();
         if (editor is null) return false;
         editor.ProtectPath(source.Request.BaseFilePath);
@@ -221,8 +239,10 @@ public sealed partial class DiffWindowViewModel
         var workingFile = await new Differ.Svn.SvnWorkingFileVerifier().VerifyAsync(source, token);
         token.ThrowIfCancellationRequested();
         if (workingFile is not null) editor.ConfirmSaveTarget(workingFile, TextInputOrigin.SvnWorking);
+        else if (source.Request.HasExplicitLocalSaveTarget) await editor.TryConfirmLocalInputAsync(token);
         else if (!string.IsNullOrEmpty(source.Request.MineRevision) && source.Request.MineRevision is not ("WC" or "WORKING"))
             editor.SetReadOnlyOrigin(TextInputOrigin.HistoricalFile);
+        token.ThrowIfCancellationRequested();
         _editorInlineCancellation?.Cancel();
         _editorSession = editor;
         ClearEditorOverview();
@@ -232,18 +252,18 @@ public sealed partial class DiffWindowViewModel
         _editorLocationText = CodeReviewStrings.NotSelected;
         _editorModeError = string.Empty;
         _editorNotice = string.Empty;
-        _editorLoadedEncoding = Options.TextEncodingName;
+        _editorLoadedEncoding = options.TextEncodingName;
         _editorPendingText = false;
         CurrentDocument = null;
         _currentHunk = -1;
         SetViewKind(FileKind.Text);
         FileKindText = Strings.EditorFileKind;
-        _lastAppliedOptions = Options.ToDiffOptions();
+        _lastAppliedOptions = options;
         NotifyEditorState();
         OnPropertyChanged(nameof(IsEditableText));
         OnPropertyChanged(nameof(EditorSession));
         PerformanceLog.Write("editor-prepare", "Text", watch.Elapsed);
-        await RecomputeEditorAsync();
+        await RecomputeEditorAsync(options);
         return true;
     }
 
@@ -263,21 +283,23 @@ public sealed partial class DiffWindowViewModel
         _ = RecomputeEditorAsync();
     }
 
-    private async Task RecomputeEditorAsync()
+    private async Task RecomputeEditorAsync(DiffOptions? requestedOptions = null)
     {
         if (_isDisposed || _editorSession is not { } editor) return;
         var snapshot = editor.CaptureText();
         var version = snapshot.Version;
         _editorNotice = string.Empty;
         editor.InvalidateResults();
-        _editorInlineCancellation?.Cancel();
         SetProperty(ref _currentHunk, -1, nameof(CurrentHunk));
         CurrentDocument = null;
         NotifyEditorState();
+        // Cancellation can resume an inline waiter immediately; publish the invalid state first.
+        _editorInlineCancellation?.Cancel();
         _editorProjectionCancellation?.Cancel();
         var cancellation = CancellationTokenSource.CreateLinkedTokenSource(_cancellation.Token);
         _editorProjectionCancellation = cancellation;
-        var options = Options.ToDiffOptions();
+        if (requestedOptions is not null) _editorRequestedOptions = requestedOptions;
+        var options = _editorRequestedOptions ?? Options.ToDiffOptions();
         try
         {
             var result = await _loadScheduler.RunAsync(() => IsActive, token => Task.Run(() =>
@@ -311,6 +333,7 @@ public sealed partial class DiffWindowViewModel
             if (!_isDisposed && !_editorPendingText && !cancellation.IsCancellationRequested
                 && ReferenceEquals(editor, _editorSession) && version == editor.Version)
             {
+                _editorRequestedOptions = _lastAppliedOptions;
                 ClearEditorOverview();
                 SetEditorNotice(Strings.EditorComparisonFailed + exception.GetType().Name);
                 SendEditorCommand(new { type = "projectionFailed", session = editor.Id.ToString("N"), version });
@@ -446,7 +469,7 @@ public sealed partial class DiffWindowViewModel
     private void SetEditorNotice(string message)
     {
         _editorNotice = message;
-        StatusText = message;
+        StatusText = EditorLocationText;
         OnPropertyChanged(nameof(EditorLocationText));
     }
 
@@ -472,6 +495,11 @@ public sealed partial class DiffWindowViewModel
         OnPropertyChanged(nameof(EditorSaveActionLabel));
         OnPropertyChanged(nameof(EditorBaseIdentity));
         OnPropertyChanged(nameof(EditorMineIdentity));
+        OnPropertyChanged(nameof(HasAlternateEditorSaveTarget));
+        OnPropertyChanged(nameof(EditorSaveTargetName));
+        OnPropertyChanged(nameof(EditorMinePathHint));
+        OnPropertyChanged(nameof(EditorRefreshHint));
+        OnPropertyChanged(nameof(EditorSaveHint));
         OnPropertyChanged(nameof(EditorPermissionText));
         OnPropertyChanged(nameof(EditorLocationText));
         OnPropertyChanged(nameof(EditorFormatText));

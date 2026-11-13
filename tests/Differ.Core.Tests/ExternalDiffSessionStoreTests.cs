@@ -73,6 +73,32 @@ public sealed class ExternalDiffSessionStoreTests
     }
 
     [Fact]
+    public async Task ExplicitLocalSaveTargetDoesNotReuseAnUnverifiedComparisonKeyAsync()
+    {
+        var testRoot = CreateTestDirectory();
+        try
+        {
+            var basePath = Path.Combine(testRoot, "base.txt");
+            var minePath = Path.Combine(testRoot, "mine.txt");
+            await File.WriteAllTextAsync(basePath, "BASE");
+            await File.WriteAllTextAsync(minePath, "MINE");
+            var store = new ExternalDiffSessionStore(Path.Combine(testRoot, "sessions"));
+            var request = CreateRequest(basePath, minePath);
+            var unverified = await store.CreateAsync(request, CancellationToken.None);
+            var local = await store.CreateAsync(
+                request with { InvocationSource = ExternalDiffRequest.LocalFileSource }, CancellationToken.None);
+
+            Assert.Equal(unverified.BaseSha256, local.BaseSha256);
+            Assert.Equal(unverified.MineSha256, local.MineSha256);
+            Assert.NotEqual(unverified.ComparisonKey, local.ComparisonKey);
+        }
+        finally
+        {
+            Directory.Delete(testRoot, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CanceledCopyRemovesItsIncompleteSessionDirectoryAsync()
     {
         var testRoot = CreateTestDirectory();

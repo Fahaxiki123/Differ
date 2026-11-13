@@ -146,6 +146,21 @@ public sealed class ComparisonTemplateRuntimeTests
                     FlushLayout(window);
                     AssertEditorScale(window, codeEditor, 15, 24);
                 }
+                else if (content is SpreadsheetWorksheetDiffView)
+                {
+                    var workbook = FindDetailsView(window, content);
+                    var worksheetViewport = Assert.IsType<Grid>(workbook.FindName("WorksheetViewport"));
+                    AssertSpreadsheetFooterFits(workbook);
+                    preferences.ReadingScale = 1.5;
+                    FlushLayout(window);
+                    var scale = Assert.IsType<ScaleTransform>(worksheetViewport.LayoutTransform);
+                    Assert.Equal(1.5, scale.ScaleX);
+                    Assert.Equal(1.5, scale.ScaleY);
+                    AssertSpreadsheetFooterFits(workbook);
+                    AssertSpreadsheetRailFits(window, (SpreadsheetWorksheetDiffView)content);
+                    preferences.ReadingScale = 1;
+                    FlushLayout(window);
+                }
                 window.Width = 960;
                 FlushLayout(window);
 
@@ -159,8 +174,9 @@ public sealed class ComparisonTemplateRuntimeTests
                     Assert.Equal(2, viewModel.WorksheetTabs.Count);
                     viewModel.SelectedWorksheet = viewModel.WorksheetTabs[1];
                     FlushLayout(window);
-                    Assert.NotSame(content, FindActiveFormatView(window));
-                    Assert.False(Assert.IsType<ToggleButton>(FindActiveFormatView(window)
+                    var otherSheet = FindActiveFormatView(window);
+                    Assert.NotSame(content, otherSheet);
+                    Assert.False(Assert.IsType<ToggleButton>(FindDetailsView(window, otherSheet)
                         .FindName("DetailsToggle")).IsChecked);
                     viewModel.SelectedWorksheet = worksheet;
                     FlushLayout(window);
@@ -174,6 +190,11 @@ public sealed class ComparisonTemplateRuntimeTests
                     PumpUntil(() => enabling.IsCompleted, window);
                     enabling.GetAwaiter().GetResult();
                     RenderSimulatedDpiEvidence(root, "editing-cs", theme, [1.0]);
+                    window.Width = 720;
+                    FlushLayout(window);
+                    AssertToolbarFits(root, viewModel);
+                    window.Width = 960;
+                    FlushLayout(window);
                 }
                 var second = workspace.AddSession(CreateSession("另一个中文长文件名称_文件标签切换验证"));
                 PumpUntil(() => !second.IsBusy && second.DifferenceCount > 0, window);
@@ -191,8 +212,9 @@ public sealed class ComparisonTemplateRuntimeTests
                 if (viewModel.IsEditableText) Assert.True(viewModel.IsEditMode);
                 if (content is not (WordDiffView or CodeEditorView))
                 {
-                    Assert.False(Assert.IsType<ToggleButton>(content.FindName("DetailsToggle")).IsChecked);
-                    Assert.False(Assert.IsType<Grid>(content.FindName("DetailsContent")).IsVisible);
+                    var detailsView = FindDetailsView(window, content);
+                    Assert.False(Assert.IsType<ToggleButton>(detailsView.FindName("DetailsToggle")).IsChecked);
+                    Assert.False(Assert.IsType<Grid>(detailsView.FindName("DetailsContent")).IsVisible);
                 }
             }
             finally
@@ -339,14 +361,17 @@ public sealed class ComparisonTemplateRuntimeTests
 
     private static void AssertToolbarFits(Grid root, DiffWindowViewModel viewModel)
     {
-        AssertPixelRoundedSize(40, root.RowDefinitions[0].ActualHeight, root);
-        AssertPixelRoundedSize(32, root.RowDefinitions[1].ActualHeight, root);
         var dpi = VisualTreeHelper.GetDpi(root);
         var horizontalTolerance = 1 / dpi.DpiScaleX;
         var verticalTolerance = 1 / dpi.DpiScaleY;
         var buttons = FindVisuals<Button>(root).ToArray();
         FrameworkElement Named(string name) => Assert.Single(FindVisuals<FrameworkElement>(root), element => element.Name == name && element.IsVisible);
+        var fileTabBar = Named("FileTabBar");
         var toolbar = Named("ComparisonToolbar");
+        AssertPixelRoundedSize(38, fileTabBar.ActualHeight, root);
+        AssertPixelRoundedSize(40, toolbar.ActualHeight, root);
+        var toolbarTop = toolbar.TransformToAncestor(root).Transform(new Point()).Y;
+        AssertPixelRoundedSize(fileTabBar.ActualHeight, toolbarTop, root);
         Assert.Empty(FindVisuals<ComboBox>(toolbar));
         Assert.DoesNotContain(buttons, button => button.IsVisible && AutomationProperties.GetName(button) == Strings.ComparisonOptions);
         var modes = ModeButtonNames
@@ -364,29 +389,58 @@ public sealed class ComparisonTemplateRuntimeTests
         viewModel.DisplayMode = oldMode;
         FlushLayout(Window.GetWindow(root)!);
         Assert.Single(modes, item => item.IsChecked == true);
+        var next = Assert.Single(buttons, button => AutomationProperties.GetName(button) == Strings.NextDifference);
+        var nextLabel = Assert.Single(FindVisuals<TextBlock>(next));
+        Assert.Equal(((SolidColorBrush)next.Foreground).Color, ((SolidColorBrush)nextLabel.Foreground).Color);
         var essentials = new List<FrameworkElement>
         {
             Assert.Single(buttons, button => AutomationProperties.GetName(button) == Strings.PreviousDifference),
-            Assert.Single(buttons, button => AutomationProperties.GetName(button) == Strings.NextDifference),
+            next,
             Assert.Single(buttons, button => Equals(button.ToolTip, Strings.ToggleThemeShortcut)),
             Assert.Single(buttons, button => Equals(button.ToolTip, Strings.Find)),
-            Assert.Single(buttons, button => Equals(button.ToolTip, Strings.RefreshMine)),
+            Named("GoToButton"),
+            Named("RefreshMineButton"),
             Assert.Single(buttons, button => Equals(button.ToolTip, Strings.MoreActions)),
             Assert.Single(FindVisuals<TextBlock>(root), text =>
                 text.GetBindingExpression(TextBlock.TextProperty)?.ParentBinding.Path?.Path == nameof(viewModel.DifferencePositionText))
         };
         essentials.AddRange(modes);
-        var statusBar = Named("ComparisonStatusBar");
-        Assert.True(statusBar.IsVisible);
-        AssertPixelRoundedSize(24, statusBar.ActualHeight, root);
+        var whitespaceButton = Assert.Single(FindVisuals<ToggleButton>(toolbar), button => button.Name == "IgnoreWhitespaceButton");
+        Assert.Equal(viewModel.Options.SupportsText, whitespaceButton.IsVisible);
+        if (whitespaceButton.IsVisible)
+        {
+            essentials.Add(whitespaceButton);
+        }
+
+        var canvas = Assert.IsType<Border>(Named("ComparisonCanvas"));
+        Assert.Equal(new CornerRadius(12), canvas.CornerRadius);
+        Assert.Equal(new Thickness(12, 0, 12, 10), canvas.Margin);
+        var clip = Assert.IsType<RectangleGeometry>(canvas.Clip);
+        Assert.Equal(12, clip.RadiusX);
+        Assert.Equal(12, clip.RadiusY);
+        AssertPixelRoundedSize(canvas.ActualWidth, clip.Rect.Width, root, horizontal: true);
+        AssertPixelRoundedSize(canvas.ActualHeight, clip.Rect.Height, root);
+        var statusBar = Assert.Single(FindVisuals<FrameworkElement>(canvas), element =>
+            element.Name == "ComparisonStatusBar" && ReferenceEquals(element.DataContext, viewModel));
+        if (statusBar.IsVisible)
+        {
+            AssertPixelRoundedSize(24, statusBar.ActualHeight, root);
+        }
+        else
+        {
+            Assert.True(viewModel.IsSpreadsheetView);
+            Assert.False(viewModel.HasWarnings);
+            Assert.False(viewModel.HasError);
+            Assert.False(viewModel.IsBusy);
+        }
         var bounds = essentials.Select(element =>
         {
             Assert.True(element.IsVisible, $"Toolbar element {element.GetType().Name} is hidden.");
             var rectangle = element.TransformToAncestor(root).TransformBounds(new Rect(element.RenderSize));
             Assert.True(rectangle.Left >= -horizontalTolerance && rectangle.Right <= root.ActualWidth + horizontalTolerance,
                 $"Toolbar clips {element.GetType().Name}: {rectangle}; width {root.ActualWidth}.");
-            Assert.True(rectangle.Top >= -verticalTolerance
-                && rectangle.Bottom <= root.RowDefinitions[0].ActualHeight + verticalTolerance,
+            Assert.True(rectangle.Top >= toolbarTop - verticalTolerance
+                && rectangle.Bottom <= toolbarTop + toolbar.ActualHeight + verticalTolerance,
                 $"Toolbar element leaves its single row: {rectangle}.");
             Assert.True(rectangle.Width > 0 && rectangle.Height > 0,
                 $"Toolbar element has no area: {element.GetType().Name}, {rectangle}.");
@@ -404,15 +458,16 @@ public sealed class ComparisonTemplateRuntimeTests
         if (viewModel.IsEditableText)
         {
             var header = Named("MinePaneHeader");
+            Assert.True(Named("MineSaveStatus").ActualWidth > 0);
             var headerBounds = header.TransformToAncestor(root).TransformBounds(new Rect(header.RenderSize));
-            var save = Assert.IsType<Button>(Named("SaveButton"));
+            var save = Assert.Single(FindVisuals<Button>(header), b => b.Name == "SaveButton");
             var label = Assert.IsType<TextBlock>(save.Content);
             Assert.Equal(((SolidColorBrush)save.Foreground).Color, ((SolidColorBrush)label.Foreground).Color);
-            var saveMenu = Assert.IsType<Button>(Named("SaveMenuButton"));
+            var saveMenu = Assert.Single(FindVisuals<Button>(header), b => b.Name == "SaveMenuButton");
             var icon = Assert.IsType<AppIcon>(saveMenu.Content);
             Assert.Equal(AppIconKind.ChevronDown, icon.Kind);
             Assert.Equal(((SolidColorBrush)saveMenu.Foreground).Color, ((SolidColorBrush)icon.Foreground).Color);
-            var actionBounds = EditorActionNames.Select(name =>
+            var actionBounds = (viewModel.IsEditMode || viewModel.IsEditorDirty ? EditorActionNames : ["EditModeToggle"]).Select(name =>
             {
                 var action = Named(name);
                 Assert.NotNull(action.GetBindingExpression(name == "EditModeToggle" ? ToggleButton.IsCheckedProperty : UIElement.IsEnabledProperty));
@@ -578,8 +633,16 @@ public sealed class ComparisonTemplateRuntimeTests
     {
         Assert.True(content.ActualWidth > 600);
         Assert.True(content.ActualHeight > 400);
-        var overview = Assert.Single(FindVisuals<DiffOverviewView>(window), view => view.IsVisible);
-        AssertPixelRoundedSize(44, overview.ActualWidth, overview, horizontal: true);
+        var overviews = FindVisuals<DiffOverviewView>(window).Where(view => view.IsVisible);
+        if (content is CodeEditorView or SpreadsheetWorksheetDiffView)
+        {
+            Assert.Empty(overviews);
+        }
+        else
+        {
+            var overview = Assert.Single(overviews);
+            AssertPixelRoundedSize(12, overview.ActualWidth, overview, horizontal: true);
+        }
         if (content is CodeEditorView editor)
         {
             PumpUntil(() => editor.IsEditorReady && editor.RenderedVersion == viewModel.EditorSession!.Version, window);
@@ -591,12 +654,22 @@ public sealed class ComparisonTemplateRuntimeTests
             Assert.True(browser.ActualHeight > 300);
             Assert.True(viewModel.EditorSession!.Text.Split('\n').Length >= 80);
             Assert.NotNull(browser.CoreWebView2);
+            var railLayout = browser.ExecuteScriptAsync("""
+                (() => {
+                    const rail = document.querySelectorAll('#difference-rail[role="scrollbar"]');
+                    return rail.length === 1 && Math.abs(rail[0].getBoundingClientRect().width - 16) <= 1
+                        && [left, right].every(pane => pane.getOption(monaco.editor.EditorOption.scrollbar).verticalScrollbarSize === 0
+                            && [...pane.getDomNode().querySelectorAll('.scrollbar.vertical')].every(bar => bar.getBoundingClientRect().width < 1));
+                })()
+                """);
+            PumpUntil(() => railLayout.IsCompleted, window);
+            Assert.Equal("true", railLayout.GetAwaiter().GetResult());
             Assert.Null(editor.FindName("AdoptButton"));
             Assert.NotNull(editor.FindName("UndoButton"));
             var headers = Assert.IsAssignableFrom<FrameworkElement>(editor.FindName("EditorPaneHeaders"));
             var baseHeader = Assert.IsAssignableFrom<FrameworkElement>(editor.FindName("BasePaneHeader"));
             var mineHeader = Assert.IsAssignableFrom<FrameworkElement>(editor.FindName("MinePaneHeader"));
-            AssertPixelRoundedSize(36, headers.ActualHeight, editor);
+            AssertPixelRoundedSize(34, headers.ActualHeight, editor);
             var baseBounds = baseHeader.TransformToAncestor(editor).TransformBounds(new Rect(baseHeader.RenderSize));
             var mineBounds = mineHeader.TransformToAncestor(editor).TransformBounds(new Rect(mineHeader.RenderSize));
             AssertPixelRoundedSize(baseBounds.Width, mineBounds.Width, editor, horizontal: true);
@@ -650,14 +723,67 @@ public sealed class ComparisonTemplateRuntimeTests
         });
         AssertPixelRoundedSize(grids[0].ActualWidth, grids[1].ActualWidth, content, horizontal: true);
         AssertPixelRoundedSize(grids[0].ActualHeight, grids[1].ActualHeight, content);
-        var toggle = Assert.IsType<ToggleButton>(content.FindName("DetailsToggle"));
+        if (content is SpreadsheetWorksheetDiffView worksheet)
+        {
+            AssertSpreadsheetRailFits(window, worksheet);
+        }
+        var toggle = Assert.IsType<ToggleButton>(FindDetailsView(window, content).FindName("DetailsToggle"));
         Assert.Equal(content is SpreadsheetWorksheetDiffView, toggle.IsChecked);
+    }
+
+    private static void AssertSpreadsheetRailFits(Window window, SpreadsheetWorksheetDiffView worksheet)
+    {
+        var rail = Assert.IsType<SpreadsheetScrollRail>(worksheet.FindName("VerticalRail"));
+        Assert.True(rail.IsVisible);
+        var railBounds = rail.TransformToAncestor(window).TransformBounds(new Rect(rail.RenderSize));
+        AssertPixelRoundedSize(16, railBounds.Width, rail, horizontal: true);
+        foreach (var grid in FindVisuals<DataGrid>(worksheet).Where(grid =>
+                     grid.Name is "BaseSpreadsheetGrid" or "MineSpreadsheetGrid"))
+        {
+            Assert.DoesNotContain(FindVisuals<ScrollBar>(grid), bar =>
+                bar.Orientation == Orientation.Vertical && bar.IsVisible);
+            var viewport = FindVisuals<ScrollContentPresenter>(grid).First();
+            var bounds = viewport.TransformToAncestor(window).TransformBounds(new Rect(viewport.RenderSize));
+            AssertPixelRoundedSize(bounds.Top, railBounds.Top, rail);
+            AssertPixelRoundedSize(bounds.Bottom, railBounds.Bottom, rail);
+        }
+    }
+
+    private static UserControl FindDetailsView(Window window, UserControl content) =>
+        content is SpreadsheetWorksheetDiffView
+            ? Assert.Single(FindVisuals<SpreadsheetDiffView>(window), view => view.IsVisible)
+            : content;
+
+    private static void AssertSpreadsheetFooterFits(UserControl workbook)
+    {
+        var header = Assert.IsType<Grid>(workbook.FindName("WorksheetSourceHeaders"));
+        AssertPixelRoundedSize(34, header.ActualHeight, header);
+        var footer = Assert.IsType<Border>(workbook.FindName("WorksheetFooter"));
+        var names = new[] { "CompactBaseValue", "CompactMineValue", "CopyComparisonButton", "DetailsToggle" };
+        var regions = names.Select(name =>
+        {
+            var element = Assert.IsAssignableFrom<FrameworkElement>(workbook.FindName(name));
+            Assert.True(element.IsVisible, $"{name} is hidden in the worksheet footer.");
+            Assert.True(element.ActualWidth >= 32, $"{name} has no usable width.");
+            return element.TransformToAncestor(footer).TransformBounds(new Rect(element.RenderSize));
+        }).ToArray();
+        for (var index = 0; index < regions.Length; index++)
+        {
+            var region = regions[index];
+            Assert.True(region.Left >= -1 && region.Right <= footer.ActualWidth + 1, $"Footer clips {names[index]}.");
+            if (index > 0)
+            {
+                Assert.True(region.Left >= regions[index - 1].Right - 1,
+                    $"Footer overlaps {names[index - 1]} and {names[index]}.");
+            }
+        }
     }
 
     private static void AssertAccessibleDetails(Window window, UserControl content, DiffWindowViewModel viewModel)
     {
-        var toggle = Assert.IsType<ToggleButton>(content.FindName("DetailsToggle"));
-        var details = Assert.IsType<Grid>(content.FindName("DetailsContent"));
+        var detailsView = FindDetailsView(window, content);
+        var toggle = Assert.IsType<ToggleButton>(detailsView.FindName("DetailsToggle"));
+        var details = Assert.IsType<Grid>(detailsView.FindName("DetailsContent"));
         Assert.True(toggle.IsVisible);
         Assert.True(toggle.Focusable);
         Assert.True(KeyboardNavigation.GetIsTabStop(toggle));
@@ -677,7 +803,7 @@ public sealed class ComparisonTemplateRuntimeTests
             Assert.True(box.Focusable);
             Assert.True(box.ActualHeight > 20);
             Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(box)));
-            var expected = string.Concat(box.Segments!.Select(segment => segment.Text));
+            var expected = string.Concat((box.DiffContent?.Segments ?? box.Segments!).Select(segment => segment.Text));
             Assert.False(string.IsNullOrEmpty(expected));
             box.SelectAll();
             Assert.Equal(expected, box.Selection.Text.TrimEnd('\r', '\n'));
@@ -695,6 +821,8 @@ public sealed class ComparisonTemplateRuntimeTests
         Assert.Equal(ToggleState.Off, provider.ToggleState);
         Assert.False(details.IsVisible);
         Assert.All(boxes, box => Assert.False(box.IsVisible));
+        if (content is SpreadsheetWorksheetDiffView)
+            Assert.All(boxes, box => Assert.Null(box.DiffContent));
     }
 
     private static void WriteReadingFixture(string path, string extension, bool changed)
@@ -765,7 +893,7 @@ public sealed class ComparisonTemplateRuntimeTests
         Assert.Equal(1.5, scale.ScaleX);
         Assert.Equal(1.5, scale.ScaleY);
         AssertPixelRoundedSize(originalOverviewWidth, overview.ActualWidth, overview, horizontal: true);
-        AssertPixelRoundedSize(44, overview.ActualWidth, overview, horizontal: true);
+        AssertPixelRoundedSize(12, overview.ActualWidth, overview, horizontal: true);
         AssertToolbarFits(root, viewModel);
 
         var bodyHeight = textView.ActualHeight;

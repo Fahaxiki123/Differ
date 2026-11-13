@@ -62,6 +62,9 @@ public sealed class EditorModeStateTests
         Assert.Equal(CodeReviewStrings.ModeChangeFailed, owner.StatusText);
         Assert.Equal(CodeReviewStrings.ModeChangeFailed, owner.EditorLocationText);
         Assert.Equal(CodeReviewStrings.ModeUnconfirmed, owner.EditorPermissionText);
+        await owner.ReloadAsync();
+        Assert.True(owner.EditorResultsCurrent);
+        Assert.Equal(CodeReviewStrings.ModeChangeFailed, owner.StatusText);
         owner.ApplyEditorModeAsync = (_, _) => Task.CompletedTask;
         await owner.SetEditModeAsync(false);
         Assert.False(owner.IsEditMode);
@@ -176,6 +179,40 @@ public sealed class EditorModeStateTests
             Assert.Equal("completely new content", owner.EditorSession.Text);
         }
         finally { releaseWorkers.TrySetResult(); await Task.WhenAll(blockers); }
+    }
+
+    [Fact]
+    public async Task WhitespaceShortcutUsesEditedTextAndLeavesOtherAdvancedRulesPendingAsync()
+    {
+        using var fixture = await Fixture.CreateAsync();
+        using var otherTab = await Fixture.CreateAsync();
+        var owner = fixture.Owner;
+        var editor = owner.EditorSession!;
+        await owner.SetEditModeAsync(true);
+        owner.Options.IgnoreCase = true;
+        owner.UpdateEditorText(editor.Id.ToString("N"), editor.Version + 1, "be fore");
+
+        await owner.ToggleIgnoreWhitespaceCommand.ExecuteAsync(null);
+
+        Assert.Same(editor, owner.EditorSession);
+        Assert.True(owner.IsIgnoringWhitespace);
+        Assert.True(owner.Options.IgnoreWhitespace);
+        Assert.True(owner.HasPendingOptions);
+        Assert.True(owner.EditorResultsCurrent);
+        Assert.Empty(editor.Hunks);
+        Assert.Equal("be fore", editor.Text);
+        Assert.Equal("after", await File.ReadAllTextAsync(fixture.MinePath));
+        Assert.False(otherTab.Owner.IsIgnoringWhitespace);
+
+        owner.UpdateEditorText(editor.Id.ToString("N"), editor.Version + 1, "B E F O R E");
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        while (!owner.EditorResultsCurrent) await Task.Delay(10, timeout.Token);
+
+        Assert.Single(editor.Hunks);
+        Assert.True(owner.HasPendingOptions);
+        await owner.ReloadAsync();
+        Assert.Empty(editor.Hunks);
+        Assert.False(owner.HasPendingOptions);
     }
 
     [Fact]

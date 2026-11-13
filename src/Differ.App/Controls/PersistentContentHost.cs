@@ -10,6 +10,8 @@ namespace Differ.App.Controls;
 
 public sealed class PersistentContentHost : Grid
 {
+    private const int RetainedInactiveLayoutLimit = 2;
+
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(
             nameof(ItemsSource),
@@ -47,6 +49,8 @@ public sealed class PersistentContentHost : Grid
 
     private readonly Dictionary<object, ContentPresenter> _presenters =
         new(ReferenceEqualityComparer.Instance);
+    private List<ContentPresenter>? _recentInactivePresenters;
+    private ContentPresenter? _activePresenter;
     private INotifyCollectionChanged? _observableItems;
 
     public PersistentContentHost()
@@ -86,6 +90,8 @@ public sealed class PersistentContentHost : Grid
     }
 
     public int CachedContentCount => _presenters.Count;
+
+    public bool PreserveRecentLayout { get; set; }
 
     private static void OnItemsSourceChanged(
         DependencyObject dependencyObject,
@@ -161,13 +167,17 @@ public sealed class PersistentContentHost : Grid
     private void ShowSelectedItem(object? selectedItem)
     {
         var stopwatch = Stopwatch.StartNew();
-        foreach (var presenter in _presenters.Values)
+        if (!PreserveRecentLayout)
         {
-            presenter.Visibility = Visibility.Collapsed;
+            foreach (var presenter in _presenters.Values)
+            {
+                presenter.Visibility = Visibility.Collapsed;
+            }
         }
 
         if (selectedItem is null || !ContainsItem(selectedItem))
         {
+            ClearRecentLayout();
             return;
         }
 
@@ -188,6 +198,10 @@ public sealed class PersistentContentHost : Grid
             Children.Add(selectedPresenter);
         }
 
+        if (PreserveRecentLayout)
+        {
+            PreservePreviousLayout(selectedPresenter!);
+        }
         selectedPresenter!.Visibility = Visibility.Visible;
         Dispatcher.BeginInvoke(
             () => PerformanceLog.Write(
@@ -196,6 +210,35 @@ public sealed class PersistentContentHost : Grid
                 stopwatch.Elapsed,
                 cacheHit),
             DispatcherPriority.Render);
+    }
+
+    private void PreservePreviousLayout(ContentPresenter selectedPresenter)
+    {
+        if (ReferenceEquals(_activePresenter, selectedPresenter)) return;
+
+        _recentInactivePresenters ??= new List<ContentPresenter>(RetainedInactiveLayoutLimit + 1);
+        _recentInactivePresenters.Remove(selectedPresenter);
+        if (_activePresenter is { } previous)
+        {
+            // Hidden retains its last measurement without painting or taking input.
+            previous.Visibility = Visibility.Hidden;
+            _recentInactivePresenters.Add(previous);
+            if (_recentInactivePresenters.Count > RetainedInactiveLayoutLimit)
+            {
+                _recentInactivePresenters[0].Visibility = Visibility.Collapsed;
+                _recentInactivePresenters.RemoveAt(0);
+            }
+        }
+        _activePresenter = selectedPresenter;
+    }
+
+    private void ClearRecentLayout()
+    {
+        if (_activePresenter is { } active) active.Visibility = Visibility.Collapsed;
+        _activePresenter = null;
+        if (_recentInactivePresenters is not { } recent) return;
+        foreach (var presenter in recent) presenter.Visibility = Visibility.Collapsed;
+        recent.Clear();
     }
 
     private void RemoveMissingPresenters(IEnumerable? items)
@@ -236,6 +279,8 @@ public sealed class PersistentContentHost : Grid
 
         Children.Remove(presenter);
         presenter.Content = null;
+        if (ReferenceEquals(_activePresenter, presenter)) _activePresenter = null;
+        _recentInactivePresenters?.Remove(presenter);
         PerformanceLog.Write(
             $"{TraceCategory}-release",
             item.GetType().Name,
@@ -269,6 +314,8 @@ public sealed class PersistentContentHost : Grid
         }
 
         _presenters.Clear();
+        _activePresenter = null;
+        _recentInactivePresenters?.Clear();
         Children.Clear();
     }
 }

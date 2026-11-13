@@ -1,5 +1,7 @@
 # Differ
 
+本机唯一开发仓库是 `D:\Diff`，源码与固定隔离开发预览均为 **0.21.18**，从根目录的 `打开开发版.cmd` 启动。主题切换、窗口按钮、713项回归与本机前台验收已完成，旧预览已删除；两处测试缓存已由用户手动删除并完成核验，详见 [0.21.18交付记录](docs/UI-0.21.18.md)，其余待办见 [项目状态](docs/PROJECT_STATUS.md)。现用 SVN 安装 `D:\Differ` 不属于开发副本，本轮未替换。下方是历史发布通道，不代表当前工作区已发布到 GitHub。
+
 ## 下载版本
 
 | 版本 | 适用情况 | 下载 |
@@ -180,5 +182,3 @@ dotnet format .\Differ.sln --verify-no-changes
 完整验证与清理使用 PowerShell 7：`pwsh -NoProfile -File scripts/verify-and-clean.ps1`。它运行 Release build/test、格式检查，无论验证是否成功都清理有明确白名单的输出，并执行目录检查；日志与测试结果保存在项目外。失败时先修问题，再重跑，不能将未通过的清理当作完成。
 
 单独检查使用 `scripts/clean-workspace.ps1 -Check`，清理使用 `-Apply`。历史设计、源码快照、性能基线和截图已迁往项目外，见 [归档索引](docs/ARCHIVE_INDEX.md)。正式程序与安装包仍在原固定路径。详细保留/清理边界见 [目录维护规则](docs/WORKSPACE_HYGIENE.md)。
-
-

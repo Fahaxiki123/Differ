@@ -4,24 +4,17 @@
         <ResourceDictionary Source="/Differ.UI;component/Themes/Dark.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!--
-        Dark design tokens. Every key here must mirror a key in Light.xaml;
-        ThemeResourceParityTests fail the build if the two dictionaries drift.
-        Diff colours keep the same hue family as the light theme but lower the
-        surface saturation and raise the inline foreground brightness so the
-        character-level emphasis stays legible on dark panels.
-    -->
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime"
                 x:Key="Theme.Name">Dark</sys:String>
 
     <!-- Chrome surfaces and text -->
-    <Color x:Key="Canvas.Color">#17191C</Color>
-    <Color x:Key="Panel.Color">#1D2024</Color>
-    <Color x:Key="Ink.Color">#E5E7EB</Color>
-    <Color x:Key="MutedInk.Color">#A2AAB5</Color>
-    <Color x:Key="Border.Color">#343940</Color>
-    <Color x:Key="Accent.Color">#83ADF1</Color>
-    <Color x:Key="AccentHover.Color">#9BBEF5</Color>
+    <Color x:Key="Canvas.Color">#111215</Color>
+    <Color x:Key="Panel.Color">#17181C</Color>
+    <Color x:Key="Ink.Color">#F5F5F7</Color>
+    <Color x:Key="MutedInk.Color">#98989F</Color>
+    <Color x:Key="Border.Color">#272930</Color>
+    <Color x:Key="Accent.Color">#F5F5F7</Color>
+    <Color x:Key="AccentHover.Color">#FFFFFF</Color>
 
     <SolidColorBrush x:Key="CanvasBrush" Color="{StaticResource Canvas.Color}" />
     <SolidColorBrush x:Key="PanelBrush" Color="{StaticResource Panel.Color}" />
@@ -30,98 +23,98 @@
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Border.Color}" />
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent.Color}" />
     <SolidColorBrush x:Key="AccentHoverBrush" Color="{StaticResource AccentHover.Color}" />
-    <SolidColorBrush x:Key="OnAccentBrush" Color="#17191C" />
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#111215" />
 
     <!-- Window / toolbar / tab / status chrome -->
-    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#17191C" />
-    <SolidColorBrush x:Key="ToolbarBackgroundBrush" Color="#24272C" />
-    <SolidColorBrush x:Key="ToolbarBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="TabStripBackgroundBrush" Color="#17191C" />
-    <SolidColorBrush x:Key="TabStripBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="TabRestBrush" Color="#17191C" />
-    <SolidColorBrush x:Key="TabRestBorderBrush" Color="#17191C" />
-    <SolidColorBrush x:Key="TabHoverBrush" Color="#30343A" />
-    <SolidColorBrush x:Key="TabSelectedBrush" Color="#1D2024" />
-    <SolidColorBrush x:Key="TabSelectedBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#24272C" />
-    <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="StatusTextBrush" Color="#A2AAB5" />
-    <SolidColorBrush x:Key="PaneHeaderBackgroundBrush" Color="#24272C" />
-    <SolidColorBrush x:Key="PaneSeparatorBrush" Color="#343940" />
-    <SolidColorBrush x:Key="GutterBackgroundBrush" Color="#24272C" />
-    <SolidColorBrush x:Key="GutterTextBrush" Color="#A2AAB5" />
-    <SolidColorBrush x:Key="DetailBackgroundBrush" Color="#1D2024" />
-    <SolidColorBrush x:Key="TextRowSeparatorBrush" Color="#001D2024" />
-    <SolidColorBrush x:Key="SelectionBorderBrush" Color="#83ADF1" />
-    <SolidColorBrush x:Key="SelectionHoverBrush" Color="#1283ADF1" />
-    <SolidColorBrush x:Key="PaneHeaderBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="ToolbarButtonBrush" Color="#0024272C" />
-    <SolidColorBrush x:Key="ToolbarButtonTextBrush" Color="#CCD1D8" />
-    <SolidColorBrush x:Key="ToolbarButtonBorderBrush" Color="#0024272C" />
-    <SolidColorBrush x:Key="ToolbarButtonHoverBrush" Color="#30343A" />
-    <SolidColorBrush x:Key="ToolbarButtonPressedBrush" Color="#3A4048" />
-    <SolidColorBrush x:Key="Toolbar.SelectedBackgroundBrush" Color="#2B3E58" />
-    <SolidColorBrush x:Key="Toolbar.SelectedBorderBrush" Color="#536E95" />
-    <SolidColorBrush x:Key="Toolbar.SelectedTextBrush" Color="#C0D8FF" />
-    <SolidColorBrush x:Key="BaseSideAccentBrush" Color="#CCD1D8" />
-    <SolidColorBrush x:Key="MineSideAccentBrush" Color="#CCD1D8" />
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#111215" />
+    <SolidColorBrush x:Key="ToolbarBackgroundBrush" Color="#111215" />
+    <SolidColorBrush x:Key="ToolbarBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="TabStripBackgroundBrush" Color="#111215" />
+    <SolidColorBrush x:Key="TabStripBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="TabRestBrush" Color="#00111215" />
+    <SolidColorBrush x:Key="TabRestBorderBrush" Color="#00111215" />
+    <SolidColorBrush x:Key="TabHoverBrush" Color="#23252C" />
+    <SolidColorBrush x:Key="TabSelectedBrush" Color="#262830" />
+    <SolidColorBrush x:Key="TabSelectedBorderBrush" Color="#383B46" />
+    <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="StatusTextBrush" Color="#98989F" />
+    <SolidColorBrush x:Key="PaneHeaderBackgroundBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="PaneSeparatorBrush" Color="#272930" />
+    <SolidColorBrush x:Key="GutterBackgroundBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="GutterTextBrush" Color="#8B8D97" />
+    <SolidColorBrush x:Key="DetailBackgroundBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="TextRowSeparatorBrush" Color="#0017181C" />
+    <SolidColorBrush x:Key="SelectionBorderBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="SelectionHoverBrush" Color="#14F5F5F7" />
+    <SolidColorBrush x:Key="PaneHeaderBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="ToolbarButtonBrush" Color="#00111215" />
+    <SolidColorBrush x:Key="ToolbarButtonTextBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="ToolbarButtonBorderBrush" Color="#00111215" />
+    <SolidColorBrush x:Key="ToolbarButtonHoverBrush" Color="#23252C" />
+    <SolidColorBrush x:Key="ToolbarButtonPressedBrush" Color="#2C2F38" />
+    <SolidColorBrush x:Key="Toolbar.SelectedBackgroundBrush" Color="#282A32" />
+    <SolidColorBrush x:Key="Toolbar.SelectedBorderBrush" Color="#383B46" />
+    <SolidColorBrush x:Key="Toolbar.SelectedTextBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="BaseSideAccentBrush" Color="#98989F" />
+    <SolidColorBrush x:Key="MineSideAccentBrush" Color="#F5F5F7" />
 
     <!-- Integration page surfaces and semantic banners -->
-    <SolidColorBrush x:Key="MainWindow.HeaderBg" Color="#24272C" />
-    <SolidColorBrush x:Key="MainWindow.HeaderText" Color="#E5E7EB" />
-    <SolidColorBrush x:Key="MainWindow.HeaderSubtext" Color="#A2AAB5" />
+    <SolidColorBrush x:Key="MainWindow.HeaderBg" Color="#1C1D22" />
+    <SolidColorBrush x:Key="MainWindow.HeaderText" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="MainWindow.HeaderSubtext" Color="#98989F" />
     <SolidColorBrush x:Key="MainWindow.InfoBg" Color="#243149" />
     <SolidColorBrush x:Key="MainWindow.InfoBorder" Color="#3B537A" />
     <SolidColorBrush x:Key="MainWindow.InfoText" Color="#A2C1F1" />
-    <SolidColorBrush x:Key="MainWindow.ErrorBg" Color="#33272C" />
+    <SolidColorBrush x:Key="MainWindow.ErrorBg" Color="#2A191D" />
     <SolidColorBrush x:Key="MainWindow.ErrorBorder" Color="#75454E" />
-    <SolidColorBrush x:Key="MainWindow.ErrorText" Color="#F1A3AE" />
-    <SolidColorBrush x:Key="MainWindow.WarningBg" Color="#342F25" />
+    <SolidColorBrush x:Key="MainWindow.ErrorText" Color="#FF8787" />
+    <SolidColorBrush x:Key="MainWindow.WarningBg" Color="#292116" />
     <SolidColorBrush x:Key="MainWindow.WarningBorder" Color="#6E5C37" />
-    <SolidColorBrush x:Key="MainWindow.WarningText" Color="#E7C37C" />
-    <SolidColorBrush x:Key="MainWindow.SuccessBg" Color="#233029" />
+    <SolidColorBrush x:Key="MainWindow.WarningText" Color="#FFD43B" />
+    <SolidColorBrush x:Key="MainWindow.SuccessBg" Color="#16261E" />
     <SolidColorBrush x:Key="MainWindow.SuccessBorder" Color="#3E684C" />
-    <SolidColorBrush x:Key="MainWindow.SuccessText" Color="#94D4AA" />
+    <SolidColorBrush x:Key="MainWindow.SuccessText" Color="#69DB7C" />
 
     <!-- Toolbar chips, counters and file-tab decorations -->
-    <SolidColorBrush x:Key="Toolbar.ChipBackgroundBrush" Color="#2B2F35" />
-    <SolidColorBrush x:Key="Toolbar.ChipBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="Toolbar.ChipTextBrush" Color="#A2AAB5" />
-    <SolidColorBrush x:Key="Toolbar.BadgeBackgroundBrush" Color="#30343A" />
-    <SolidColorBrush x:Key="Toolbar.BadgeBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="Toolbar.CounterBackgroundBrush" Color="#30343A" />
+    <SolidColorBrush x:Key="Toolbar.ChipBackgroundBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="Toolbar.ChipBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="Toolbar.ChipTextBrush" Color="#98989F" />
+    <SolidColorBrush x:Key="Toolbar.BadgeBackgroundBrush" Color="#23252C" />
+    <SolidColorBrush x:Key="Toolbar.BadgeBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="Toolbar.CounterBackgroundBrush" Color="#23252C" />
 
     <!-- Status-bar warning badge and blocking error banner -->
-    <SolidColorBrush x:Key="Badge.Warning.Bg" Color="#342F25" />
-    <SolidColorBrush x:Key="Badge.Warning.Text" Color="#E7C37C" />
-    <SolidColorBrush x:Key="Banner.Error.Bg" Color="#33272C" />
+    <SolidColorBrush x:Key="Badge.Warning.Bg" Color="#292116" />
+    <SolidColorBrush x:Key="Badge.Warning.Text" Color="#FFD43B" />
+    <SolidColorBrush x:Key="Banner.Error.Bg" Color="#2A191D" />
     <SolidColorBrush x:Key="Banner.Error.Border" Color="#75454E" />
-    <SolidColorBrush x:Key="Banner.Error.Text" Color="#F1A3AE" />
-    <SolidColorBrush x:Key="Toolbar.CounterBorderBrush" Color="#343940" />
-    <SolidColorBrush x:Key="FileTab.TextBrush" Color="#A2AAB5" />
-    <SolidColorBrush x:Key="FileTab.IconBackgroundBrush" Color="#0017191C" />
-    <SolidColorBrush x:Key="FileTab.BadgeBackgroundBrush" Color="#0017191C" />
+    <SolidColorBrush x:Key="Banner.Error.Text" Color="#FF8787" />
+    <SolidColorBrush x:Key="Toolbar.CounterBorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="FileTab.TextBrush" Color="#98989F" />
+    <SolidColorBrush x:Key="FileTab.IconBackgroundBrush" Color="#00111215" />
+    <SolidColorBrush x:Key="FileTab.BadgeBackgroundBrush" Color="#00111215" />
 
     <!-- ScrollBar modern template (no arrow buttons, rounded track and thumb) -->
-    <SolidColorBrush x:Key="ScrollBar.TrackBrush" Color="#1D2024" />
-    <SolidColorBrush x:Key="ScrollBar.ThumbBrush" Color="#464D57" />
-    <SolidColorBrush x:Key="ScrollBar.ThumbHoverBrush" Color="#596370" />
-    <SolidColorBrush x:Key="ScrollBar.ThumbPressedBrush" Color="#6E7B8C" />
+    <SolidColorBrush x:Key="ScrollBar.TrackBrush" Color="#17181C" />
+    <SolidColorBrush x:Key="ScrollBar.ThumbBrush" Color="#3F424D" />
+    <SolidColorBrush x:Key="ScrollBar.ThumbHoverBrush" Color="#565A68" />
+    <SolidColorBrush x:Key="ScrollBar.ThumbPressedBrush" Color="#717687" />
 
     <!-- Standard control chrome (Button / TextBox / DataGrid in App.xaml) -->
-    <SolidColorBrush x:Key="Control.Surface" Color="#1D2024" />
-    <SolidColorBrush x:Key="Control.Hover" Color="#30343A" />
-    <SolidColorBrush x:Key="Control.Pressed" Color="#3A4048" />
-    <SolidColorBrush x:Key="DataGrid.GridLine" Color="#292E34" />
-    <SolidColorBrush x:Key="DataGrid.Header.Bg" Color="#24272C" />
+    <SolidColorBrush x:Key="Control.Surface" Color="#17181C" />
+    <SolidColorBrush x:Key="Control.Hover" Color="#23252C" />
+    <SolidColorBrush x:Key="Control.Pressed" Color="#2C2F38" />
+    <SolidColorBrush x:Key="DataGrid.GridLine" Color="#23252C" />
+    <SolidColorBrush x:Key="DataGrid.Header.Bg" Color="#1C1D22" />
 
     <!-- Semantic diff row backgrounds and borders (DiffWindow) -->
-    <SolidColorBrush x:Key="Diff.Row.Added.Bg" Color="#233029" />
-    <SolidColorBrush x:Key="Diff.Row.Added.Border" Color="#71B187" />
-    <SolidColorBrush x:Key="Diff.Row.Deleted.Bg" Color="#33272C" />
-    <SolidColorBrush x:Key="Diff.Row.Deleted.Border" Color="#D28F99" />
-    <SolidColorBrush x:Key="Diff.Row.Modified.Bg" Color="#342F25" />
-    <SolidColorBrush x:Key="Diff.Row.Modified.Border" Color="#D2AC66" />
+    <SolidColorBrush x:Key="Diff.Row.Added.Bg" Color="#1A2721" />
+    <SolidColorBrush x:Key="Diff.Row.Added.Border" Color="#69DB7C" />
+    <SolidColorBrush x:Key="Diff.Row.Deleted.Bg" Color="#2C1B1F" />
+    <SolidColorBrush x:Key="Diff.Row.Deleted.Border" Color="#FF8787" />
+    <SolidColorBrush x:Key="Diff.Row.Modified.Bg" Color="#292116" />
+    <SolidColorBrush x:Key="Diff.Row.Modified.Border" Color="#FFD43B" />
     <SolidColorBrush x:Key="Diff.Row.Moved.Bg" Color="#243149" />
     <SolidColorBrush x:Key="Diff.Row.Moved.Border" Color="#83ADF1" />
     <SolidColorBrush x:Key="Diff.Row.Conflict.Bg" Color="#452E22" />
@@ -130,50 +123,48 @@
     <SolidColorBrush x:Key="Diff.Row.Unsupported.Border" Color="#B598D4" />
 
     <!-- Text view asymmetric cell backgrounds -->
-    <SolidColorBrush x:Key="Diff.TextCell.Base.Added" Color="#24282D" />
-    <SolidColorBrush x:Key="Diff.TextCell.Base.Deleted" Color="#33272C" />
-    <SolidColorBrush x:Key="Diff.TextCell.Base.Modified" Color="#342F25" />
-    <SolidColorBrush x:Key="Diff.TextCell.Mine.Added" Color="#233029" />
-    <SolidColorBrush x:Key="Diff.TextCell.Mine.Deleted" Color="#24282D" />
-    <SolidColorBrush x:Key="Diff.TextCell.Mine.Modified" Color="#342F25" />
+    <SolidColorBrush x:Key="Diff.TextCell.Base.Added" Color="#1C1E24" />
+    <SolidColorBrush x:Key="Diff.TextCell.Base.Deleted" Color="#2A191D" />
+    <SolidColorBrush x:Key="Diff.TextCell.Base.Modified" Color="#292116" />
+    <SolidColorBrush x:Key="Diff.TextCell.Mine.Added" Color="#16261E" />
+    <SolidColorBrush x:Key="Diff.TextCell.Mine.Deleted" Color="#1C1E24" />
+    <SolidColorBrush x:Key="Diff.TextCell.Mine.Modified" Color="#292116" />
 
     <!-- Spreadsheet cell backgrounds -->
-    <SolidColorBrush x:Key="Diff.Cell.Added" Color="#233029" />
-    <SolidColorBrush x:Key="Diff.Cell.Deleted" Color="#33272C" />
-    <SolidColorBrush x:Key="Diff.Cell.Modified" Color="#342F25" />
+    <SolidColorBrush x:Key="Diff.Cell.Added" Color="#1A2721" />
+    <SolidColorBrush x:Key="Diff.Cell.Deleted" Color="#2C1B1F" />
+    <SolidColorBrush x:Key="Diff.Cell.Modified" Color="#292116" />
     <SolidColorBrush x:Key="Diff.Cell.Moved" Color="#243149" />
     <SolidColorBrush x:Key="Diff.Cell.Conflict" Color="#452E22" />
     <SolidColorBrush x:Key="Diff.Cell.Unsupported" Color="#342B40" />
 
     <!-- Word pane backgrounds (asymmetric) -->
-    <SolidColorBrush x:Key="Diff.WordPane.Base.Added" Color="#24282D" />
-    <SolidColorBrush x:Key="Diff.WordPane.Mine.Added" Color="#233029" />
-    <SolidColorBrush x:Key="Diff.WordPane.Base.Deleted" Color="#33272C" />
-    <SolidColorBrush x:Key="Diff.WordPane.Mine.Deleted" Color="#24282D" />
-    <SolidColorBrush x:Key="Diff.WordPane.Modified" Color="#342F25" />
+    <SolidColorBrush x:Key="Diff.WordPane.Base.Added" Color="#1C1E24" />
+    <SolidColorBrush x:Key="Diff.WordPane.Mine.Added" Color="#16261E" />
+    <SolidColorBrush x:Key="Diff.WordPane.Base.Deleted" Color="#2A191D" />
+    <SolidColorBrush x:Key="Diff.WordPane.Mine.Deleted" Color="#1C1E24" />
+    <SolidColorBrush x:Key="Diff.WordPane.Modified" Color="#292116" />
     <SolidColorBrush x:Key="Diff.WordPane.Moved" Color="#243149" />
     <SolidColorBrush x:Key="Diff.WordPane.Conflict" Color="#452E22" />
     <SolidColorBrush x:Key="Diff.WordPane.Unsupported" Color="#342B40" />
 
     <!-- Word footer summaries -->
-    <SolidColorBrush x:Key="Word.Summary.BaseBg" Color="#24272C" />
-    <SolidColorBrush x:Key="Word.Summary.BaseBorder" Color="#343940" />
-    <SolidColorBrush x:Key="Word.Summary.BaseText" Color="#CCD1D8" />
-    <SolidColorBrush x:Key="Word.Summary.MineBg" Color="#24272C" />
-    <SolidColorBrush x:Key="Word.Summary.MineBorder" Color="#343940" />
-    <SolidColorBrush x:Key="Word.Summary.MineText" Color="#CCD1D8" />
-    <SolidColorBrush x:Key="Word.Summary.Separator" Color="#343940" />
+    <SolidColorBrush x:Key="Word.Summary.BaseBg" Color="#1C1D22" />
+    <SolidColorBrush x:Key="Word.Summary.BaseBorder" Color="#272930" />
+    <SolidColorBrush x:Key="Word.Summary.BaseText" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="Word.Summary.MineBg" Color="#1C1D22" />
+    <SolidColorBrush x:Key="Word.Summary.MineBorder" Color="#272930" />
+    <SolidColorBrush x:Key="Word.Summary.MineText" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="Word.Summary.Separator" Color="#272930" />
 
     <!-- Inline (character-level) foreground emphasis -->
-    <Color x:Key="Diff.Inline.Added.Color">#94D4AA</Color>
-    <Color x:Key="Diff.Inline.Modified.Color">#E7C37C</Color>
-    <Color x:Key="Diff.Inline.Deleted.Color">#F1A3AE</Color>
+    <Color x:Key="Diff.Inline.Added.Color">#69DB7C</Color>
+    <Color x:Key="Diff.Inline.Modified.Color">#FFD43B</Color>
+    <Color x:Key="Diff.Inline.Deleted.Color">#FF8787</Color>
     <Color x:Key="Diff.Inline.Moved.Color">#A2C1F1</Color>
     <Color x:Key="Diff.Inline.Conflict.Color">#E6AD82</Color>
-    <Color x:Key="Diff.Inline.WordAdded.Color">#94D4AA</Color>
+    <Color x:Key="Diff.Inline.WordAdded.Color">#69DB7C</Color>
 
-    <!-- Inline foreground brushes (bound via SetResourceReference so theme
-         switches propagate to already-realised Runs without manual events) -->
     <SolidColorBrush x:Key="Diff.Inline.Added.Brush" Color="{StaticResource Diff.Inline.Added.Color}" />
     <SolidColorBrush x:Key="Diff.Inline.Modified.Brush" Color="{StaticResource Diff.Inline.Modified.Color}" />
     <SolidColorBrush x:Key="Diff.Inline.Deleted.Brush" Color="{StaticResource Diff.Inline.Deleted.Color}" />
@@ -182,20 +173,24 @@
     <SolidColorBrush x:Key="Diff.Inline.WordAdded.Brush" Color="{StaticResource Diff.Inline.WordAdded.Color}" />
 
     <!-- Overview minimap -->
-    <SolidColorBrush x:Key="Diff.Overview.ViewportBrush" Color="#14A2AAB5" />
-    <SolidColorBrush x:Key="Diff.Overview.ViewportBorderBrush" Color="#608B95A3" />
-    <SolidColorBrush x:Key="Diff.Overview.PreviewBrush" Color="#1D2024" />
-    <SolidColorBrush x:Key="Diff.Overview.PreviewBorderBrush" Color="#343940" />
+    <SolidColorBrush x:Key="Diff.Overview.ViewportBrush" Color="#22F5F5F7" />
+    <SolidColorBrush x:Key="Diff.Overview.ViewportBorderBrush" Color="#66F5F5F7" />
+    <SolidColorBrush x:Key="Diff.Rail.Divider" Color="#2B2C31" />
+    <SolidColorBrush x:Key="Diff.Rail.Band" Color="#12F5F5F7" />
+    <SolidColorBrush x:Key="Diff.Rail.BandHover" Color="#1BF5F5F7" />
+    <SolidColorBrush x:Key="Diff.Rail.Edge" Color="#62F5F5F7" />
+    <SolidColorBrush x:Key="Diff.Overview.PreviewBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="Diff.Overview.PreviewBorderBrush" Color="#272930" />
     <Color x:Key="Diff.Overview.Shadow.Color">#000000</Color>
-    <Color x:Key="Diff.Overview.Unchanged.Color">#50565F</Color>
-    <Color x:Key="Diff.Overview.Added.Color">#679E7B</Color>
-    <Color x:Key="Diff.Overview.Deleted.Color">#AE727D</Color>
-    <Color x:Key="Diff.Overview.Modified.Color">#AE8E53</Color>
-    <Color x:Key="Diff.Overview.Moved.Color">#7191C0</Color>
-    <Color x:Key="Diff.Overview.Conflict.Color">#B28263</Color>
-    <Color x:Key="Diff.Overview.Unsupported.Color">#907DA8</Color>
-    <Color x:Key="Diff.Overview.Hover.Color">#30343A</Color>
-    <Color x:Key="Diff.Overview.HoverPen.Color">#83ADF1</Color>
+    <Color x:Key="Diff.Overview.Unchanged.Color">#0017181C</Color>
+    <Color x:Key="Diff.Overview.Added.Color">#69DB7C</Color>
+    <Color x:Key="Diff.Overview.Deleted.Color">#FF8787</Color>
+    <Color x:Key="Diff.Overview.Modified.Color">#FFD43B</Color>
+    <Color x:Key="Diff.Overview.Moved.Color">#83ADF1</Color>
+    <Color x:Key="Diff.Overview.Conflict.Color">#D69A73</Color>
+    <Color x:Key="Diff.Overview.Unsupported.Color">#B598D4</Color>
+    <Color x:Key="Diff.Overview.Hover.Color">#23252C</Color>
+    <Color x:Key="Diff.Overview.HoverPen.Color">#F5F5F7</Color>
     <SolidColorBrush x:Key="Diff.Overview.Unchanged.Brush" Color="{StaticResource Diff.Overview.Unchanged.Color}" />
     <SolidColorBrush x:Key="Diff.Overview.Added.Brush" Color="{StaticResource Diff.Overview.Added.Color}" />
     <SolidColorBrush x:Key="Diff.Overview.Deleted.Brush" Color="{StaticResource Diff.Overview.Deleted.Color}" />
@@ -205,38 +200,41 @@
     <SolidColorBrush x:Key="Diff.Overview.Unsupported.Brush" Color="{StaticResource Diff.Overview.Unsupported.Color}" />
     <SolidColorBrush x:Key="Diff.Overview.HoverBrush" Color="{StaticResource Diff.Overview.Hover.Color}" />
     <SolidColorBrush x:Key="Diff.Overview.HoverPenBrush" Color="{StaticResource Diff.Overview.HoverPen.Color}" />
-    <SolidColorBrush x:Key="Diff.Overview.BackgroundBrush" Color="#17191C" />
-    <SolidColorBrush x:Key="Diff.Overview.BorderBrush" Color="#343940" />
+    <SolidColorBrush x:Key="Diff.Overview.BackgroundBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="Diff.Overview.BorderBrush" Color="#272930" />
     <!-- Floating surfaces alone receive a shadow. -->
     <Color x:Key="Popup.Shadow.Color">#000000</Color>
-    <sys:Double xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Popup.Shadow.Opacity">0.22</sys:Double>
-    <!-- Text comparison sample: scoped until its design is accepted. -->
-    <SolidColorBrush x:Key="Sample.ToolbarBrush" Color="#282633" />
-    <SolidColorBrush x:Key="Sample.PaneHeaderBrush" Color="#252430" />
-    <SolidColorBrush x:Key="Sample.TabStripBrush" Color="#201F29" />
-    <SolidColorBrush x:Key="Sample.SurfaceBrush" Color="#1E1E26" />
-    <SolidColorBrush x:Key="Sample.BorderBrush" Color="#3C394D" />
-    <SolidColorBrush x:Key="Sample.AccentBrush" Color="#B7A9FF" />
-    <SolidColorBrush x:Key="Sample.AccentHoverBrush" Color="#C5BAFF" />
-    <SolidColorBrush x:Key="Sample.AccentPressedBrush" Color="#A08EED" />
-    <SolidColorBrush x:Key="Sample.InkBrush" Color="#ECEAF5" />
-    <SolidColorBrush x:Key="Sample.MutedInkBrush" Color="#B4AEC8" />
-    <SolidColorBrush x:Key="Sample.SelectedBrush" Color="#39304F" />
-    <SolidColorBrush x:Key="Sample.HoverBrush" Color="#393449" />
-    <SolidColorBrush x:Key="Sample.PressedBrush" Color="#463B5D" />
-    <SolidColorBrush x:Key="Sample.OnAccentBrush" Color="#20172D" />
-    <SolidColorBrush x:Key="Sample.SwitchTrackBrush" Color="#50495E" />
-    <SolidColorBrush x:Key="Sample.SwitchThumbBrush" Color="#F5F2FC" />
-    <SolidColorBrush x:Key="Sample.SelectionBrush" Color="#4C4167" />
-    <SolidColorBrush x:Key="Sample.InactiveSelectionBrush" Color="#393346" />
-    <SolidColorBrush x:Key="Sample.LineNumberBrush" Color="#ABA1C1" />
-    <SolidColorBrush x:Key="Sample.ScrollThumbBrush" Color="#514B62" />
-    <SolidColorBrush x:Key="Sample.ScrollHoverBrush" Color="#6C617E" />
-    <SolidColorBrush x:Key="Sample.ScrollPressedBrush" Color="#8875A5" />
-    <SolidColorBrush x:Key="Sample.IndentBrush" Color="#302C3B" />
-    <SolidColorBrush x:Key="Sample.MissingBrush" Color="#292631" />
-    <SolidColorBrush x:Key="Editor.Selection" Color="#414C79" />
-    <SolidColorBrush x:Key="Editor.InactiveSelection" Color="#353C4C" />
-    <SolidColorBrush x:Key="Editor.Indent" Color="#373E49" />
-    <SolidColorBrush x:Key="Editor.Missing" Color="#1B1E23" />
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Popup.Shadow.Opacity">0.24</sys:Double>
+    <!-- Text comparison sample tokens -->
+    <SolidColorBrush x:Key="Sample.ToolbarBrush" Color="#111215" />
+    <SolidColorBrush x:Key="Sample.PaneHeaderBrush" Color="#1C1D22" />
+    <SolidColorBrush x:Key="Sample.TabStripBrush" Color="#111215" />
+    <SolidColorBrush x:Key="Sample.SurfaceBrush" Color="#17181C" />
+    <SolidColorBrush x:Key="Sample.BorderBrush" Color="#272930" />
+    <SolidColorBrush x:Key="Sample.AccentBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="Sample.AccentHoverBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Sample.AccentPressedBrush" Color="#D1D1D6" />
+    <SolidColorBrush x:Key="Sample.InkBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="Sample.MutedInkBrush" Color="#98989F" />
+    <SolidColorBrush x:Key="Sample.SelectedBrush" Color="#282A32" />
+    <SolidColorBrush x:Key="Sample.HoverBrush" Color="#23252C" />
+    <SolidColorBrush x:Key="Sample.PressedBrush" Color="#2C2F38" />
+    <SolidColorBrush x:Key="Sample.OnAccentBrush" Color="#111215" />
+    <SolidColorBrush x:Key="Sample.SwitchTrackBrush" Color="#3F424D" />
+    <SolidColorBrush x:Key="Sample.SwitchThumbBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="Sample.SelectionBrush" Color="#2C3240" />
+    <SolidColorBrush x:Key="Sample.InactiveSelectionBrush" Color="#232630" />
+    <SolidColorBrush x:Key="Sample.LineNumberBrush" Color="#8B8D97" />
+    <SolidColorBrush x:Key="Sample.ScrollThumbBrush" Color="#3F424D" />
+    <SolidColorBrush x:Key="Sample.ScrollHoverBrush" Color="#565A68" />
+    <SolidColorBrush x:Key="Sample.ScrollPressedBrush" Color="#717687" />
+    <SolidColorBrush x:Key="Sample.IndentBrush" Color="#23252C" />
+    <SolidColorBrush x:Key="Sample.MissingBrush" Color="#1C1E24" />
+    <SolidColorBrush x:Key="Editor.Selection" Color="#2C3240" />
+    <SolidColorBrush x:Key="Editor.InactiveSelection" Color="#232630" />
+    <SolidColorBrush x:Key="Editor.Indent" Color="#23252C" />
+    <SolidColorBrush x:Key="Editor.Missing" Color="#1C1E24" />
+    <SolidColorBrush x:Key="Caption.CloseHoverBrush" Color="#C42B1C" />
+    <SolidColorBrush x:Key="Caption.ClosePressedBrush" Color="#B22719" />
+    <SolidColorBrush x:Key="Caption.CloseActiveForegroundBrush" Color="#FFFFFF" />
 </ResourceDictionary>

@@ -1,5 +1,15 @@
 # 历史材料归档索引
 
+2026-11-12：唯一开发仓库为 `D:\Diff`，唯一开发预览为 `D:\项目归档\Differ\开发预览`，从仓库根目录 `打开开发版.cmd` 启动。现状和未完成项见 [项目状态](PROJECT_STATUS.md)。
+
+2026-11-13，0.21.18 接续修复证据：`D:\项目归档\Differ\2026-11-13-caption-finish`。保留同内容前后自然播放帧、真实窗口按钮与关闭保护结果、合成输入及哈希、工程验证、发布事务与清理清单，详见 [0.21.18交付记录](UI-0.21.18.md)。最终源码验证为 `verification-accepted`，前台截图为 `accepted-*`，安全更新状态为 `preview-update-accepted\preview-state.json`（Finalized）；固定预览为0.21.18，旧next/previous/retired运行副本均已清除。发布后清理见 `cleanup-final-apply.json`、`cleanup-final-check.json`；两处测试缓存现已由用户手动删除，代理复核见 `manual-cache-cleanup-confirmation.json`，再次工作区检查见 `manual-cache-workspace-check.json`；此前 `cleanup-remaining.json` 和重试拒绝记录保留为历史事实。目录中的 `after-*`、`final-*`、`direct-*` 是中间实验，文件名含 final 不代表最终验收；证据归档不是第二个开发入口。
+
+2026-11-12，精确查找与另存目标提示：`D:\项目归档\Differ\2026-11-12-find-save`，实现与前台过程见 [0.21.17](UI-0.21.17.md)。同日标题栏问题调查与接手前审查：`D:\项目归档\Differ\2026-11-12-caption-unified`，原始失败记录见 [0.21.18审查](UI-0.21.18-review.md)，本轮没有改写历史证据。
+
+本轮历史资料根目录为 `D:\项目归档\Differ\2026-11-12-consolidation`：原 `D:\Differ-*` 的设计、源码快照、截图、样例和测试记录对应 `history\原文件夹名`；原 `D:\Differ\UIReview` 对应 `history\Differ-installed-UIReview`。旧运行副本和可重建缓存已清理，历史启动器不再是有效试用入口。保留文件的迁移 SHA-256 清单见根目录 `preserved-files-sha256.csv`。
+
+历史 0.21.0 安装包及校验值位于 `history\Differ-Releases\0.21.0\assets`，离线打包输入位于同级 `packaging-inputs`。保留它们用于回退与重建，没有删除或替换远端历史版本。下方 E 盘入口是更早记录，本轮没有核实或迁移那些历史位置。
+
 2026-11-08 合并操作集中与连续处理：`E:\Differ-Review\2026-11-08-merge-interaction`，用户标注图、同尺寸前后运行图、布局与流程回归、发布验证见 [UI-0.20.0.md](UI-0.20.0.md)。
 
 2026-11-08 合并基础窗格开关：`E:\Differ-Review\2026-11-08-merge-base-toggle`，同内容前后运行画面、状态记忆与并发偏好回归、宽窄窗/浅深/缩放验证，见 [UI-0.19.1.md](UI-0.19.1.md)。

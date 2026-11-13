@@ -35,4 +35,8 @@
   <data name="ReadOnlyBaseMessage" xml:space="preserve"><value>BASE 始终只读。</value></data>
   <data name="ReadOnlyMineMessage" xml:space="preserve"><value>开启编辑模式后可修改右侧文档。</value></data>
   <data name="SaveAsEllipsis" xml:space="preserve"><value>另存为…</value></data>
+  <data name="SourceFileHint" xml:space="preserve"><value>来源文件：{0}</value></data>
+  <data name="SaveTargetHint" xml:space="preserve"><value>保存目标：{0}</value></data>
+  <data name="SaveTargetUnspecified" xml:space="preserve"><value>尚未指定（需另存为）</value></data>
+  <data name="RefreshUsesSource" xml:space="preserve"><value>F5 仍重新读取来源文件，不读取当前另存目标。</value></data>
 </root>

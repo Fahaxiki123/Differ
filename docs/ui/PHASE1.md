@@ -1,5 +1,7 @@
 # Differ 界面体系第一阶段
 
+> 本页保留第一阶段历史记录，不能代替当前版本状态。2026-11-12 已将历史材料集中归档并移除旧运行副本；当前唯一开发入口及后续 Excel 样板、未迁回交互见 [项目状态](../PROJECT_STATUS.md)，原路径映射见 [归档索引](../ARCHIVE_INDEX.md)。下面旧版本的 EXE 与启动命令不再作为试用入口。
+
 基线为 `origin/codex/preview-0.20.0` 的 `13e1a210961ae60b604b93ecf1d26b25372117d6`。本地实施分支为 `codex/ui-system-phase1`。检查时远端与本地预览引用相同，原工作区干净。编译环境为 Windows x64 与 .NET SDK 10.0.401，仓库继续使用 WPF、WebView2、Monaco、CommunityToolkit.Mvvm 和 DiffPlex。
 
 ## P1-01 资产清点
@@ -45,7 +47,7 @@
 
 ## P1-05 验收记录
 
-证据根目录为 `D:\Differ-UI-Phase1`。原样 0.20.0 的还原、构建和格式检查通过。隔离基线全量测试 641 通过、1 失败。失败用例原先要求关闭标签后立即删除快照，但生产服务允许 Windows 文件占用时有限重试。本轮仅让断言等待重试，保留对原件、保留会话和已关闭会话的全部断言。
+证据根目录为 `D:\项目归档\Differ\2026-11-12-consolidation\history\Differ-UI-Phase1`。原样 0.20.0 的还原、构建和格式检查通过。隔离基线全量测试 641 通过、1 失败。失败用例原先要求关闭标签后立即删除快照，但生产服务允许 Windows 文件占用时有限重试。本轮仅让断言等待重试，保留对原件、保留会话和已关闭会话的全部断言。
 
 最终还原、Release 构建、全量测试及格式检查退出码均为 0，649 项测试通过。完整日志位于 `validation`，包括普通配置 Release 构建和隔离配置测试。结构测试核对双主题键和类型、合并顺序、对比度、无业务反向依赖及菜单分隔线。WebView2 专项检查缓存模型、版本、光标、选区、滚动与撤销保持。运行时捕获单独保存，不计入桌面截图。
 
@@ -64,8 +66,8 @@
 
 ## P1-06 隔离试用与安全校验
 
-- 本机验收程序 `D:\Differ-UI-Phase1\preview-final\Differ.Phase1.Preview.exe`，产品版本 `0.20.0-ui-phase1`，信息版本后缀为基线 SHA。哈希和版本清单见 `artifact-manifest.json`。同一阶段改动的 GitHub 源码版本为 `v0.21.0`，在 `codex/ui-system-phase1` 分支维护。
-- Gallery `D:\Differ-UI-Phase1\gallery\Differ.UI.Gallery.exe`。两个交付目录中的 `Differ.UI.dll` SHA-256 一致。可在 PowerShell 执行 `pwsh -NoProfile -File D:\Differ-UI-Phase1\Run-Fixture.ps1 -Case Text` 直接打开合成双栏，再运行 `-Case Second` 测同窗口标签，或 `-Case Merge` 打开合成三方冲突。
+- 本机验收程序 `D:\项目归档\Differ\2026-11-12-consolidation\history\Differ-UI-Phase1\preview-final\Differ.Phase1.Preview.exe`，产品版本 `0.20.0-ui-phase1`，信息版本后缀为基线 SHA。哈希和版本清单见 `artifact-manifest.json`。同一阶段改动的 GitHub 源码版本为 `v0.21.0`，在 `codex/ui-system-phase1` 分支维护。
+- Gallery `D:\项目归档\Differ\2026-11-12-consolidation\history\Differ-UI-Phase1\gallery\Differ.UI.Gallery.exe`。两个交付目录中的 `Differ.UI.dll` SHA-256 一致。可在 PowerShell 执行 `pwsh -NoProfile -File D:\项目归档\Differ\2026-11-12-consolidation\history\Differ-UI-Phase1\Run-Fixture.ps1 -Case Text` 直接打开合成双栏，再运行 `-Case Second` 测同窗口标签，或 `-Case Merge` 打开合成三方冲突。
 - 预览通过 `scripts/publish.ps1 -PreviewDirectory <新的仓库外绝对路径>` 发布到空目标，验证依赖和许可后再移动暂存。保留清单校验，恢复六份许可的原始字节并核对全部 37 项。预览使用独立管道、偏好、快照、日志和 WebView2 配置，预览配置目录受保存路径保护。
 - 21 个合成输入重新生成后字节一致。真实 SVN 全局和高级 Diff/Merge 绑定前后哈希一致。试用只在项目外写入，源码、预览、测试输入和证据位置见交付清单。
 - 清理脚本专项 11 项通过。工程 `Apply` 只清理可重建输出，随后的 `Check` 通过，交付和证据目录留在工程外。

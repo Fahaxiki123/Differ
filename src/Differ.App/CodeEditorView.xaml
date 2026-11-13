@@ -4,29 +4,81 @@
              xmlns:wv="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              xmlns:dui="clr-namespace:Differ.UI.Controls;assembly=Differ.UI"
              xmlns:resources="clr-namespace:Differ.App.Resources"
-             Loaded="OnLoaded" SizeChanged="OnHeaderSizeChanged" Background="{DynamicResource Dui.Surface.Content}">
+             Loaded="OnLoaded" Background="{DynamicResource Dui.Surface.Content}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <GridLength x:Key="Editor.PaneHeaderRowHeight">34</GridLength>
+            <Style x:Key="Editor.PaneRole" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="Editor.PaneMetadata" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="Editor.PaneRevision" TargetType="TextBlock" BasedOn="{StaticResource Editor.PaneMetadata}">
+                <Setter Property="Margin" Value="0,0,6,0" />
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="{x:Static resources:Strings.RevisionUnknown}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Editor.EditModePill" TargetType="ToggleButton" BasedOn="{StaticResource Dui.Toggle.Segment}">
+                <Setter Property="Content" Value="{x:Static resources:ChromeStrings.EnableEditing}" />
+                <Setter Property="Background" Value="{DynamicResource Dui.Surface.Content}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource Dui.Border.Control}" />
+                <Setter Property="Padding" Value="6,0" />
+                <Setter Property="MinHeight" Value="24" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsEditMode}" Value="True">
+                        <Setter Property="Content" Value="{x:Static resources:ChromeStrings.EditingActive}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding EditorPermissionText}" Value="{x:Static resources:CodeReviewStrings.ModeUnconfirmed}">
+                        <Setter Property="Content" Value="{x:Static resources:CodeReviewStrings.ModeUnconfirmed}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Editor.OnDemandToolsStyle" TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsEditMode}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsEditorDirty}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Background="{DynamicResource Dui.Surface.Content}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{StaticResource Dui.Metrics.PaneHeaderRowHeight}" />
+            <RowDefinition Height="{StaticResource Editor.PaneHeaderRowHeight}" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Border x:Name="EditorPaneHeaders" Style="{StaticResource Dui.PaneHeader}"
-                Background="{DynamicResource Dui.Surface.Content}" Padding="0">
+                MinHeight="0" Padding="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="24" />
+                    <ColumnDefinition Width="1" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="{StaticResource Ui.ComparisonRailColumnWidth}" />
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="BasePaneHeader" Margin="8,0">
+                <Grid x:Name="BasePaneHeader" Margin="10,0">
                     <Grid.ToolTip>
                         <StackPanel MaxWidth="700">
                             <TextBlock Text="{Binding BaseTitle}" TextWrapping="Wrap" />
@@ -34,74 +86,140 @@
                             <TextBlock Text="{Binding BaseRevisionText}" />
                         </StackPanel>
                     </Grid.ToolTip>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding EditorBaseIdentity}" Foreground="{DynamicResource Dui.Text.Primary}"
-                               FontSize="{StaticResource Dui.Metrics.BodyFontSize}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <Border Grid.Column="1" Margin="8,0,0,0" Padding="6,2"
-                            Background="{DynamicResource Dui.State.ReadOnly}" VerticalAlignment="Center"
-                            CornerRadius="{StaticResource Dui.Metrics.SmallRadius}">
-                        <TextBlock Text="{x:Static resources:ChromeStrings.ReadOnly}"
-                                   Foreground="{DynamicResource Dui.Text.Secondary}" FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}" />
-                    </Border>
+                    <DockPanel LastChildFill="True">
+                        <TextBlock DockPanel.Dock="Right" Margin="8,0,0,0"
+                                   Text="{x:Static resources:ChromeStrings.ReadOnly}" Style="{StaticResource Editor.PaneMetadata}" />
+                        <Border DockPanel.Dock="Left" Padding="6,1" Margin="0,0,8,0"
+                                Background="{DynamicResource Dui.State.Hover}" VerticalAlignment="Center"
+                                CornerRadius="{StaticResource Dui.Metrics.SmallRadius}">
+                            <TextBlock Text="{x:Static resources:Strings.BaseSide}" Style="{StaticResource Editor.PaneRole}" />
+                        </Border>
+                        <TextBlock Text="{Binding BaseRevisionText}" Style="{StaticResource Editor.PaneRevision}" />
+                    </DockPanel>
                 </Grid>
-                <Border Grid.Column="1" BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="1,0" />
-                <Grid x:Name="MinePaneHeader" Grid.Column="2" Margin="8,0">
+                <Border Grid.Column="1" Background="{DynamicResource Dui.Border.Subtle}" />
+                <Grid x:Name="MinePaneHeader" Grid.Column="2" Margin="10,0">
                     <Grid.ToolTip>
                         <StackPanel MaxWidth="700">
                             <TextBlock Text="{Binding MineTitle}" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding MinePath}" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding EditorMinePathHint}" TextWrapping="Wrap" />
                             <TextBlock Text="{Binding MineRevisionText}" />
                             <TextBlock Text="{Binding EditorPermissionText}" />
                             <TextBlock Text="{Binding EditorSaveStatus}" />
                         </StackPanel>
                     </Grid.ToolTip>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <DockPanel Margin="0,0,6,0" VerticalAlignment="Center" LastChildFill="True">
-                    <TextBlock x:Name="MineSaveStatus" DockPanel.Dock="Right" Margin="8,0,0,0" Text="{Binding EditorSaveStatus}"
-                               Foreground="{DynamicResource Dui.Text.Secondary}" FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding EditorMineIdentity}" Foreground="{DynamicResource Dui.Text.Primary}"
-                               FontSize="{StaticResource Dui.Metrics.BodyFontSize}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    </DockPanel>
-                    <StackPanel x:Name="EditorActions" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="UndoButton" Style="{StaticResource Dui.Button.Icon}" Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
-                                Command="{Binding UndoEditorCommand}" IsEnabled="{Binding CanEditorUndo}"
-                                AutomationProperties.Name="{x:Static resources:Strings.EditorUndo}" ToolTip="{x:Static resources:ChromeStrings.UndoShortcut}">
-                            <dui:AppIcon Kind="Undo" />
-                        </Button>
-                        <Button x:Name="RedoButton" Style="{StaticResource Dui.Button.Icon}" Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}" Margin="2,0,4,0"
-                                Command="{Binding RedoEditorCommand}" IsEnabled="{Binding CanEditorRedo}"
-                                AutomationProperties.Name="{x:Static resources:Strings.EditorRedo}" ToolTip="{x:Static resources:ChromeStrings.RedoShortcut}">
-                            <dui:AppIcon Kind="Redo" />
-                        </Button>
-                        <ToggleButton x:Name="EditModeToggle" Style="{StaticResource Dui.Toggle.Switch}" Margin="0,0,6,0"
-                                      Content="{Binding EditorPermissionText}" IsChecked="{Binding IsEditMode, Mode=OneWay}" Command="{Binding ToggleEditModeCommand}"
-                                      AutomationProperties.Name="{x:Static resources:ChromeStrings.EditMode}" ToolTip="{x:Static resources:ChromeStrings.EditModeHint}" />
-                        <Border CornerRadius="{StaticResource Dui.Metrics.ControlRadius}" Background="Transparent">
-                            <StackPanel Orientation="Horizontal">
-                                <Button x:Name="SaveButton" Style="{StaticResource Dui.Button.Primary}" MinWidth="56"
-                                        MinHeight="{StaticResource Dui.Metrics.ToolbarButtonHeight}" Padding="8,0"
-                                        Command="{Binding SaveEditorCommand}" IsEnabled="{Binding CanEditorSave}"
-                                        ToolTip="{x:Static resources:ChromeStrings.SaveShortcut}" AutomationProperties.Name="{Binding EditorSaveActionLabel}">
-                                    <TextBlock Text="{Binding EditorSaveActionLabel}" VerticalAlignment="Center"
-                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                    <DockPanel LastChildFill="True">
+                        <StackPanel x:Name="EditorActions" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ToggleButton x:Name="EditModeToggle" Style="{StaticResource Editor.EditModePill}"
+                                          IsChecked="{Binding IsEditMode, Mode=OneWay}" Command="{Binding ToggleEditModeCommand}"
+                                          AutomationProperties.Name="{Binding Content, RelativeSource={RelativeSource Self}}"
+                                          ToolTip="{x:Static resources:ChromeStrings.EditModeHint}">
+                                <ToggleButton.ContentTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <dui:AppIcon Kind="Edit" Size="12" Margin="0,0,4,0">
+                                                <dui:AppIcon.Style>
+                                                    <Style TargetType="dui:AppIcon">
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding IsCompactToolbar, RelativeSource={RelativeSource AncestorType=Window}}" Value="True" />
+                                                                    <Condition Binding="{Binding DataContext.HasAlternateEditorSaveTarget, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </MultiDataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </dui:AppIcon.Style>
+                                            </dui:AppIcon>
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ToggleButton.ContentTemplate>
+                            </ToggleButton>
+                            <StackPanel x:Name="EditModeTools" Style="{StaticResource Editor.OnDemandToolsStyle}" Margin="6,0,0,0">
+                                <Button x:Name="UndoButton" Style="{StaticResource Dui.Button.Secondary}"
+                                        Width="24" Height="24" MinHeight="24" Padding="0"
+                                        Command="{Binding UndoEditorCommand}" IsEnabled="{Binding CanEditorUndo}"
+                                        AutomationProperties.Name="{x:Static resources:Strings.EditorUndo}" ToolTip="{x:Static resources:ChromeStrings.UndoShortcut}">
+                                    <dui:AppIcon Kind="Undo" Size="12" />
                                 </Button>
-                                <Button x:Name="SaveMenuButton" Style="{StaticResource Dui.Button.Primary}"
-                                        Width="{StaticResource Dui.Metrics.ToolbarButtonHeight}" MinWidth="{StaticResource Dui.Metrics.ToolbarButtonHeight}"
-                                        MinHeight="{StaticResource Dui.Metrics.ToolbarButtonHeight}" Margin="1,0,0,0" Padding="0"
-                                        Click="SaveOptions_Click" IsEnabled="{Binding CanEditorSaveAs}"
-                                        ToolTip="{x:Static resources:ChromeStrings.SaveOptions}" AutomationProperties.Name="{x:Static resources:ChromeStrings.SaveOptions}">
-                                    <dui:AppIcon Kind="ChevronDown"
-                                                 Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
-                                    <Button.ContextMenu>
-                                        <ContextMenu Style="{StaticResource Dui.ContextMenu}" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                            <MenuItem Header="{x:Static resources:Strings.EditorSaveAs}" InputGestureText="Ctrl+Shift+S"
-                                                      Command="{Binding SaveEditorAsCommand}" IsEnabled="{Binding CanEditorSaveAs}" />
-                                        </ContextMenu>
-                                    </Button.ContextMenu>
+                                <Button x:Name="RedoButton" Style="{StaticResource Dui.Button.Secondary}"
+                                        Width="24" Height="24" MinHeight="24" Padding="0" Margin="4,0"
+                                        Command="{Binding RedoEditorCommand}" IsEnabled="{Binding CanEditorRedo}"
+                                        AutomationProperties.Name="{x:Static resources:Strings.EditorRedo}" ToolTip="{x:Static resources:ChromeStrings.RedoShortcut}">
+                                    <dui:AppIcon Kind="Redo" Size="12" />
                                 </Button>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="SaveButton" Style="{StaticResource Dui.Button.Primary}" MinWidth="48"
+                                            Height="24" MinHeight="24" Padding="6,0"
+                                            Command="{Binding SaveEditorCommand}" IsEnabled="{Binding CanEditorSave}"
+                                            ToolTip="{Binding EditorSaveHint}" AutomationProperties.Name="{Binding EditorSaveActionLabel}">
+                                        <TextBlock Text="{Binding EditorSaveActionLabel}" VerticalAlignment="Center"
+                                                   Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                    </Button>
+                                    <Button x:Name="SaveMenuButton" Style="{StaticResource Dui.Button.Primary}"
+                                            Width="24" MinWidth="24"
+                                            Height="24" MinHeight="24" Margin="1,0,0,0" Padding="0"
+                                            Click="SaveOptions_Click" IsEnabled="{Binding CanEditorSaveAs}"
+                                            ToolTip="{x:Static resources:ChromeStrings.SaveOptions}" AutomationProperties.Name="{x:Static resources:ChromeStrings.SaveOptions}">
+                                        <dui:AppIcon Kind="ChevronDown"
+                                                     Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                        <Button.ContextMenu>
+                                            <ContextMenu Style="{StaticResource Dui.ContextMenu}" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="{x:Static resources:Strings.EditorSaveAs}" InputGestureText="Ctrl+Shift+S"
+                                                          Command="{Binding SaveEditorAsCommand}" IsEnabled="{Binding CanEditorSaveAs}" />
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
+                                </StackPanel>
                             </StackPanel>
+                        </StackPanel>
+                        <Border DockPanel.Dock="Left" Padding="6,1" Margin="0,0,8,0"
+                                Background="{DynamicResource Dui.State.Hover}" VerticalAlignment="Center"
+                                CornerRadius="{StaticResource Dui.Metrics.SmallRadius}">
+                            <TextBlock x:Name="MinePaneRole">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Editor.PaneRole}">
+                                        <Setter Property="Text" Value="{Binding EditorMineIdentity}" />
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsCompactToolbar, RelativeSource={RelativeSource AncestorType=Window}}" Value="True" />
+                                                    <Condition Binding="{Binding HasAlternateEditorSaveTarget}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Text" Value="{x:Static resources:CodeReviewStrings.ResultSide}" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Border>
-                    </StackPanel>
+                        <Grid Margin="0,0,6,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MaxWidth="96" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding MineRevisionText}" Style="{StaticResource Editor.PaneRevision}" />
+                            <TextBlock x:Name="MineSaveStatus" Grid.Column="1" Text="{Binding EditorSaveStatus}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Editor.PaneMetadata}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEditorDirty}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource Dui.Status.Warning}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock x:Name="MineSaveTarget" Grid.Column="2" Margin="6,0,0,0"
+                                       Text="{Binding EditorSaveTargetName}" Style="{StaticResource Editor.PaneMetadata}"
+                                       ToolTip="{Binding EditorMinePathHint}"
+                                       AutomationProperties.Name="{Binding EditorSaveTargetName}"
+                                       Visibility="{Binding HasAlternateEditorSaveTarget, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </Grid>
+                    </DockPanel>
                 </Grid>
             </Grid>
         </Border>

@@ -10,6 +10,25 @@ namespace Differ.App.Tests;
 
 public sealed class SpreadsheetCellPresenterTests
 {
+    [Fact]
+    public void RecycledRowContextReplacesTheValueOnTheCorrectSide()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var oldCell = Cell("before", DiffKind.Unchanged, changed: false);
+            var newCell = Cell("after", DiffKind.Unchanged, changed: false);
+            var presenter = new SpreadsheetCellPresenter(isBaseSide: false, columnIndex: 0);
+            var row = new SpreadsheetRowViewModel("row", 1, 1, DiffKind.Modified, [oldCell], [newCell]);
+            presenter.UpdateRow(row);
+            Assert.Same(newCell, presenter.Cell);
+            presenter.DataContext = row with { MineCells = [oldCell] };
+            Assert.Same(oldCell, presenter.Cell);
+            presenter.DataContext = null;
+            Assert.Null(presenter.Cell);
+            Assert.Null(presenter.ToolTip);
+        });
+    }
+
     [Theory]
     [InlineData(AppTheme.Light)]
     [InlineData(AppTheme.Dark)]
@@ -17,7 +36,7 @@ public sealed class SpreadsheetCellPresenterTests
     {
         ThemeTestSupport.RunSta(() =>
         {
-            var presenter = new SpreadsheetCellPresenter();
+            var presenter = new SpreadsheetCellPresenter(isBaseSide: true);
             using var themes = ThemeTestSupport.CreateService(presenter.Resources, new FakeSystemThemeMonitor(initialTheme));
             themes.InitializeFromSystem();
             var text = Assert.IsType<InlineDiffTextBlock>(presenter.Child);
@@ -25,7 +44,7 @@ public sealed class SpreadsheetCellPresenterTests
             Assert.Null(presenter.ToolTip);
             Assert.Same(presenter.FindResource("PanelBrush"), presenter.Background);
 
-            foreach (var kind in new[] { DiffKind.Added, DiffKind.Deleted, DiffKind.Modified, DiffKind.Moved, DiffKind.Conflict, DiffKind.Unsupported })
+            foreach (var kind in new[] { DiffKind.Deleted, DiffKind.Modified, DiffKind.Moved, DiffKind.Conflict, DiffKind.Unsupported })
             {
                 var value = Cell("row " + kind, kind, changed: true);
                 presenter.Cell = value;
@@ -39,6 +58,16 @@ public sealed class SpreadsheetCellPresenterTests
                 themes.Toggle();
                 Assert.Same(presenter.FindResource("Diff.Cell." + kind), presenter.Background);
             }
+
+            var replacement = Cell("value replacement", DiffKind.Modified, changed: true) with { IsContentReplacement = true };
+            presenter.Cell = replacement;
+            Assert.Same(presenter.FindResource("Diff.Cell.Deleted"), presenter.Background);
+            Assert.Equal(DiffKind.Deleted, text.DiffKind);
+
+            var opposite = Cell(string.Empty, DiffKind.Added, changed: false);
+            presenter.Cell = opposite;
+            Assert.Same(presenter.FindResource("PanelBrush"), presenter.Background);
+            Assert.Equal(string.Empty, text.Text);
 
             var unchanged = Cell("recycled plain text", DiffKind.Unchanged, changed: false);
             presenter.Cell = unchanged;
