@@ -4,7 +4,7 @@
 
 **已更新唯一开发版至0.21.18。**最终源码的Release构建、713项测试、格式检查和本机前台验收通过；固定入口已核对，旧预览已删除，项目清理检查通过。两处任务缓存（原约22.25 MiB）已由用户手动删除，代理随后核对缓存路径、唯一开发版及现用SVN安装和绑定，均通过。
 
-2026-11-13，用户完成初步试用，反馈暂未发现问题，并要求将当前开发版本提交到GitHub。
+2026-11-13，用户完成初步试用，反馈暂未发现问题，并要求将当前开发版本提交到GitHub。在确认仓库已为公开状态后，用户明确授权将源码提交 `2951bf5` 推送到 `Fahaxiki123/Differ` 的 `codex/ui-system-phase1` 分支。
 
 ## 修复内容
 
@@ -67,7 +67,7 @@
 
 此前代理的自动删除被审批以 `blocked by policy` 拒绝，命令未执行；`cleanup-remaining.json`、`cache-cleanup-retry-result.json`保留该历史事实。2026-11-13，用户手动删除后，代理只执行核验，没有将手工删除记为代理执行成功。最新[核验记录](D:/项目归档/Differ/2026-11-13-caption-finish/manual-cache-cleanup-confirmation.json)确认缓存不存在、唯一0.21.18开发版完整载荷与源码身份一致、固定开发偏好仍存在、现用0.17.1 SVN安装主程序校验值及Diff/Merge绑定未变。再次Apply/Check均Clean=true、Targets=0、Unclassified=0，见 `manual-cache-workspace-apply.json`、`manual-cache-workspace-check.json`；本轮两处缓存清理已收口。
 
-`D:\Differ\Differ.App.exe` 仍为现用 0.17.1 SVN 安装；本轮不替换它、不更改真实 Diff/Merge 绑定，不运行 SVN 写操作，不提交或发布 GitHub。
+`D:\Differ\Differ.App.exe` 仍为现用 0.17.1 SVN 安装；本轮不替换它、不更改真实 Diff/Merge 绑定，不运行 SVN 写操作。源码同步遵循本报告开头的公开推送授权，本轮不创建新的Release或安装包。
 
 ## 未验证范围
 
