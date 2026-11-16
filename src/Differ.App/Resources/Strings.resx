@@ -8,6 +8,9 @@
   <data name="SelectedContentDetails" xml:space="preserve"><value>所选内容详情</value></data>
   <data name="ExpandFullContent" xml:space="preserve"><value>展开完整内容</value></data>
   <data name="CollapseContentDetails" xml:space="preserve"><value>收起内容详情</value></data>
+  <data name="SpreadsheetCopyComparison" xml:space="preserve"><value>复制对照</value></data>
+  <data name="SpreadsheetExpandDetails" xml:space="preserve"><value>展开详情</value></data>
+  <data name="SpreadsheetCollapseDetails" xml:space="preserve"><value>收起详情</value></data>
   <data name="ComparisonRulesAdjusted" xml:space="preserve"><value>规则已调整</value></data>
   <data name="ComparisonRulesPending" xml:space="preserve"><value>规则待应用</value></data>
   <data name="Summary" xml:space="preserve"><value>统计</value></data>

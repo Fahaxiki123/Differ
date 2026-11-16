@@ -15,6 +15,9 @@ public static class Strings
     public static string SelectedContentDetails => Get();
     public static string ExpandFullContent => Get();
     public static string CollapseContentDetails => Get();
+    public static string SpreadsheetCopyComparison => Get();
+    public static string SpreadsheetExpandDetails => Get();
+    public static string SpreadsheetCollapseDetails => Get();
     public static string ComparisonRulesAdjusted => Get();
     public static string ComparisonRulesPending => Get();
     public static string RulesDefault => Get();

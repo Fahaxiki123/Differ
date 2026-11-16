@@ -1,0 +1,345 @@
+<Window x:Class="Differ.UI.Gallery.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dui="clr-namespace:Differ.UI.Controls;assembly=Differ.UI"
+        xmlns:local="clr-namespace:Differ.UI.Gallery"
+        Style="{StaticResource Dui.Dialog}"
+        Title="Differ UI Gallery"
+        Width="1024"
+        Height="720"
+        MinWidth="720"
+        MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        PreviewKeyDown="OnPreviewKeyDown">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Background="{DynamicResource Dui.Surface.Toolbar}"
+                BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="0,0,0,1" Padding="24,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="DIFFER / UI GALLERY" FontWeight="SemiBold"
+                               FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
+                               Foreground="{DynamicResource Dui.Accent}" />
+                    <TextBlock Text="第一阶段组件预览" FontSize="{StaticResource Gallery.TitleSize}" FontWeight="SemiBold" />
+                    <TextBlock Text="WPF 原生控件 · 所有数据和操作均为示例"
+                               Style="{StaticResource Gallery.Caption}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <ComboBox x:Name="ThemePicker" Width="104" Style="{StaticResource Dui.Input.ComboBox}"
+                              AutomationProperties.Name="界面主题" SelectionChanged="OnThemeChanged">
+                        <ComboBoxItem Content="浅色" />
+                        <ComboBoxItem Content="深色" />
+                    </ComboBox>
+                    <Button x:Name="NarrowButton" Style="{StaticResource Dui.Button.Secondary}"
+                            Margin="8,0,0,0" Content="{StaticResource Gallery.Narrow}" Click="OnToggleNarrow" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" Style="{StaticResource Dui.StatusBar}">
+            <TextBlock x:Name="Activity" Text="{StaticResource Gallery.Ready}" VerticalAlignment="Center"
+                       AutomationProperties.LiveSetting="Polite" TextTrimming="CharacterEllipsis" />
+        </Border>
+
+        <TabControl Margin="24,12,24,16" Background="{DynamicResource Dui.Surface.Content}"
+                    BorderBrush="{DynamicResource Dui.Border.Subtle}">
+            <TabItem Header="工作区" Style="{StaticResource Dui.Tab}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{StaticResource Dui.Metrics.ToolbarRowHeight}" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ToolBarTray Background="{DynamicResource Dui.Surface.Toolbar}" IsLocked="True">
+                        <ToolBar Style="{StaticResource Dui.ToolBar}" Band="0" BandIndex="0"
+                                 Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ToolBarTray}}">
+                            <RadioButton Content="全部" IsChecked="True" GroupName="Scope" Click="OnSampleAction"
+                                         ToolBar.OverflowMode="Never" Style="{StaticResource Dui.Radio.Segment}" />
+                            <RadioButton Content="差异" GroupName="Scope" Click="OnSampleAction"
+                                         ToolBar.OverflowMode="Never" Style="{StaticResource Dui.Radio.Segment}" />
+                            <RadioButton Content="上下文" GroupName="Scope" Click="OnSampleAction"
+                                         ToolBar.OverflowMode="Never" Style="{StaticResource Dui.Radio.Segment}" />
+                            <Separator ToolBar.OverflowMode="Never" />
+                            <Button x:Name="PreviousButton" AutomationProperties.Name="上一处示例差异" ToolTip="上一处示例差异"
+                                    ToolBar.OverflowMode="Never" Style="{StaticResource Dui.Button.Icon}" Click="OnPrevious">
+                                <dui:AppIcon Kind="Previous" />
+                            </Button>
+                            <TextBlock x:Name="Position" TextAlignment="Center" VerticalAlignment="Center" MinWidth="74"
+                                       ToolBar.OverflowMode="Never" />
+                            <Button x:Name="NextButton" AutomationProperties.Name="下一处示例差异" ToolTip="下一处示例差异"
+                                    ToolBar.OverflowMode="Never" Style="{StaticResource Dui.Button.Icon}" Click="OnNext">
+                                <dui:AppIcon Kind="Next" />
+                            </Button>
+                            <Separator />
+                            <Button Content="查找示例" Style="{StaticResource Dui.Button.Toolbar}" Click="OnSampleAction" />
+                            <Button Content="刷新示例" Style="{StaticResource Dui.Button.Toolbar}" Click="OnSampleAction" />
+                            <Button Content="示例路径信息" Style="{StaticResource Dui.Button.Toolbar}" Click="OnSampleAction" />
+                            <Button Content="恢复示例标签" Style="{StaticResource Dui.Button.Toolbar}" Click="OnResetFiles" />
+                            <Button Content="查看示例文档属性" Style="{StaticResource Dui.Button.Toolbar}" Click="OnSampleAction" />
+                            <Button Content="其他示例命令" ToolBar.OverflowMode="Always"
+                                    Style="{StaticResource Dui.Button.Toolbar}" Click="OnSampleAction" />
+                        </ToolBar>
+                    </ToolBarTray>
+
+                    <TabControl x:Name="Files" Grid.Row="1"
+                                Background="{DynamicResource Dui.Surface.Content}"
+                                BorderBrush="{DynamicResource Dui.Border.Subtle}"
+                                BorderThickness="0,1,0,0">
+                        <TabControl.ItemContainerStyle>
+                            <Style TargetType="TabItem" BasedOn="{StaticResource Dui.Tab}">
+                                <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                            </Style>
+                        </TabControl.ItemContainerStyle>
+                        <TabControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" ToolTip="{Binding Name}">
+                                    <dui:AppIcon Kind="File" Margin="0,0,6,0" />
+                                    <TextBlock Text="{Binding Name}" MaxWidth="155" TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding DirtyLabel}" Margin="6,0,4,0" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Dui.Text.Secondary}" />
+                                    <Button Tag="{Binding}" AutomationProperties.Name="关闭示例标签" ToolTip="关闭示例标签"
+                                            Style="{StaticResource Dui.Button.Icon}" Click="OnCloseFile">
+                                        <dui:AppIcon Kind="Close" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TabControl.ItemTemplate>
+                        <TabControl.ContentTemplate>
+                            <DataTemplate>
+                                <DataTemplate.Resources>
+                                    <Style x:Key="Gallery.ReadOnlyPane" TargetType="TextBox" BasedOn="{StaticResource Dui.Input.TextBox}">
+                                        <Setter Property="IsReadOnly" Value="True" />
+                                        <Setter Property="TextWrapping" Value="NoWrap" />
+                                        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+                                        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="VerticalContentAlignment" Value="Top" />
+                                        <Setter Property="Padding" Value="12,8" />
+                                        <Setter Property="Background" Value="{DynamicResource Dui.Surface.Content}" />
+                                        <Setter Property="FontFamily" Value="{StaticResource Gallery.CodeFont}" />
+                                        <Setter Property="FontSize" Value="{StaticResource Gallery.CodeSize}" />
+                                        <Setter Property="FontWeight" Value="Normal" />
+                                    </Style>
+                                    <Style TargetType="ScrollViewer" BasedOn="{StaticResource Gallery.ScrollViewer}" />
+                                </DataTemplate.Resources>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" MinWidth="120" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" MinWidth="120" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="{StaticResource Dui.Metrics.PaneHeaderRowHeight}" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Border Style="{StaticResource Dui.PaneHeader}">
+                                        <TextBlock Text="BASE · 只读" VerticalAlignment="Center" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Dui.Text.Primary}" />
+                                    </Border>
+                                    <Border Grid.Column="2" Style="{StaticResource Dui.PaneHeader}">
+                                        <DockPanel LastChildFill="True">
+                                            <TextBlock DockPanel.Dock="Right" Text="样例" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Dui.Text.Secondary}" />
+                                            <TextBlock Text="{Binding Name}" ToolTip="{Binding Name}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource Dui.Text.Primary}"
+                                                       FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                        </DockPanel>
+                                    </Border>
+                                    <TextBox Grid.Row="1" AutomationProperties.Name="BASE 示例内容"
+                                             Style="{StaticResource Gallery.ReadOnlyPane}" Text="{Binding BaseText, Mode=OneWay}" />
+                                    <TextBox Grid.Row="1" Grid.Column="2" AutomationProperties.Name="当前示例内容"
+                                             Style="{StaticResource Gallery.ReadOnlyPane}" Text="{Binding CurrentText, Mode=OneWay}" />
+                                    <GridSplitter Grid.Column="1" Grid.RowSpan="2" Width="6" HorizontalAlignment="Stretch"
+                                                  Style="{StaticResource Dui.GridSplitter}" ResizeBehavior="PreviousAndNext"
+                                                  ResizeDirection="Columns" AutomationProperties.Name="调整示例窗格宽度" />
+                                </Grid>
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
+
+                    <Border Grid.Row="2" Style="{StaticResource Dui.StatusBar}">
+                        <WrapPanel VerticalAlignment="Center" ToolTip="色标配合文字解释差异状态。工作区示例不执行文件比较。">
+                            <Border Style="{StaticResource Gallery.DiffMarker}" BorderBrush="{StaticResource Gallery.Diff.Added}" Margin="0,0,8,0">
+                                <TextBlock Text="新增" />
+                            </Border>
+                            <Border Style="{StaticResource Gallery.DiffMarker}" BorderBrush="{StaticResource Gallery.Diff.Deleted}" Margin="0,0,8,0">
+                                <TextBlock Text="删除" />
+                            </Border>
+                            <Border Style="{StaticResource Gallery.DiffMarker}" BorderBrush="{StaticResource Gallery.Diff.Modified}" Margin="0,0,8,0">
+                                <TextBlock Text="修改" />
+                            </Border>
+                            <Border Style="{StaticResource Gallery.DiffMarker}" BorderBrush="{StaticResource Gallery.Diff.Moved}" Margin="0,0,8,0">
+                                <TextBlock Text="移动" />
+                            </Border>
+                            <Border Style="{StaticResource Gallery.DiffMarker}" BorderBrush="{StaticResource Gallery.Diff.Conflict}" Margin="0">
+                                <TextBlock Text="冲突 · 未解决" />
+                            </Border>
+                        </WrapPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="基础控件" Style="{StaticResource Dui.Tab}">
+                <ScrollViewer Style="{StaticResource Gallery.ScrollViewer}" VerticalScrollBarVisibility="Auto"
+                              Padding="{StaticResource Dui.Metrics.DialogPadding}">
+                    <StackPanel>
+                        <TextBlock Text="命令按钮" Style="{StaticResource Gallery.SectionHeading}" />
+                        <TextBlock Text="将指针悬停或按下按钮。用 Tab 检查焦点，用 Space 或 Enter 执行。"
+                                   Style="{StaticResource Gallery.Caption}" Margin="{StaticResource Dui.Metrics.StackSpacing}" />
+                        <WrapPanel Margin="{StaticResource Gallery.SectionSpacing}">
+                            <Button Style="{StaticResource Dui.Button.Primary}" Content="主要操作" Click="OnSampleAction"
+                                    Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <Button Style="{StaticResource Dui.Button.Secondary}" Content="次要操作" Click="OnSampleAction"
+                                    Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <Button Style="{StaticResource Dui.Button.Quiet}" Content="轻量操作" Click="OnSampleAction"
+                                    Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <Button Style="{StaticResource Dui.Button.Danger}" Content="危险操作示例" Click="OnShowDialog"
+                                    Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <Button Style="{StaticResource Dui.Button.Secondary}" Content="禁用" IsEnabled="False"
+                                    Margin="{StaticResource Gallery.ItemSpacing}" />
+                        </WrapPanel>
+                        <TextBlock Text="选择状态" Style="{StaticResource Gallery.SectionHeading}" />
+                        <WrapPanel Margin="{StaticResource Gallery.SectionSpacing}">
+                            <CheckBox Style="{StaticResource Dui.CheckBox}" Content="区分大小写" Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <CheckBox Style="{StaticResource Dui.CheckBox}" Content="已勾选" IsChecked="True" Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <CheckBox Style="{StaticResource Dui.CheckBox}" Content="混合" IsThreeState="True"
+                                      IsChecked="{x:Null}" Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <CheckBox Style="{StaticResource Dui.CheckBox}" Content="禁用" IsEnabled="False" Margin="{StaticResource Gallery.ItemSpacing}" />
+                            <ToggleButton Style="{StaticResource Dui.Toggle.Switch}" Content="编辑开关示例" Margin="{StaticResource Gallery.ItemSpacing}" />
+                        </WrapPanel>
+                        <TextBlock Text="输入状态" Style="{StaticResource Gallery.SectionHeading}" />
+                        <UniformGrid Columns="2">
+                            <StackPanel Margin="{StaticResource Gallery.ItemSpacing}">
+                                <Label Target="{Binding ElementName=RegularInput}" Content="可编辑文本" Padding="0,0,0,4"
+                                       Foreground="{DynamicResource Dui.Text.Secondary}" />
+                                <TextBox x:Name="RegularInput" Style="{StaticResource Dui.Input.TextBox}" Text="输入中文、选择并复制" />
+                            </StackPanel>
+                            <StackPanel Margin="{StaticResource Gallery.ItemSpacing}">
+                                <Label Target="{Binding ElementName=ReadOnlyInput}" Content="只读可复制" Padding="0,0,0,4"
+                                       Foreground="{DynamicResource Dui.Text.Secondary}" />
+                                <TextBox x:Name="ReadOnlyInput" Style="{StaticResource Dui.Input.TextBox}" Text="只读文本样例" IsReadOnly="True" />
+                            </StackPanel>
+                            <StackPanel Margin="{StaticResource Gallery.ItemSpacing}">
+                                <Label Target="{Binding ElementName=QuantityInput}" Content="校验示例 · 输入 1 到 99" Padding="0,0,0,4"
+                                       Foreground="{DynamicResource Dui.Text.Secondary}" />
+                                <TextBox x:Name="QuantityInput" Style="{StaticResource Dui.Input.TextBox}">
+                                    <TextBox.Text>
+                                        <Binding Path="Quantity" RelativeSource="{RelativeSource AncestorType=Window}" UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <local:SampleQuantityRule ValidatesOnTargetUpdated="True" />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                            </StackPanel>
+                            <StackPanel Margin="{StaticResource Gallery.ItemSpacing}">
+                                <Label Target="{Binding ElementName=DisabledCombo}" Content="禁用下拉框" Padding="0,0,0,4"
+                                       Foreground="{DynamicResource Dui.Text.Secondary}" />
+                                <ComboBox x:Name="DisabledCombo" Style="{StaticResource Dui.Input.ComboBox}" IsEnabled="False" SelectedIndex="0">
+                                    <ComboBoxItem Content="系统默认" />
+                                </ComboBox>
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="菜单与反馈" Style="{StaticResource Dui.Tab}">
+                <ScrollViewer Style="{StaticResource Gallery.ScrollViewer}" VerticalScrollBarVisibility="Auto"
+                              Padding="{StaticResource Dui.Metrics.DialogPadding}">
+                    <StackPanel>
+                        <TextBlock Text="菜单、提示与对话框" Style="{StaticResource Gallery.SectionHeading}" />
+                        <WrapPanel Margin="{StaticResource Gallery.SectionSpacing}">
+                            <Menu Style="{StaticResource Dui.Menu}" Margin="{StaticResource Gallery.ItemSpacing}" VerticalAlignment="Center">
+                                <MenuItem Style="{StaticResource Dui.MenuItem}" Header="示例菜单(_M)">
+                                    <MenuItem Style="{StaticResource Dui.MenuItem}" Header="打开对话框(_O)" Click="OnShowDialog" />
+                                    <MenuItem Style="{StaticResource Dui.MenuItem}" Header="复选项(_C)" IsCheckable="True" />
+                                    <MenuItem Style="{StaticResource Dui.MenuItem}" Header="禁用项" IsEnabled="False" />
+                                </MenuItem>
+                            </Menu>
+                            <Button Content="右键或 Shift+F10" Style="{StaticResource Dui.Button.Secondary}"
+                                    Margin="{StaticResource Gallery.ItemSpacing}">
+                                <Button.ContextMenu>
+                                    <ContextMenu Style="{StaticResource Dui.ContextMenu}">
+                                        <MenuItem Style="{StaticResource Dui.MenuItem}" Header="示例命令" Click="OnSampleAction" />
+                                        <MenuItem Style="{StaticResource Dui.MenuItem}" Header="不可用" IsEnabled="False" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+                            <Button Content="打开对话框" Style="{StaticResource Dui.Button.Primary}" Click="OnShowDialog"
+                                    Margin="{StaticResource Gallery.ItemSpacing}">
+                                <Button.ToolTip>
+                                    <ToolTip Style="{StaticResource Dui.ToolTip}" Content="Enter 可确认，Esc 可取消。关闭后返回原入口。" />
+                                </Button.ToolTip>
+                            </Button>
+                        </WrapPanel>
+                        <TextBlock Text="异步与空状态" Style="{StaticResource Gallery.SectionHeading}" />
+                        <DockPanel Margin="{StaticResource Gallery.SectionSpacing}">
+                            <Button x:Name="BusyButton" DockPanel.Dock="Left" Content="开始处理" Style="{StaticResource Dui.Button.Secondary}"
+                                    Margin="0,0,12,0" Click="OnStartBusy" />
+                            <ProgressBar x:Name="BusyProgress" Style="{StaticResource Dui.ProgressBar}" Height="8"
+                                         VerticalAlignment="Center" AutomationProperties.Name="示例处理进度" />
+                        </DockPanel>
+                        <ContentControl Style="{StaticResource Dui.EmptyState}">
+                            <StackPanel>
+                                <dui:AppIcon Kind="File" Size="{StaticResource Dui.Metrics.IconSizeLarge}"
+                                             Foreground="{DynamicResource Dui.Text.Secondary}" HorizontalAlignment="Center" />
+                                <TextBlock Text="没有可显示的样例" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,8,0,0" />
+                                <TextBlock Text="示例列表清空时显示此区域。" Style="{StaticResource Gallery.Caption}" />
+                            </StackPanel>
+                        </ContentControl>
+                        <Border Margin="0,16,0,0" Padding="{StaticResource Dui.Metrics.InputPadding}"
+                                Background="{DynamicResource Dui.Status.WarningSurface}"
+                                BorderBrush="{DynamicResource Dui.Status.Warning}" BorderThickness="1,0,0,0">
+                            <TextBlock Text="警告示例 · 部分内容需要进一步检查。" Foreground="{DynamicResource Dui.Status.Warning}" TextWrapping="Wrap" />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="表面与字体" Style="{StaticResource Dui.Tab}">
+                <ScrollViewer Style="{StaticResource Gallery.ScrollViewer}" VerticalScrollBarVisibility="Auto"
+                              Padding="{StaticResource Dui.Metrics.DialogPadding}">
+                    <StackPanel>
+                        <TextBlock Text="表面层级" Style="{StaticResource Gallery.SectionHeading}" />
+                        <UniformGrid Columns="2" Margin="{StaticResource Gallery.SectionSpacing}">
+                            <Border Background="{DynamicResource Dui.Surface.Window}" Padding="{StaticResource Dui.Metrics.DialogPadding}"
+                                    BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="1" Margin="{StaticResource Gallery.ItemSpacing}">
+                                <TextBlock Text="Window · 窗口外壳" />
+                            </Border>
+                            <Border Background="{DynamicResource Dui.Surface.Toolbar}" Padding="{StaticResource Dui.Metrics.DialogPadding}"
+                                    BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="1" Margin="{StaticResource Gallery.ItemSpacing}">
+                                <TextBlock Text="Toolbar · 命令区" />
+                            </Border>
+                            <Border Background="{DynamicResource Dui.Surface.Content}" Padding="{StaticResource Dui.Metrics.DialogPadding}"
+                                    BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="1" Margin="{StaticResource Gallery.ItemSpacing}">
+                                <TextBlock Text="Content · 正文区" />
+                            </Border>
+                            <Border Background="{DynamicResource Dui.Accent}" Padding="{StaticResource Dui.Metrics.DialogPadding}"
+                                    Margin="{StaticResource Gallery.ItemSpacing}">
+                                <TextBlock Text="Accent · 主要操作" Foreground="{DynamicResource Dui.Text.OnAccent}" />
+                            </Border>
+                        </UniformGrid>
+                        <TextBlock Text="字号与图标" Style="{StaticResource Gallery.SectionHeading}" />
+                        <TextBlock Text="审阅变更 / Review changes — 界面正文 13 DIP" Margin="{StaticResource Dui.Metrics.StackSpacing}" />
+                        <TextBlock Text="文件名和状态 / File name and status — 辅助信息 12 DIP"
+                                   Style="{StaticResource Gallery.Caption}" Margin="{StaticResource Dui.Metrics.StackSpacing}" />
+                        <TextBlock Text="review.diff(左侧, 右侧) — 等宽阅读示例 15 DIP" TextWrapping="Wrap"
+                                   FontFamily="{StaticResource Gallery.CodeFont}" FontSize="{StaticResource Gallery.CodeSize}"
+                                   Margin="{StaticResource Gallery.SectionSpacing}" />
+                        <StackPanel Orientation="Horizontal">
+                            <dui:AppIcon Kind="Search" Foreground="{DynamicResource Dui.Text.Primary}" Margin="0,0,8,0" />
+                            <dui:AppIcon Kind="Search" Foreground="{DynamicResource Dui.Text.Primary}"
+                                         Size="{StaticResource Dui.Metrics.IconSizeLarge}" Margin="0,0,8,0" />
+                            <TextBlock Text="语义图标 · 16 / 20 DIP" Style="{StaticResource Gallery.Caption}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

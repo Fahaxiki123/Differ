@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <!-- Row definitions require GridLength. Control dimensions use Double. -->
+    <sys:Double x:Key="Dui.Metrics.ToolbarHeight">40</sys:Double>
+    <GridLength x:Key="Dui.Metrics.ToolbarRowHeight">40</GridLength>
+    <sys:Double x:Key="Dui.Metrics.FileTabHeight">32</sys:Double>
+    <GridLength x:Key="Dui.Metrics.FileTabRowHeight">32</GridLength>
+    <sys:Double x:Key="Dui.Metrics.PaneHeaderHeight">36</sys:Double>
+    <GridLength x:Key="Dui.Metrics.PaneHeaderRowHeight">36</GridLength>
+    <sys:Double x:Key="Dui.Metrics.StatusBarHeight">24</sys:Double>
+    <GridLength x:Key="Dui.Metrics.StatusBarRowHeight">24</GridLength>
+    <sys:Double x:Key="Dui.Metrics.ControlHeight">32</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.ToolbarButtonHeight">28</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.ToolbarIconButtonWidth">32</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.BodyFontSize">13</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.SecondaryFontSize">12</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.IconSize">16</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.IconSizeLarge">20</sys:Double>
+    <sys:Double x:Key="Dui.Metrics.ScrollBarSize">11</sys:Double>
+    <Thickness x:Key="Dui.Metrics.ButtonPadding">12,0</Thickness>
+    <Thickness x:Key="Dui.Metrics.ToolbarButtonPadding">8,0</Thickness>
+    <Thickness x:Key="Dui.Metrics.PanePadding">12,0</Thickness>
+    <Thickness x:Key="Dui.Metrics.InputPadding">8,4</Thickness>
+    <Thickness x:Key="Dui.Metrics.TooltipPadding">8</Thickness>
+    <Thickness x:Key="Dui.Metrics.PopupPadding">4</Thickness>
+    <Thickness x:Key="Dui.Metrics.DialogPadding">24</Thickness>
+    <Thickness x:Key="Dui.Metrics.StackSpacing">0,0,0,8</Thickness>
+    <CornerRadius x:Key="Dui.Metrics.SmallRadius">4</CornerRadius>
+    <CornerRadius x:Key="Dui.Metrics.ControlRadius">6</CornerRadius>
+    <CornerRadius x:Key="Dui.Metrics.PopupRadius">8</CornerRadius>
+    <CornerRadius x:Key="Dui.Metrics.TabRadius">6,6,0,0</CornerRadius>
+    <FontFamily x:Key="Dui.Metrics.UiFont">Segoe UI, Microsoft YaHei UI</FontFamily>
+    <sys:Double x:Key="Dui.Metrics.PopupMaxWidth">480</sys:Double>
+    <sys:String x:Key="Dui.ToolBar.OverflowLabel">更多命令</sys:String>
+</ResourceDictionary>

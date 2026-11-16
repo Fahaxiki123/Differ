@@ -38,5 +38,9 @@ public static class CodeReviewStrings
     public static string ReadOnlyBaseMessage => Get();
     public static string ReadOnlyMineMessage => Get();
     public static string SaveAsEllipsis => Get();
+    public static string SourceFileHint => Get();
+    public static string SaveTargetHint => Get();
+    public static string SaveTargetUnspecified => Get();
+    public static string RefreshUsesSource => Get();
     private static string Get([CallerMemberName] string name = "") => Manager.GetString(name, CultureInfo.CurrentCulture) ?? name;
 }

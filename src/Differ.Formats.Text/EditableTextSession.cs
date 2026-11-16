@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Differ.Core.External;
 using Differ.Core.Models;
 using Differ.Formats.Text.Resources;
 
@@ -47,6 +48,7 @@ public sealed class EditableTextSession
     private string? _savedFingerprint;
     private string? _inputPath;
     private string _inputFingerprint;
+    private bool _localInputConfirmed;
     private bool _saving;
     private readonly IReadOnlyList<string> _sourceWarnings;
     private readonly string _baseEncodingName;
@@ -205,6 +207,29 @@ public sealed class EditableTextSession
         Origin = origin;
     }
 
+    public async Task TryConfirmLocalInputAsync(CancellationToken cancellationToken = default)
+    {
+        if (_inputPath is not { } inputPath)
+        {
+            return;
+        }
+
+        try
+        {
+            var target = MergePathSafety.NormalizeAndValidate(inputPath);
+            ValidateLocalInputTarget(target);
+            await AssertUnchangedAsync(target, _inputFingerprint, cancellationToken).ConfigureAwait(false);
+            ConfirmSaveTarget(target, TextInputOrigin.LocalFile);
+            _inputPath = target;
+            _localInputConfirmed = true;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+            or ArgumentException or NotSupportedException)
+        {
+            // A missing, changed or protected input leaves the session eligible for Save As.
+        }
+    }
+
     public void ChooseUniformLineEnding(string lineEnding)
     {
         if (lineEnding is not ("\n" or "\r\n" or "\r")) throw new ArgumentException("Invalid line ending.", nameof(lineEnding));
@@ -220,6 +245,10 @@ public sealed class EditableTextSession
         ValidateTarget(target);
         var sameTarget = string.Equals(target, SaveTarget, StringComparison.OrdinalIgnoreCase);
         if (sameTarget && !IsDirty) return; // No edit means no byte rewrite, including mixed line endings.
+        if (_localInputConfirmed && string.Equals(target, _inputPath, StringComparison.OrdinalIgnoreCase))
+        {
+            ValidateLocalInputTarget(target);
+        }
         if (!IsDirty && Version == 1 && string.Equals(target, _inputPath, StringComparison.OrdinalIgnoreCase))
         {
             await AssertUnchangedAsync(target, _inputFingerprint, cancellationToken).ConfigureAwait(false);
@@ -349,9 +378,21 @@ public sealed class EditableTextSession
             || string.Equals(path, _snapshotPath, StringComparison.OrdinalIgnoreCase)
             || (_snapshotDirectory is not null && path.StartsWith(_snapshotDirectory.TrimEnd(Path.DirectorySeparatorChar)
                 + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            || ExternalDiffSessionStore.IsWithinPreviewProfile(path)
             || path.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Differ", "Sessions")
                 + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
             throw new IOException(TextStrings.EditorProtectedTarget);
+    }
+
+    private void ValidateLocalInputTarget(string target)
+    {
+        ValidateTarget(target);
+        if (target.Split(Path.DirectorySeparatorChar).Contains(".svn", StringComparer.OrdinalIgnoreCase)
+            || (File.GetAttributes(target) & FileAttributes.ReadOnly) != 0)
+        {
+            throw new IOException(TextStrings.EditorProtectedTarget);
+        }
+        MergePathSafety.AssertOutputSafe(target, [.. _protectedPaths, _basePath, _snapshotPath]);
     }
 
     private static async Task AssertUnchangedAsync(string path, string? expected, CancellationToken token)

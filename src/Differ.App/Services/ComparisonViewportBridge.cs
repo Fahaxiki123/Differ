@@ -82,7 +82,13 @@ internal sealed class ComparisonViewportBridge : IDisposable
         return null;
     }
 
-    private void OnScrollChanged(object sender, ScrollChangedEventArgs e) => QueueUpdate();
+    private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (e.VerticalChange != 0 || e.ExtentHeightChange != 0 || e.ViewportHeightChange != 0)
+        {
+            QueueUpdate();
+        }
+    }
     private void OnVisibilityChanged(object sender, DependencyPropertyChangedEventArgs e) => QueueUpdate();
     private void OnSizeChanged(object sender, SizeChangedEventArgs e) => QueueUpdate();
 

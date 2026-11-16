@@ -112,6 +112,10 @@
                                        TextWrapping="Wrap" />
                         </Border>
 
+                        <WrapPanel Margin="0,13,0,0">
+                            <Button Click="OpenCompare_Click" Content="{x:Static resources:FileOpenStrings.OpenCompare}" />
+                            <Button Margin="8,0,0,0" Click="OpenMerge_Click" Content="{x:Static resources:FileOpenStrings.OpenMerge}" />
+                        </WrapPanel>
                         <StackPanel Margin="0,13,0,0"
                                     Orientation="Horizontal">
                             <Button Command="{Binding InstallIntegrationCommand}"
@@ -150,6 +154,12 @@
                                  IsReadOnly="True"
                                  Text="{Binding ExecutablePath, Mode=OneWay}" />
 
+                        <Expander Margin="0,16,0,0" Header="{x:Static resources:FileOpenStrings.MergeTemplateTitle}">
+                            <StackPanel>
+                                <TextBlock Margin="0,8,0,6" TextWrapping="Wrap" Text="{x:Static resources:FileOpenStrings.MergeTemplateHint}" />
+                                <TextBox x:Name="MergeCommandBox" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="11.5" Padding="9" />
+                            </StackPanel>
+                        </Expander>
                         <TextBlock Margin="0,16,0,0"
                                    Foreground="{DynamicResource MutedInkBrush}"
                                    FontSize="11"

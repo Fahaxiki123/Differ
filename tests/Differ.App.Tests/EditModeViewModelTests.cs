@@ -10,11 +10,70 @@ namespace Differ.App.Tests;
 
 public sealed class EditModeViewModelTests
 {
+    [Fact]
+    public async Task ExplicitLocalComparisonSavesTheRightFileUntilSaveAsChangesTarget()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "Differ.EditMode.Tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var basePath = Path.Combine(directory, "base.txt");
+        var minePath = Path.Combine(directory, "mine.txt");
+        var copyPath = Path.Combine(directory, "copy.txt");
+        await File.WriteAllTextAsync(basePath, "BASE 原文");
+        await File.WriteAllTextAsync(minePath, "当前原文");
+        using var scheduler = new ComparisonLoadScheduler();
+        var store = new ExternalDiffSessionStore(Path.Combine(directory, "sessions"));
+        var session = await store.CreateAsync(new ExternalDiffRequest
+        {
+            BaseFilePath = basePath,
+            MineFilePath = minePath,
+            InvocationSource = ExternalDiffRequest.LocalFileSource
+        }, CancellationToken.None);
+        using var owner = new DiffWindowViewModel(new DiffCoordinator([new TextDiffAdapter(new TextFileReader())]), scheduler,
+            session, NullLogger<DiffWindowViewModel>.Instance, _ => { });
+        try
+        {
+            owner.EnableDocumentEditor();
+            await owner.LoadAsync();
+            var editor = Assert.IsType<EditableTextSession>(owner.EditorSession);
+            Assert.Equal(TextInputOrigin.LocalFile, editor.Origin);
+            Assert.Equal(minePath, editor.SaveTarget);
+            Assert.False(owner.IsEditMode);
+            await owner.SetEditModeAsync(true);
+
+            owner.UpdateEditorText(editor.Id.ToString("N"), editor.Version + 1, "已原位保存");
+            await WaitForResults(owner);
+            await owner.SaveEditorAsync();
+            Assert.Equal("已原位保存", await File.ReadAllTextAsync(minePath));
+            Assert.False(owner.IsEditorDirty);
+
+            await owner.SaveEditorAsync(copyPath);
+            Assert.Equal("已原位保存", await File.ReadAllTextAsync(copyPath));
+            Assert.Equal(copyPath, editor.SaveTarget);
+            owner.UpdateEditorText(editor.Id.ToString("N"), editor.Version + 1, "已保存到副本");
+            await WaitForResults(owner);
+            await owner.SaveEditorAsync();
+            Assert.Equal("已保存到副本", await File.ReadAllTextAsync(copyPath));
+            Assert.Equal("已原位保存", await File.ReadAllTextAsync(minePath));
+            Assert.Equal("BASE 原文", await File.ReadAllTextAsync(basePath));
+            Assert.Equal("当前原文", await File.ReadAllTextAsync(session.MineSnapshotPath));
+            Assert.False(owner.IsEditorDirty);
+        }
+        finally
+        {
+            owner.Dispose();
+            store.TryDelete(session);
+            Directory.Delete(directory, true);
+        }
+    }
+
     [Theory]
-    [InlineData(null, TextInputOrigin.Unknown)]
-    [InlineData("WC", TextInputOrigin.Unknown)]
-    [InlineData("47", TextInputOrigin.HistoricalFile)]
-    public async Task PermissionDoesNotPromoteOriginAndOffStillAllowsSavingDirtyText(string? revision, TextInputOrigin expectedOrigin)
+    [InlineData(null, TextInputOrigin.Unknown, false, false)]
+    [InlineData("WC", TextInputOrigin.Unknown, false, false)]
+    [InlineData("47", TextInputOrigin.HistoricalFile, false, false)]
+    [InlineData("47", TextInputOrigin.HistoricalFile, true, false)]
+    [InlineData(null, TextInputOrigin.Unknown, true, true)]
+    public async Task PermissionDoesNotPromoteOriginAndOffStillAllowsSavingDirtyText(
+        string? revision, TextInputOrigin expectedOrigin, bool explicitLocal, bool changeInputAfterSnapshot)
     {
         var directory = Path.Combine(Path.GetTempPath(), "Differ.EditMode.Tests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
@@ -29,8 +88,15 @@ public sealed class EditModeViewModelTests
             BaseFilePath = basePath,
             MineFilePath = minePath,
             MineRevision = revision,
+            InvocationSource = explicitLocal ? ExternalDiffRequest.LocalFileSource : null,
             MineDisplayName = "工作副本 - 可写名称不能提供保存权限"
         }, CancellationToken.None);
+        var expectedMineText = "当前原文";
+        if (changeInputAfterSnapshot)
+        {
+            expectedMineText = "会话创建后的外部编辑";
+            await File.WriteAllTextAsync(minePath, expectedMineText);
+        }
         using var owner = new DiffWindowViewModel(new DiffCoordinator([new TextDiffAdapter(new TextFileReader())]), scheduler,
             session, NullLogger<DiffWindowViewModel>.Instance, _ => { });
         try
@@ -69,6 +135,7 @@ public sealed class EditModeViewModelTests
             Assert.False(owner.CanEditorAdopt);
             owner.UpdateEditorText(id, editor.Version + 1, "late readonly mutation");
             Assert.Equal("已编辑中文", editor.Text);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => owner.SaveEditorAsync());
             await Assert.ThrowsAsync<IOException>(() => owner.SaveEditorAsync(basePath));
             await Assert.ThrowsAsync<IOException>(() => owner.SaveEditorAsync(session.MineSnapshotPath));
             Assert.True(owner.IsEditorDirty);
@@ -79,7 +146,7 @@ public sealed class EditModeViewModelTests
             Assert.False(owner.IsEditorDirty);
             Assert.Equal("已编辑中文", await File.ReadAllTextAsync(target));
             Assert.Equal("BASE 原文", await File.ReadAllTextAsync(basePath));
-            Assert.Equal("当前原文", await File.ReadAllTextAsync(minePath));
+            Assert.Equal(expectedMineText, await File.ReadAllTextAsync(minePath));
             Assert.Equal(TextInputOrigin.LocalFile, editor.Origin);
         }
         finally

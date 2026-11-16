@@ -56,6 +56,7 @@ public sealed class UserPreferencesServiceTests
             Assert.Equal(104, preferences.SpreadsheetDetailHeight);
             Assert.False(preferences.TextDetailsExpanded);
             Assert.True(preferences.SpreadsheetDetailsExpanded);
+            Assert.False(preferences.MergeShowBase);
             Assert.Null(await preferences.LoadRulesAsync("text"));
         }
         finally { Directory.Delete(root, recursive: true); }
@@ -176,6 +177,143 @@ public sealed class UserPreferencesServiceTests
             using var cancellation = new CancellationTokenSource();
             cancellation.Cancel();
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => preferences.SaveAsync(cancellation.Token));
+            Assert.Equal(original, await File.ReadAllTextAsync(path));
+            Assert.Single(Directory.GetFiles(root));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task MergeVisibilityDefaultsHiddenAndPersistsWithoutChangingLayoutOrRulesAsync()
+    {
+        var root = CreateRoot();
+        try
+        {
+            var path = Path.Combine(root, "preferences.json");
+            using var preferences = new UserPreferencesService(path);
+            await preferences.LoadAsync();
+            Assert.False(preferences.MergeShowBase);
+            preferences.WindowWidth = 1234;
+            preferences.SpreadsheetDetailHeight = 180;
+            await preferences.SaveAsync();
+            await preferences.SaveRulesAsync("text", new DiffOptions { IgnoreCase = true });
+            await preferences.SetMergeShowBaseAsync(true);
+            Assert.True(preferences.MergeShowBase);
+
+            using var reopened = new UserPreferencesService(path);
+            await reopened.LoadAsync();
+            Assert.True(reopened.MergeShowBase);
+            Assert.Equal(1234, reopened.WindowWidth);
+            Assert.Equal(180, reopened.SpreadsheetDetailHeight);
+            Assert.True((await reopened.LoadRulesAsync("text"))!.IgnoreCase);
+            await reopened.SetMergeShowBaseAsync(false);
+            using var hidden = new UserPreferencesService(path);
+            await hidden.LoadAsync();
+            Assert.False(hidden.MergeShowBase);
+            Assert.Single(Directory.GetFiles(root));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task StaleDiffAndMergeInstancesOnlyWriteTheirOwnPreferenceFieldsAsync()
+    {
+        var root = CreateRoot();
+        try
+        {
+            var path = Path.Combine(root, "preferences.json");
+            using var diff = new UserPreferencesService(path);
+            using var merge = new UserPreferencesService(path);
+            await diff.LoadAsync();
+            await merge.LoadAsync();
+            await merge.SetMergeShowBaseAsync(true);
+            Assert.False(diff.MergeShowBase); // This process deliberately still has the old view.
+            diff.WindowWidth = 1111;
+            await diff.SaveAsync();
+            await diff.SaveRulesAsync("excel", new DiffOptions { KeyColumns = ["B"] });
+            using (var loaded = new UserPreferencesService(path))
+            {
+                await loaded.LoadAsync();
+                Assert.True(loaded.MergeShowBase);
+                Assert.Equal(1111, loaded.WindowWidth);
+            }
+            // A merge process's stale layout must not overwrite the later diff layout.
+            await merge.SetMergeShowBaseAsync(false);
+            using var final = new UserPreferencesService(path);
+            await final.LoadAsync();
+            Assert.False(final.MergeShowBase);
+            Assert.Equal(1111, final.WindowWidth);
+            Assert.Equal(["B"], (await final.LoadRulesAsync("excel"))!.KeyColumns);
+            Assert.Single(Directory.GetFiles(root));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task ConcurrentIndependentWritersPreserveMergeFlagLayoutAndRulesAsync()
+    {
+        var root = CreateRoot();
+        try
+        {
+            var path = Path.Combine(root, "preferences.json");
+            using var diff = new UserPreferencesService(path);
+            using var merge = new UserPreferencesService(path);
+            using var rules = new UserPreferencesService(path);
+            await Task.WhenAll(diff.LoadAsync(), merge.LoadAsync(), rules.LoadAsync());
+            for (var index = 0; index < 12; index++)
+            {
+                var showBase = index % 2 == 0;
+                diff.WindowWidth = 1000 + index;
+                await Task.WhenAll(diff.SaveAsync(), merge.SetMergeShowBaseAsync(showBase),
+                    rules.SaveRulesAsync("text", new DiffOptions { IgnoreCase = showBase }));
+                using var latest = new UserPreferencesService(path);
+                await latest.LoadAsync();
+                Assert.Equal(showBase, latest.MergeShowBase);
+                Assert.Equal(1000 + index, latest.WindowWidth);
+                Assert.Equal(showBase, (await latest.LoadRulesAsync("text"))!.IgnoreCase);
+                Assert.Single(Directory.GetFiles(root));
+            }
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task CanceledMergePreferenceWritePreservesFileAndInMemoryChoiceAsync()
+    {
+        var root = CreateRoot();
+        try
+        {
+            var path = Path.Combine(root, "preferences.json");
+            using var preferences = new UserPreferencesService(path);
+            await preferences.SetMergeShowBaseAsync(true);
+            var original = await File.ReadAllTextAsync(path);
+            using var cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => preferences.SetMergeShowBaseAsync(false, cancellation.Token));
+            Assert.True(preferences.MergeShowBase);
+            Assert.Equal(original, await File.ReadAllTextAsync(path));
+            Assert.Single(Directory.GetFiles(root));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public async Task CancellationWhileAnotherWriterHoldsLockDoesNotResetSettingsAsync()
+    {
+        var root = CreateRoot();
+        try
+        {
+            var path = Path.Combine(root, "preferences.json");
+            using var preferences = new UserPreferencesService(path);
+            await preferences.SetMergeShowBaseAsync(true);
+            var original = await File.ReadAllTextAsync(path);
+            using (var held = new FileStream(path + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                FileShare.None, 1, FileOptions.DeleteOnClose))
+            {
+                using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => preferences.SetMergeShowBaseAsync(false, cancellation.Token));
+            }
+            Assert.True(preferences.MergeShowBase);
             Assert.Equal(original, await File.ReadAllTextAsync(path));
             Assert.Single(Directory.GetFiles(root));
         }

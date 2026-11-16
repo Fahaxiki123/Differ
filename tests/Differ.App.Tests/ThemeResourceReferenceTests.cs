@@ -1,7 +1,8 @@
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
+using System.Windows;
+using Differ.App.Services;
 
 namespace Differ.App.Tests;
 
@@ -18,14 +19,14 @@ public sealed class ThemeResourceReferenceTests
         RegexOptions.Compiled);
 
     private static readonly Regex ThemeKeyLiteral = new(
-        @"""((?:(?:Diff|Theme|Word)\.[A-Za-z0-9_.]+|[A-Za-z][A-Za-z0-9_.]*(?:Brush|\.Color)))""",
+        @"""((?:(?:Diff|Dui|Editor|Theme|Word)\.[A-Za-z0-9_.]+|[A-Za-z][A-Za-z0-9_.]*(?:Brush|\.Color)))""",
         RegexOptions.Compiled);
 
     [Fact]
     public void EveryDynamicResourceKeyInViewsExistsInBothThemes()
     {
-        var light = ReadKeys("Light.xaml");
-        var dark = ReadKeys("Dark.xaml");
+        var light = ReadKeys(AppTheme.Light, includeSharedControls: true);
+        var dark = ReadKeys(AppTheme.Dark, includeSharedControls: true);
         var missing = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var file in EnumerateViewXaml())
@@ -50,8 +51,8 @@ public sealed class ThemeResourceReferenceTests
     [Fact]
     public void EveryThemeKeyLiteralInControlsExistsInBothThemes()
     {
-        var light = ReadKeys("Light.xaml");
-        var dark = ReadKeys("Dark.xaml");
+        var light = ReadKeys(AppTheme.Light, includeSharedControls: true);
+        var dark = ReadKeys(AppTheme.Dark, includeSharedControls: true);
         var missing = new SortedSet<string>(StringComparer.Ordinal);
 
         var sources = Directory
@@ -101,7 +102,7 @@ public sealed class ThemeResourceReferenceTests
     [Fact]
     public void ThemeKeysInProductionXamlUseDynamicResource()
     {
-        var themeKeys = ReadKeys("Light.xaml");
+        var themeKeys = ReadKeys(AppTheme.Light, includeSharedControls: false);
         var staticResource = new Regex(
             @"\{StaticResource\s+([A-Za-z0-9_.]+)\s*\}",
             RegexOptions.Compiled);
@@ -171,17 +172,31 @@ public sealed class ThemeResourceReferenceTests
             StringComparison.OrdinalIgnoreCase);
     }
 
-    private static HashSet<string> ReadKeys(string themeFileName)
+    private static HashSet<string> ReadKeys(AppTheme theme, bool includeSharedControls)
     {
-        var path = Path.Combine(AppSourceRoot, "Themes", themeFileName);
-        var xaml = XName.Get("Key", "http://schemas.microsoft.com/winfx/2006/xaml");
-        return XDocument
-            .Load(path)
-            .Descendants()
-            .Select(element => element.Attribute(xaml)?.Value)
-            .Where(key => !string.IsNullOrEmpty(key))
-            .Select(key => key!)
-            .ToHashSet(StringComparer.Ordinal);
+        var keys = new HashSet<string>(StringComparer.Ordinal);
+        ThemeTestSupport.RunSta(() =>
+        {
+            var resources = new ResourceDictionary();
+            if (includeSharedControls)
+            {
+                resources.MergedDictionaries.Add(ThemeTestSupport.Load("Themes/Controls.xaml"));
+            }
+
+            using var service = ThemeTestSupport.CreateService(resources, new FakeSystemThemeMonitor(theme));
+            service.InitializeFromSystem();
+            AddKeys(resources);
+        });
+        return keys;
+
+        void AddKeys(ResourceDictionary dictionary)
+        {
+            keys.UnionWith(dictionary.Keys.OfType<string>());
+            foreach (var child in dictionary.MergedDictionaries)
+            {
+                AddKeys(child);
+            }
+        }
     }
 
     private static string AppSourceRoot =>

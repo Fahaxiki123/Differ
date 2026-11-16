@@ -209,7 +209,7 @@ public sealed class CodeEditorRuntimeTests
         owner.UpdateEditorText(owner.EditorSession.Id.ToString("N"), version, "stale input");
         Assert.Equal(acceptedVersion, owner.EditorSession.Version);
         Assert.Equal("-- pending mode close\n" + text, owner.EditorSession.Text);
-        Assert.Equal("true", Wait(browser.ExecuteScriptAsync("(()=>{right.focus();const event=new KeyboardEvent('keydown',{key:'s',code:'KeyS',keyCode:83,which:83,ctrlKey:true,bubbles:true,cancelable:true});right.getDomNode().querySelector('textarea').dispatchEvent(event);return event.defaultPrevented;})()")));
+        PressCtrlS(browser);
         PumpUntil(() => !owner.IsEditorDirty);
         Assert.False(owner.IsEditorDirty);
         Assert.Equal("-- pending mode close\n" + text, File.ReadAllText(owner.EditorSession.SaveTarget!));
@@ -220,6 +220,9 @@ public sealed class CodeEditorRuntimeTests
         PumpUntil(() => owner.EditorResultsCurrent && owner.EditorSession.Version > beforeUndoVersion);
         Assert.Equal(text, owner.EditorSession.Text);
     }
+
+    private static void PressCtrlS(WebView2 browser) =>
+        Assert.Equal("true", Wait(browser.ExecuteScriptAsync("(()=>{right.focus();const event=new KeyboardEvent('keydown',{key:'s',code:'KeyS',keyCode:83,which:83,ctrlKey:true,bubbles:true,cancelable:true});right.getDomNode().querySelector('textarea').dispatchEvent(event);return event.defaultPrevented;})()")));
 
     private static void AssertZoneScrollPreserved(CodeEditorView view, WebView2 browser, DiffWindowViewModel owner)
     {
@@ -246,9 +249,17 @@ public sealed class CodeEditorRuntimeTests
     {
         var firstText = first.EditorSession!.Text;
         var firstVersion = first.EditorSession.Version;
+        var localMinePath = Path.Combine(Path.GetDirectoryName(minePath)!, "explicit-local.lua");
+        File.Copy(minePath, localMinePath);
         for (var cycle = 0; cycle < 3; cycle++)
         {
-            var session = Wait(store.CreateAsync(new ExternalDiffRequest { BaseFilePath = basePath, MineFilePath = minePath }, CancellationToken.None));
+            var explicitLocal = cycle == 2;
+            var session = Wait(store.CreateAsync(new ExternalDiffRequest
+            {
+                BaseFilePath = basePath,
+                MineFilePath = explicitLocal ? localMinePath : minePath,
+                InvocationSource = explicitLocal ? ExternalDiffRequest.LocalFileSource : null
+            }, CancellationToken.None));
             using var second = new DiffWindowViewModel(new DiffCoordinator([new TextDiffAdapter(new TextFileReader())]), scheduler,
                 session, NullLogger<DiffWindowViewModel>.Instance, _ => { });
             second.EnableDocumentEditor();
@@ -276,6 +287,14 @@ public sealed class CodeEditorRuntimeTests
             Assert.False(second.IsEditMode);
             Assert.Equal("true", Wait(secondBrowser.ExecuteScriptAsync("right.getOption(monaco.editor.EditorOption.readOnly)")));
             Assert.Equal("2", Wait(secondBrowser.ExecuteScriptAsync("monaco.editor.getModels().length")));
+            if (explicitLocal)
+            {
+                Assert.Equal(localMinePath, second.EditorSession.SaveTarget);
+                Wait(second.SetEditModeAsync(true));
+                PressCtrlS(secondBrowser);
+                PumpUntil(() => !second.IsEditorDirty);
+                Assert.Equal(second.EditorSession.Text, File.ReadAllText(localMinePath));
+            }
             second.Dispose();
             Assert.True(secondView.IsEditorDisposed);
             window.Content = firstView;

@@ -82,11 +82,11 @@ function Assert-CleanupTarget([string]$Path) {
     Assert-NoReparseAncestors $target
     $relative = [IO.Path]::GetRelativePath($repositoryRoot, $target)
     $allowed = $relative -in $fixedStagingPaths
-    if ($relative -match '^(src|tests|scripts)\\(?:[^\\]+\\)*(bin|obj)$') {
+    if ($relative -match '^(src|tests|scripts|samples)\\(?:[^\\]+\\)*(bin|obj)$') {
         $projectDirectory = [IO.Path]::GetDirectoryName($target)
         $allowed = @(Get-ChildItem -LiteralPath $projectDirectory -File -Filter '*.csproj').Count -gt 0
     }
-    elseif ($relative -match '^(src|tests|scripts)\\(?:[^\\]+\\)*__pycache__$') {
+    elseif ($relative -match '^(src|tests|scripts|samples)\\(?:[^\\]+\\)*__pycache__$') {
         $allowed = $true
     }
     if (-not $allowed) { throw "Target is not on the reproducible-output allowlist: $relative" }
@@ -224,7 +224,7 @@ try {
         if (-not $ownsMaintenanceLock) { throw 'Another publish/package/cleanup operation owns this workspace.' }
     }
     $fixedStagingPaths = @('artifacts\packaging\2026-09-25\tooling\build', 'artifacts\Differ-win-x64-staging')
-    foreach ($rootName in @('src', 'tests', 'scripts')) {
+    foreach ($rootName in @('src', 'tests', 'scripts', 'samples')) {
         Find-ProjectOutput (Join-Path $repositoryRoot $rootName)
     }
     foreach ($relative in $fixedStagingPaths) {

@@ -113,7 +113,6 @@
                 <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="GridLinesVisibility" Value="Horizontal" />
-                <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource DataGrid.GridLine}" />
                 <Setter Property="HeadersVisibility" Value="Column" />
                 <Setter Property="RowHeaderWidth" Value="0" />
                 <Setter Property="CanUserAddRows" Value="False" />
@@ -122,6 +121,15 @@
                 <Setter Property="IsReadOnly" Value="True" />
                 <Setter Property="EnableRowVirtualization" Value="True" />
                 <Setter Property="EnableColumnVirtualization" Value="True" />
+                <Style.Triggers>
+                    <!-- WPF regenerates row containers when the native line brush changes, even for hidden lines. -->
+                    <Trigger Property="GridLinesVisibility" Value="Horizontal">
+                        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource DataGrid.GridLine}" />
+                    </Trigger>
+                    <Trigger Property="GridLinesVisibility" Value="All">
+                        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource DataGrid.GridLine}" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style TargetType="DataGridColumnHeader">

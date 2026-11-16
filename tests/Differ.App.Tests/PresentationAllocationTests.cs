@@ -135,7 +135,7 @@ public sealed class PresentationAllocationTests
         var presentation = ComparisonPresentationBuilder.Build(Document(rows), CancellationToken.None);
         var sheet = Assert.Single(presentation.WorksheetTabs);
 
-        Assert.Equal(360, Assert.Single(sheet.Columns).Width);
+        Assert.Equal(312, Assert.Single(sheet.Columns).Width);
         Assert.Equal(1, presentation.Summary.Changed);
         Assert.NotSame(sheet.Rows[1].BaseCells[0], sheet.Rows[1].MineCells[0]);
         Assert.Equal(oldText, sheet.Rows[1].BaseCells[0].Text);

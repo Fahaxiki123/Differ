@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Differ.UI;component/Themes/Controls.xaml" />
         <ResourceDictionary Source="Metrics.xaml" />
     </ResourceDictionary.MergedDictionaries>
 

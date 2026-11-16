@@ -2,4 +2,21 @@
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; worker-src 'self' blob:; connect-src 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="editor.css"></head>
-<body><div id="editor" aria-label="BASE 与当前结果的完整文档编辑器"><div id="base"></div><div id="merge-gutter"><button id="adopt-current" type="button" hidden disabled>&#8594;</button></div><div id="mine"></div></div><div id="context" class="sr-only"><span id="current-location" role="status" aria-live="polite" aria-atomic="true"></span></div><script src="vs/loader.js"></script><script src="editor.js"></script></body></html>
+<body>
+<div id="editor" aria-label="BASE 与当前结果的完整文档编辑器">
+    <div id="base"></div>
+    <div id="merge-gutter"><button id="adopt-current" type="button" hidden disabled>&#8594;</button></div>
+    <div id="mine"></div>
+    <div id="difference-rail" role="scrollbar" aria-orientation="vertical" aria-controls="mine" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-label="差异滚动条" tabindex="0">
+        <div id="rail-viewport" aria-hidden="true"></div>
+        <canvas id="rail-markers" aria-hidden="true"></canvas>
+        <div id="rail-current" aria-hidden="true" hidden></div>
+    </div>
+</div>
+<div id="rail-preview" role="tooltip" hidden></div>
+<div id="context" class="sr-only"><span id="current-location" role="status" aria-live="polite" aria-atomic="true"></span></div>
+<canvas id="theme-mist" aria-hidden="true" hidden></canvas>
+<script src="vs/loader.js"></script>
+<script src="editor-rail.js"></script>
+<script src="editor.js"></script>
+</body></html>

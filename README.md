@@ -8,7 +8,7 @@
 
 **[下载 0.21.18 Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)** · [版本说明与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.18) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
 
-0.21.18 开发预览安装包已发布，约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名；已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。程序测试、安装包校验及未验证范围见[安装包交付记录](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/RELEASE-0.21.18.md)。开发源码位于 `codex/ui-system-phase1`，默认 `main` 保留原稳定应用代码。
+0.21.18 开发预览安装包已发布，约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名；已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。程序测试、安装包校验及未验证范围见[安装包交付记录](docs/RELEASE-0.21.18.md)。默认 `main` 已同步 0.21.18 源码，日常开发在 `codex/ui-system-phase1` 继续。0.21.18 安装包仍为预发布，稳定安装包见[历史版本](https://github.com/Fahaxiki123/Differ/releases)。
 
 ### 本次更新
 
@@ -116,7 +116,7 @@ TortoiseSVN“设置 → 差异查看器”主页面确认或手动修改当前�
 
 可构建带正式应用图标的当前用户离线安装包 `artifacts/installers/Differ-Setup.exe`，面向 Windows 10/11 x64。内含 .NET 运行组件；无需 Office 或开发环境。TortoiseSVN 仍由用户或公司 IT 单独安装。
 
-SVN 绑定是默认不勾选的可选项，按目标电脑的实际安装路径生成配置，先备份其原有工具及支持扩展名的高级覆盖。卸载仅恢复该安装位置持有的绑定，并保护安装后的人为修改。公司电脑的安装、绑定、升级和卸载步骤见 [离线安装说明](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/INSTALLATION.md)。
+SVN 绑定是默认不勾选的可选项，按目标电脑的实际安装路径生成配置，先备份其原有工具及支持扩展名的高级覆盖。卸载仅恢复该安装位置持有的绑定，并保护安装后的人为修改。公司电脑的安装、绑定、升级和卸载步骤见 [离线安装说明](docs/INSTALLATION.md)。
 
 生成安装包前先运行下面的发布脚本，再运行 `scripts/build-installer.ps1`。安装器与 SHA-256 文件放在独立的 `artifacts/installers`，不混入软件发布目录。当前安装包未数字签名，企业白名单策略需由公司 IT 审核。
 
@@ -138,7 +138,7 @@ pwsh -NoProfile -File .\scripts\publish.ps1
 
 ## 开发验证
 
-从GitHub克隆后的依赖、源码边界与构建步骤见 [干净源码构建说明](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/BUILDING.md)。默认测试不需要原始业务文档。
+从GitHub克隆后的依赖、源码边界与构建步骤见 [干净源码构建说明](docs/BUILDING.md)。默认测试不需要原始业务文档。
 
 ```powershell
 dotnet restore
@@ -147,10 +147,10 @@ dotnet test .\Differ.sln -c Release
 dotnet format .\Differ.sln --verify-no-changes
 ```
 
-项目长期规范见 [`docs/DEVELOPMENT_SPEC.md`](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/DEVELOPMENT_SPEC.md)。
+项目长期规范见 [`docs/DEVELOPMENT_SPEC.md`](docs/DEVELOPMENT_SPEC.md)。
 
 ## 每次任务结束的目录收尾
 
 完整验证与清理使用 PowerShell 7：`pwsh -NoProfile -File scripts/verify-and-clean.ps1`。它运行 Release build/test、格式检查，无论验证是否成功都清理有明确白名单的输出，并执行目录检查；日志与测试结果保存在项目外。失败时先修问题，再重跑，不能将未通过的清理当作完成。
 
-单独检查使用 `scripts/clean-workspace.ps1 -Check`，清理使用 `-Apply`。历史设计、源码快照、性能基线和截图已迁往项目外，见 [归档索引](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/ARCHIVE_INDEX.md)。正式程序与安装包仍在原固定路径。详细保留/清理边界见 [目录维护规则](https://github.com/Fahaxiki123/Differ/blob/codex/ui-system-phase1/docs/WORKSPACE_HYGIENE.md)。
+单独检查使用 `scripts/clean-workspace.ps1 -Check`，清理使用 `-Apply`。历史设计、源码快照、性能基线和截图已迁往项目外，见 [归档索引](docs/ARCHIVE_INDEX.md)。正式程序与安装包仍在原固定路径。详细保留/清理边界见 [目录维护规则](docs/WORKSPACE_HYGIENE.md)。

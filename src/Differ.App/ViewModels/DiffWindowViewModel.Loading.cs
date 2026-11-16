@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using Differ.App.Resources;
 using Differ.App.Services;
 using Differ.Core.External;
@@ -11,12 +12,14 @@ public sealed partial class DiffWindowViewModel
 {
     private CancellationTokenSource? _loadCancellation;
     private int _loadVersion;
+    private static readonly CompositeFormat SpreadsheetSummaryDetailsFormat =
+        CompositeFormat.Parse(ChromeStrings.SpreadsheetSummaryDetailsFormat);
 
     public Task LoadAsync() => _isLoaded || _isDisposed ? Task.CompletedTask : ReloadAsync();
     public Task ReloadAsync() => LoadCoreAsync(refreshMine: false, CancellationToken.None);
     public Task RefreshMineAsync(CancellationToken cancellationToken = default) => LoadCoreAsync(refreshMine: true, cancellationToken);
 
-    private async Task LoadCoreAsync(bool refreshMine, CancellationToken cancellationToken)
+    private async Task LoadCoreAsync(bool refreshMine, CancellationToken cancellationToken, DiffOptions? optionsOverride = null)
     {
         if (_isDisposed) return;
         if (refreshMine && IsEditableText && ConfirmDiscardEditorAsync is { } confirm && !await confirm()) return;
@@ -28,7 +31,7 @@ public sealed partial class DiffWindowViewModel
         _loadCancellation = loadCancellation;
         var loadToken = loadCancellation.Token;
         var loadVersion = ++_loadVersion;
-        var options = Options.ToDiffOptions();
+        var options = optionsOverride ?? Options.ToDiffOptions();
         var originalSession = _session;
         ExternalDiffSession? candidate = null;
         var committed = false;
@@ -58,7 +61,7 @@ public sealed partial class DiffWindowViewModel
                 StatusText = validationError;
                 return;
             }
-            if (await TryLoadEditorAsync(refreshMine, comparisonSession, loadToken))
+            if (await TryLoadEditorAsync(refreshMine, comparisonSession, options, loadToken))
             {
                 loadToken.ThrowIfCancellationRequested();
                 if (loadVersion != _loadVersion || _isDisposed) return;
@@ -172,6 +175,7 @@ public sealed partial class DiffWindowViewModel
         SummaryText = string.Join(" · ", summaryItems
             .Where(item => item.Count != 0)
             .Select(item => $"{item.Label} {item.Count.ToString(CultureInfo.CurrentCulture)}"));
+        OfficeSummaryDetail = presentation.FileKind == FileKind.Word ? SummaryText : string.Empty;
         if (presentation.FileKind == FileKind.Word)
             SummaryText = $"{DifferenceCount} 个变更区域 · 段落/表格单元格细项：{SummaryText}";
         if (presentation.FileKind == FileKind.Excel)
@@ -182,8 +186,11 @@ public sealed partial class DiffWindowViewModel
             var cellCount = presentation.ChangedRows.Length - structureCount - formattingCount;
             SummaryText = string.Format(CultureInfo.CurrentCulture, Strings.SpreadsheetSummaryUnitsFormat,
                 DifferenceCount, structureCount, cellCount, formattingCount);
+            OfficeSummaryDetail = DifferenceCount == 0 ? string.Empty : string.Format(CultureInfo.CurrentCulture,
+                SpreadsheetSummaryDetailsFormat, structureCount, cellCount, formattingCount);
         }
-        StatusText = presentation.Summary.Changed == 0 ? Strings.ComparisonIdentical
+        StatusText = IsApplyingEditorProjection && _editorModeError.Length != 0 ? _editorModeError
+            : presentation.Summary.Changed == 0 ? Strings.ComparisonIdentical
             : presentation.FileKind == FileKind.Word ? string.Format(CultureInfo.CurrentCulture, Strings.ComparisonCompleteRegionsFormat, DifferenceCount)
             : presentation.FileKind == FileKind.Excel ? string.Format(CultureInfo.CurrentCulture, Strings.ComparisonCompleteEventsFormat, DifferenceCount)
             : string.Format(CultureInfo.CurrentCulture, ComparisonCompleteMessageFormat, presentation.Summary.Changed);

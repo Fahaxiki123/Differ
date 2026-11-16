@@ -2,36 +2,58 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Differ.App.Controls"
+             xmlns:dui="clr-namespace:Differ.UI.Controls;assembly=Differ.UI"
              xmlns:local="clr-namespace:Differ.App"
              xmlns:resources="clr-namespace:Differ.App.Resources"
-             Background="{DynamicResource PanelBrush}">
+             Background="{DynamicResource Dui.Surface.Content}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="PaneRevisionStyle" TargetType="TextBlock">
+            <Style x:Key="WorksheetSourceTitle" TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="Foreground" Value="{DynamicResource MutedInkBrush}" />
-                <Setter Property="FontSize" Value="{StaticResource Ui.MetadataFontSize}" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            </Style>
+            <Style x:Key="WorksheetSourceLabel" TargetType="Border">
+                <Setter Property="Padding" Value="6,1" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="CornerRadius" Value="{StaticResource Dui.Metrics.SmallRadius}" />
+                <Setter Property="Background" Value="{DynamicResource Dui.State.Hover}" />
+            </Style>
+            <Style x:Key="WorksheetReadOnlyLabel" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+            </Style>
+            <Style x:Key="WorksheetRevision" TargetType="TextBlock" BasedOn="{StaticResource WorksheetReadOnlyLabel}">
+                <Setter Property="Margin" Value="6,0,0,0" />
+                <Setter Property="MaxWidth" Value="100" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}"
-                                 Value="{x:Static resources:Strings.RevisionUnknown}">
+                    <Trigger Property="Text" Value="{x:Static resources:Strings.RevisionUnknown}">
                         <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
+                    </Trigger>
                 </Style.Triggers>
             </Style>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <Style x:Key="WorksheetTabItemStyle" TargetType="ListBoxItem">
-                <Setter Property="MinWidth" Value="92" />
-                <Setter Property="Height" Value="{StaticResource Ui.WorksheetTabHeight}" />
-                <Setter Property="FontSize" Value="{StaticResource Ui.ToolbarFontSize}" />
-                <Setter Property="Padding" Value="12,0" />
-                <Setter Property="Margin" Value="0,0,4,0" />
-                <Setter Property="Background" Value="{DynamicResource TabRestBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource FileTab.TextBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource TabRestBorderBrush}" />
-                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="MinWidth" Value="88" />
+                <Setter Property="MaxWidth" Value="164" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Setter Property="Padding" Value="7,0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="FocusVisualStyle" Value="{StaticResource Dui.KeyboardFocus}" />
+                <Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}" />
+                <Setter Property="ToolTip" Value="{Binding DisplayName}" />
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="Template">
@@ -42,18 +64,18 @@
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="{StaticResource Ui.TabCornerRadius}">
+                                    CornerRadius="5">
                                 <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource TabHoverBrush}" />
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Dui.State.Hover}" />
                                 </Trigger>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource TabSelectedBrush}" />
-                                    <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource TabSelectedBorderBrush}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+                                    <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Dui.Surface.Content}" />
+                                    <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Dui.Border.Subtle}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
                                     <Setter Property="FontWeight" Value="SemiBold" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
@@ -61,93 +83,270 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <Style x:Key="WorksheetPreviewValue" TargetType="controls:InlineDiffTextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Primary}" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Setter Property="TextWrapping" Value="NoWrap" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            </Style>
+            <Style x:Key="WorksheetInspectorCopy" TargetType="Button" BasedOn="{StaticResource Dui.Button.Secondary}">
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding SelectedWorksheet.SelectedCell}" Value="{x:Null}">
+                        <Setter Property="IsEnabled" Value="False" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="WorksheetInspectorToggle" TargetType="ToggleButton" BasedOn="{StaticResource Dui.Toggle.Segment}">
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="Background" Value="{DynamicResource Dui.Surface.Content}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource Dui.Border.Subtle}" />
+                <Setter Property="Content" Value="{x:Static resources:Strings.SpreadsheetExpandDetails}" />
+                <Style.Triggers>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Content" Value="{x:Static resources:Strings.SpreadsheetCollapseDetails}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="WorksheetInspectorLabel" TargetType="TextBlock">
+                <Setter Property="Margin" Value="0,0,0,3" />
+                <Setter Property="FontSize" Value="{StaticResource Dui.Metrics.SecondaryFontSize}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+            </Style>
             <DataTemplate x:Key="WorksheetContentTemplate">
                 <local:SpreadsheetWorksheetDiffView />
             </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource PanelBrush}">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="{StaticResource Ui.PaneHeaderRowHeight}" />
+            <RowDefinition Height="34" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" MinHeight="{StaticResource Ui.WorksheetTabBarHeight}" />
+            <RowDefinition Height="0" />
+            <RowDefinition Height="Auto" MinHeight="{StaticResource Ui.DetailHeaderHeight}" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"  Background="{DynamicResource PaneHeaderBackgroundBrush}">
+        <Grid x:Name="WorksheetSourceHeaders" Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="1" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="{StaticResource Ui.ComparisonRailColumnWidth}" />
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Padding="{StaticResource Ui.PaneHeaderPadding}"
-                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+            <Border Grid.Column="0" Style="{StaticResource Dui.PaneHeader}" MinHeight="0">
                 <Border.ToolTip>
-                    <StackPanel MaxWidth="640">
-                        <TextBlock FontWeight="SemiBold" Text="{Binding BaseTitle}" TextWrapping="Wrap" />
-                        <TextBlock Margin="0,4,0,0" Text="{Binding BasePath}" TextWrapping="Wrap" />
-                        <TextBlock Margin="0,4,0,0" Text="{Binding BaseRevisionText}" />
-                    </StackPanel>
+                    <ToolTip Style="{StaticResource Dui.ToolTip}"
+                             DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <StackPanel>
+                            <TextBlock FontWeight="SemiBold" Text="{Binding BaseTitle}" TextWrapping="Wrap" />
+                            <TextBlock Margin="0,4,0,0" Text="{Binding BasePath}" TextWrapping="Wrap" />
+                            <TextBlock Margin="0,4,0,0" Text="{Binding BaseRevisionText}" />
+                        </StackPanel>
+                    </ToolTip>
                 </Border.ToolTip>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
-                               Foreground="{DynamicResource MutedInkBrush}" FontSize="{StaticResource Ui.ToolbarFontSize}"
-                               Text="{x:Static resources:Strings.BaseSide}" />
-                    <TextBlock Style="{StaticResource PaneRevisionStyle}" Text="{Binding BaseRevisionText}" />
-                </StackPanel>
+                <DockPanel>
+                    <Border DockPanel.Dock="Left" Style="{StaticResource WorksheetSourceLabel}">
+                        <TextBlock Foreground="{DynamicResource Dui.Text.Primary}" FontWeight="SemiBold"
+                                   FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}" Text="{x:Static resources:Strings.BaseSide}" />
+                    </Border>
+                    <Border DockPanel.Dock="Right" Margin="8,0,0,0" Padding="6,1"
+                            Background="{DynamicResource Dui.State.ReadOnly}" VerticalAlignment="Center"
+                            CornerRadius="{StaticResource Dui.Metrics.SmallRadius}">
+                        <TextBlock Style="{StaticResource WorksheetReadOnlyLabel}" Text="{x:Static resources:ChromeStrings.ReadOnly}" />
+                    </Border>
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <TextBlock Style="{StaticResource WorksheetSourceTitle}" Text="{Binding BaseTitle}" />
+                        <TextBlock Grid.Column="1" Style="{StaticResource WorksheetRevision}" Text="{Binding BaseRevisionText}" />
+                    </Grid>
+                </DockPanel>
             </Border>
-            <Border Grid.Column="2" Padding="{StaticResource Ui.PaneHeaderPadding}"
-                    BorderBrush="{DynamicResource PaneHeaderBorderBrush}" BorderThickness="0,0,0,1">
+            <Border Grid.Column="2" Style="{StaticResource Dui.PaneHeader}" MinHeight="0">
                 <Border.ToolTip>
-                    <StackPanel MaxWidth="640">
-                        <TextBlock FontWeight="SemiBold" Text="{Binding MineTitle}" TextWrapping="Wrap" />
-                        <TextBlock Margin="0,4,0,0" Text="{Binding MinePath}" TextWrapping="Wrap" />
-                        <TextBlock Margin="0,4,0,0" Text="{Binding MineRevisionText}" />
-                    </StackPanel>
+                    <ToolTip Style="{StaticResource Dui.ToolTip}"
+                             DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <StackPanel>
+                            <TextBlock FontWeight="SemiBold" Text="{Binding MineTitle}" TextWrapping="Wrap" />
+                            <TextBlock Margin="0,4,0,0" Text="{Binding MinePath}" TextWrapping="Wrap" />
+                            <TextBlock Margin="0,4,0,0" Text="{Binding MineRevisionText}" />
+                        </StackPanel>
+                    </ToolTip>
                 </Border.ToolTip>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center"
-                               Foreground="{DynamicResource MutedInkBrush}" FontSize="{StaticResource Ui.ToolbarFontSize}"
-                               Text="{x:Static resources:Strings.MineSide}" />
-                    <TextBlock Style="{StaticResource PaneRevisionStyle}" Text="{Binding MineRevisionText}" />
-                </StackPanel>
+                <DockPanel>
+                    <Border DockPanel.Dock="Left" Style="{StaticResource WorksheetSourceLabel}">
+                        <TextBlock Foreground="{DynamicResource Dui.Text.Primary}" FontWeight="SemiBold"
+                                   FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}" Text="{x:Static resources:Strings.MineSide}" />
+                    </Border>
+                    <Border DockPanel.Dock="Right" Margin="8,0,0,0" Padding="6,1"
+                            Background="{DynamicResource Dui.State.ReadOnly}" VerticalAlignment="Center"
+                            CornerRadius="{StaticResource Dui.Metrics.SmallRadius}">
+                        <TextBlock Style="{StaticResource WorksheetReadOnlyLabel}" Text="{x:Static resources:ChromeStrings.ReadOnly}" />
+                    </Border>
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <TextBlock Style="{StaticResource WorksheetSourceTitle}" Text="{Binding MineTitle}" />
+                        <TextBlock Grid.Column="1" Style="{StaticResource WorksheetRevision}" Text="{Binding MineRevisionText}" />
+                    </Grid>
+                </DockPanel>
             </Border>
-            <Border Grid.Column="1" Background="{DynamicResource PaneSeparatorBrush}" />
+            <Border Grid.Column="1" Background="{DynamicResource Dui.Border.Subtle}" />
         </Grid>
 
-        <controls:PersistentContentHost Grid.Row="1"
-                                        ContentTemplate="{StaticResource WorksheetContentTemplate}"
-                                        ItemsSource="{Binding WorksheetTabs}"
-                                        SelectedItem="{Binding SelectedWorksheet}"
-                                        TraceCategory="worksheet-switch" />
-
-        <Border Grid.Row="2"
-                Padding="8,0"
-                Background="{DynamicResource TabStripBackgroundBrush}"
-                BorderBrush="{DynamicResource TabStripBorderBrush}"
-                BorderThickness="0,1,0,0"
-                Visibility="{Binding HasWorksheetTabs, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Margin="2,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource StatusTextBrush}" FontSize="{StaticResource Ui.MetadataFontSize}" Text="{x:Static resources:Strings.WorksheetTabs}" />
-                <ListBox x:Name="WorksheetTabs" Grid.Column="1"
-                         Background="Transparent"
-                         Padding="0"
-                         BorderThickness="0"
-                         ItemContainerStyle="{StaticResource WorksheetTabItemStyle}"
-                         ItemsSource="{Binding WorksheetTabs}"
-                         SelectedItem="{Binding SelectedWorksheet, Mode=TwoWay}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+        <Grid x:Name="WorksheetViewport" Grid.Row="1">
+            <Grid.LayoutTransform>
+                <ScaleTransform ScaleX="{Binding DataContext.Preferences.ReadingScale, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=1}"
+                                ScaleY="{Binding DataContext.Preferences.ReadingScale, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=1}" />
+            </Grid.LayoutTransform>
+            <controls:PersistentContentHost PreserveRecentLayout="True"
+                                            ContentTemplate="{StaticResource WorksheetContentTemplate}"
+                                            ItemsSource="{Binding WorksheetTabs}"
+                                            SelectedItem="{Binding SelectedWorksheet}"
+                                            TraceCategory="worksheet-switch" />
+        </Grid>
+        <GridSplitter x:Name="DetailSplitter" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      Background="Transparent" Visibility="Collapsed" FocusVisualStyle="{StaticResource Dui.KeyboardFocus}"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext">
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border x:Name="Divider" Height="1" VerticalAlignment="Center"
+                                Background="{DynamicResource Dui.Border.Subtle}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Divider" Property="Background" Value="{DynamicResource Dui.Accent}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
+        <Grid Grid.Row="3" Background="{DynamicResource Dui.Surface.Content}">
+            <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <Grid x:Name="DetailsContent" Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="DataContext" Value="{x:Null}" />
+                        <Style.Triggers>
+                            <Trigger Property="Visibility" Value="Visible">
+                                <Setter Property="DataContext"
+                                        Value="{Binding DataContext.SelectedWorksheet.SelectedCell, RelativeSource={RelativeSource AncestorType=local:SpreadsheetDiffView}}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.LayoutTransform>
+                    <ScaleTransform ScaleX="{Binding DataContext.Preferences.ReadingScale, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=1}"
+                                    ScaleY="{Binding DataContext.Preferences.ReadingScale, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=1}" />
+                </Grid.LayoutTransform>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Border Padding="12,4">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource WorksheetInspectorLabel}"
+                                   Text="{x:Static resources:Strings.FullBaseContent}" />
+                        <controls:SelectableDiffTextBox DiffContent="{Binding BaseDetails}"
+                                                        FontSize="{StaticResource Ui.SpreadsheetFontSize}"
+                                                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
+                                                        Foreground="{DynamicResource Dui.Text.Primary}"
+                                                        AutomationProperties.Name="{x:Static resources:Strings.FullBaseContent}" />
+                    </DockPanel>
+                </Border>
+                <Border Grid.Column="1" Background="{DynamicResource Dui.Border.Subtle}" />
+                <Border Grid.Column="2" Padding="12,4">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource WorksheetInspectorLabel}"
+                                   Text="{x:Static resources:Strings.FullCurrentContent}" />
+                        <controls:SelectableDiffTextBox DiffContent="{Binding MineDetails}"
+                                                        FontSize="{StaticResource Ui.SpreadsheetFontSize}"
+                                                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI"
+                                                        Foreground="{DynamicResource Dui.Text.Primary}"
+                                                        AutomationProperties.Name="{x:Static resources:Strings.FullCurrentContent}" />
+                    </DockPanel>
+                </Border>
             </Grid>
-        </Border>
+            <Border x:Name="WorksheetFooter" Grid.Row="1" MinHeight="{StaticResource Ui.DetailHeaderHeight}"
+                    Padding="8,2" Background="{DynamicResource Dui.Surface.PaneHeader}"
+                    BorderBrush="{DynamicResource Dui.Border.Subtle}" BorderThickness="0,1,0,0">
+                <Border.ToolTip>
+                    <ToolTip Style="{StaticResource Dui.ToolTip}"
+                             DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding StatusText}" />
+                            <TextBlock Text="{Binding OfficeSummaryDetail}" />
+                        </StackPanel>
+                    </ToolTip>
+                </Border.ToolTip>
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="1.4*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <ListBox x:Name="WorksheetTabs" AutomationProperties.Name="{x:Static resources:Strings.WorksheetTabs}"
+                             Background="Transparent" Padding="0" BorderThickness="0" VerticalAlignment="Center"
+                             Visibility="{Binding HasWorksheetTabs, Converter={StaticResource BooleanToVisibilityConverter}}"
+                             ItemContainerStyle="{StaticResource WorksheetTabItemStyle}" ItemsSource="{Binding WorksheetTabs}"
+                             SelectedItem="{Binding SelectedWorksheet, Mode=TwoWay}" SelectionChanged="WorksheetTabs_SelectionChanged"
+                             ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Margin="5,0,0,0" FontSize="11"
+                                               Foreground="{DynamicResource Dui.Text.Secondary}" Text="{Binding DifferenceCount}"
+                                               Visibility="{Binding HasDifferences, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <TextBlock Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Grid Grid.Column="1" Margin="8,0" MaxWidth="380" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          DataContext="{Binding SelectedWorksheet.SelectedCell}">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Margin="0,0,7,0" Padding="5,1" CornerRadius="4" MaxWidth="108"
+                                Background="{DynamicResource Dui.State.Hover}">
+                            <TextBlock Foreground="{DynamicResource Dui.Text.Secondary}" FontSize="{StaticResource Dui.Metrics.SecondaryFontSize}"
+                                       FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Text="{Binding PreviewAddress}" />
+                        </Border>
+                        <controls:InlineDiffTextBlock x:Name="CompactBaseValue" Grid.Column="1" Style="{StaticResource WorksheetPreviewValue}"
+                                                     DiffContent="{Binding BasePreview}"
+                                                     TextAlignment="Right" ToolTip="{Binding BaseText}"
+                                                     AutomationProperties.Name="{x:Static resources:Strings.FullBaseContent}" />
+                        <TextBlock Grid.Column="2" Margin="6,0" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Dui.Text.Secondary}" Text="→" />
+                        <controls:InlineDiffTextBlock x:Name="CompactMineValue" Grid.Column="3" Style="{StaticResource WorksheetPreviewValue}"
+                                                     DiffContent="{Binding MinePreview}"
+                                                     ToolTip="{Binding MineText}"
+                                                     AutomationProperties.Name="{x:Static resources:Strings.FullCurrentContent}" />
+                    </Grid>
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                        <Button x:Name="CopyComparisonButton" Style="{StaticResource WorksheetInspectorCopy}" Click="CopyBothSides_Click"
+                                Content="{x:Static resources:Strings.SpreadsheetCopyComparison}"
+                                ToolTip="{x:Static resources:Strings.CopyBothSides}"
+                                AutomationProperties.Name="{x:Static resources:Strings.CopyBothSides}" />
+                        <ToggleButton x:Name="DetailsToggle" Style="{StaticResource WorksheetInspectorToggle}" Margin="5,0,0,0"
+                                      AutomationProperties.Name="{x:Static resources:Strings.SelectedContentDetails}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

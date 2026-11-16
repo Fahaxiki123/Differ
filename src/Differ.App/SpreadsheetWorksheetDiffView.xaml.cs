@@ -14,14 +14,13 @@ namespace Differ.App;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1001", Justification = "WPF owns the view lifetime; Unloaded deterministically releases viewport and layout event subscriptions, and Loaded creates fresh bindings.")]
 public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPaneFocusTarget
 {
-    private ComparisonViewportBridge? _overviewBridge;
-    private ReadingLayoutBinding? _readingLayout;
     private WorksheetTabViewModel? _viewModel;
+    private WorksheetTabViewModel? _columnsOwner;
     private ScrollViewer? _baseScrollViewer;
     private ScrollViewer? _mineScrollViewer;
+    private DispatcherOperation? _scrollViewerAttachOperation;
     private DispatcherOperation? _selectionOperation;
     private DispatcherOperation? _scrollOperation;
-    private ScrollViewer? _pendingScrollTarget;
     private double _pendingVerticalOffset;
     private double _pendingHorizontalOffset;
     private bool _pendingVerticalScroll;
@@ -39,6 +38,8 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         DataContextChanged += OnDataContextChanged;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        InitializeThumbDrag();
+        InitializeVerticalRail();
     }
 
     public void FocusBasePane()
@@ -53,21 +54,18 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        _readingLayout?.Dispose();
-        _readingLayout = ReadingLayoutBinding.Attach(this, 2, true, DetailSplitter, DetailsToggle, DetailsContent);
         AttachViewModel(DataContext as WorksheetTabViewModel);
         ConfigureColumns();
-        Dispatcher.BeginInvoke(
-            AttachScrollViewers,
-            DispatcherPriority.Loaded);
+        QueueScrollViewerAttachment();
         QueueSelectionSynchronization();
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        _readingLayout?.Dispose();
-        _readingLayout = null;
+        CancelThumbDrag();
         AttachViewModel(null);
+        _scrollViewerAttachOperation?.Abort();
+        _scrollViewerAttachOperation = null;
         DetachScrollViewers();
         if (_selectionOperation?.Status == DispatcherOperationStatus.Pending)
         {
@@ -81,7 +79,6 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         }
 
         _scrollOperation = null;
-        _pendingScrollTarget = null;
         _pendingVerticalScroll = false;
         _pendingHorizontalScroll = false;
     }
@@ -90,10 +87,11 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         object sender,
         DependencyPropertyChangedEventArgs e)
     {
+        CancelThumbDrag();
         AttachViewModel(e.NewValue as WorksheetTabViewModel);
+        ConfigureColumns();
         if (IsLoaded)
         {
-            ConfigureColumns();
             QueueSelectionSynchronization();
         }
     }
@@ -115,12 +113,26 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         {
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         }
+        UpdateRailRows();
     }
 
     private void OnViewModelPropertyChanged(
         object? sender,
         PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(WorksheetTabViewModel.Rows))
+        {
+            CancelThumbDrag();
+        }
+        else if (e.PropertyName == nameof(WorksheetTabViewModel.ScrollableRows))
+        {
+            UpdateRailRows();
+        }
+        else if (e.PropertyName == nameof(WorksheetTabViewModel.SelectedRow))
+        {
+            VerticalRail.UpdateSelection(_viewModel?.SelectedRow?.StableId);
+        }
+
         if (string.Equals(
                 e.PropertyName,
                 nameof(WorksheetTabViewModel.SelectedRow),
@@ -140,18 +152,17 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
 
     private void ConfigureColumns()
     {
-        if (_viewModel is null)
+        if (_viewModel is null || ReferenceEquals(_viewModel, _columnsOwner))
         {
             return;
         }
 
-        ConfigureColumns(
-            BaseSpreadsheetGrid,
-            nameof(SpreadsheetRowViewModel.BaseCells));
-        ConfigureColumns(
-            MineSpreadsheetGrid,
-            nameof(SpreadsheetRowViewModel.MineCells));
+        // Install the immutable columns before the first measure can realize
+        // a row with only its gutter, then realize it again with business cells.
+        ConfigureColumns(BaseSpreadsheetGrid, isBaseSide: true);
+        ConfigureColumns(MineSpreadsheetGrid, isBaseSide: false);
         ConfigureFrozenHeaders();
+        _columnsOwner = _viewModel;
     }
 
     private void ConfigureFrozenHeaders()
@@ -200,7 +211,7 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
             Header = string.Empty,
             CellTemplate = (DataTemplate)Resources[baseSide ? "BaseRowNumberTemplate" : "MineRowNumberTemplate"]
         });
-        ConfigureColumns(grid, baseSide ? nameof(SpreadsheetRowViewModel.BaseCells) : nameof(SpreadsheetRowViewModel.MineCells));
+        ConfigureColumns(grid, baseSide);
         grid.SelectedCellsChanged += SpreadsheetGrid_SelectedCellsChanged;
         grid.ContextMenuOpening += SpreadsheetGrid_ContextMenuOpening;
         grid.PreviewKeyDown += SpreadsheetGrid_PreviewKeyDown;
@@ -208,7 +219,7 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         return grid;
     }
 
-    private void ConfigureColumns(DataGrid grid, string cellsPropertyName)
+    private void ConfigureColumns(DataGrid grid, bool isBaseSide)
     {
         while (grid.Columns.Count > 1)
         {
@@ -220,12 +231,12 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         for (var index = 0; index < _viewModel!.Columns.Count; index++)
         {
             var column = _viewModel.Columns[index];
-            grid.Columns.Add(new SpreadsheetValueColumn(cellsPropertyName, index)
+            grid.Columns.Add(new SpreadsheetValueColumn(isBaseSide, index)
             {
                 Width = column.Width,
                 Header = column with
                 {
-                    DisplayHeader = cellsPropertyName == nameof(SpreadsheetRowViewModel.BaseCells)
+                    DisplayHeader = isBaseSide
                         ? column.BaseColumn ?? "—" : column.MineColumn ?? "—"
                 },
                 HeaderTemplate = headerTemplate
@@ -235,9 +246,24 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
 
     private void SpreadsheetGrid_Loaded(object sender, RoutedEventArgs e)
     {
-        Dispatcher.BeginInvoke(
-            AttachScrollViewers,
-            DispatcherPriority.Loaded);
+        QueueScrollViewerAttachment();
+    }
+
+    private void QueueScrollViewerAttachment()
+    {
+        if (_scrollViewerAttachOperation?.Status == DispatcherOperationStatus.Pending)
+        {
+            return;
+        }
+
+        _scrollViewerAttachOperation = Dispatcher.BeginInvoke(() =>
+        {
+            _scrollViewerAttachOperation = null;
+            if (IsLoaded)
+            {
+                AttachScrollViewers();
+            }
+        }, DispatcherPriority.Loaded);
     }
 
     private void AttachScrollViewers()
@@ -254,20 +280,19 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         if (_baseScrollViewer is not null)
         {
             _baseScrollViewer.ScrollChanged += OnBaseScrollChanged;
-            _overviewBridge = new ComparisonViewportBridge(this, _baseScrollViewer, BaseSpreadsheetGrid,
-                _viewModel?.FrozenHeaderRows.Count ?? 0);
         }
 
         if (_mineScrollViewer is not null)
         {
             _mineScrollViewer.ScrollChanged += OnMineScrollChanged;
         }
+        AttachRail();
     }
 
     private void DetachScrollViewers()
     {
-        _overviewBridge?.Dispose();
-        _overviewBridge = null;
+        CancelThumbDrag();
+        DetachRail();
         if (_baseScrollViewer is not null)
         {
             _baseScrollViewer.ScrollChanged -= OnBaseScrollChanged;
@@ -290,12 +315,14 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
     {
         UpdateHeaderScrollbarGutter();
         SynchronizeScroll(_mineScrollViewer, e);
+        OnRailScrollChanged(e);
     }
 
     private void OnMineScrollChanged(object sender, ScrollChangedEventArgs e)
     {
         UpdateHeaderScrollbarGutter();
         SynchronizeScroll(_baseScrollViewer, e);
+        OnRailScrollChanged(e);
     }
 
     private void UpdateHeaderScrollbarGutter()
@@ -316,7 +343,7 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
         ScrollViewer? target,
         ScrollChangedEventArgs e)
     {
-        if (_isSynchronizingScroll || target is null)
+        if (_thumbDrag is not null || _isSynchronizingScroll || target is null)
         {
             return;
         }
@@ -327,7 +354,6 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
             return;
         }
 
-        _pendingScrollTarget = target;
         if (Math.Abs(e.VerticalChange) > double.Epsilon)
         {
             _pendingVerticalScroll = true;
@@ -340,14 +366,16 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
             _pendingHorizontalOffset = e.HorizontalOffset;
         }
 
+        QueueScrollSynchronization();
+    }
+
+    private void QueueScrollSynchronization()
+    {
         if (_scrollOperation?.Status == DispatcherOperationStatus.Pending)
         {
             return;
         }
 
-        // ScrollChanged may arrive once per mouse-wheel tick or once per
-        // scrollbar pixel. Apply the latest pair only once at Render priority
-        // so both grids are laid out together instead of thrashing each other.
         _scrollOperation = Dispatcher.BeginInvoke(
             ApplyPendingScroll,
             DispatcherPriority.Render);
@@ -356,45 +384,49 @@ public partial class SpreadsheetWorksheetDiffView : UserControl, IComparisonPane
     private void ApplyPendingScroll()
     {
         _scrollOperation = null;
-        var target = _pendingScrollTarget;
         var applyVertical = _pendingVerticalScroll;
         var applyHorizontal = _pendingHorizontalScroll;
         var verticalOffset = _pendingVerticalOffset;
         var horizontalOffset = _pendingHorizontalOffset;
-        _pendingScrollTarget = null;
         _pendingVerticalScroll = false;
         _pendingHorizontalScroll = false;
-
-        if (target is null)
-        {
-            return;
-        }
 
         try
         {
             _isSynchronizingScroll = true;
-            if (applyVertical
-                && Math.Abs(target.VerticalOffset - verticalOffset) > 0.1)
+            if (applyVertical)
             {
-                target.ScrollToVerticalOffset(verticalOffset);
+                AlignVerticalOffset(_baseScrollViewer, verticalOffset);
+                AlignVerticalOffset(_mineScrollViewer, verticalOffset);
             }
 
-            if (applyHorizontal
-                && Math.Abs(target.HorizontalOffset - horizontalOffset) > 0.1)
-            {
-                target.ScrollToHorizontalOffset(horizontalOffset);
-            }
             if (applyHorizontal)
             {
-                _baseScrollViewer?.ScrollToHorizontalOffset(horizontalOffset);
-                _mineScrollViewer?.ScrollToHorizontalOffset(horizontalOffset);
-                _baseHeaderScroll?.ScrollToHorizontalOffset(horizontalOffset);
-                _mineHeaderScroll?.ScrollToHorizontalOffset(horizontalOffset);
+                AlignHorizontalOffset(_baseScrollViewer, horizontalOffset);
+                AlignHorizontalOffset(_mineScrollViewer, horizontalOffset);
+                AlignHorizontalOffset(_baseHeaderScroll, horizontalOffset);
+                AlignHorizontalOffset(_mineHeaderScroll, horizontalOffset);
             }
         }
         finally
         {
             _isSynchronizingScroll = false;
+        }
+    }
+
+    private static void AlignVerticalOffset(ScrollViewer? viewer, double offset)
+    {
+        if (viewer is not null && Math.Abs(viewer.VerticalOffset - offset) > 0.1)
+        {
+            viewer.ScrollToVerticalOffset(offset);
+        }
+    }
+
+    private static void AlignHorizontalOffset(ScrollViewer? viewer, double offset)
+    {
+        if (viewer is not null && Math.Abs(viewer.HorizontalOffset - offset) > 0.1)
+        {
+            viewer.ScrollToHorizontalOffset(offset);
         }
     }
 

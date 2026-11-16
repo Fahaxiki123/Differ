@@ -49,16 +49,28 @@ public sealed class WorkspaceTabManagementTests
             Assert.Equal(3, workspace.Tabs.Count);
             workspace.CloseOtherTabsCommand.Execute(null);
             Assert.Single(workspace.Tabs);
+            await WaitForSnapshotCleanupAsync(sessions[0], sessions[2]);
             Assert.False(Directory.Exists(sessions[0].SessionDirectoryPath));
             Assert.True(Directory.Exists(sessions[1].SessionDirectoryPath));
             Assert.False(Directory.Exists(sessions[2].SessionDirectoryPath));
             workspace.CloseAllTabsCommand.Execute(null);
             Assert.Empty(workspace.Tabs);
             Assert.Null(workspace.SelectedTab);
+            await WaitForSnapshotCleanupAsync(sessions[1]);
             Assert.Empty(Directory.GetDirectories(store.RootPath));
             Assert.Equal("base", await File.ReadAllTextAsync(baseline));
             Assert.Equal("beta.txt", await File.ReadAllTextAsync(Path.Combine(root, "beta.txt")));
         }
         finally { Directory.Delete(root, recursive: true); }
+    }
+
+    private static async Task WaitForSnapshotCleanupAsync(params ExternalDiffSession[] sessions)
+    {
+        // A canceled reader can retain a handle until the store's bounded retry runs.
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        while (elapsed.Elapsed < TimeSpan.FromSeconds(4) && sessions.Any(session => Directory.Exists(session.SessionDirectoryPath)))
+        {
+            await Task.Delay(25);
+        }
     }
 }

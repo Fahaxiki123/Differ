@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+    <!-- Final RGBA values reproduce runDuskSolution in the selected scheme-2 HTML. -->
+    <RadialGradientBrush x:Key="ThemeMist.Day" ColorInterpolationMode="SRgbLinearInterpolation" po:Freeze="True">
+        <GradientStop Offset="0" Color="#50FFFFFF" />
+        <GradientStop Offset="0.40" Color="#39FBBF24" />
+        <GradientStop Offset="1" Color="#00000000" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="ThemeMist.Night" ColorInterpolationMode="SRgbLinearInterpolation" po:Freeze="True">
+        <GradientStop Offset="0" Color="#39BAE6FD" />
+        <GradientStop Offset="0.35" Color="#2438BDF8" />
+        <GradientStop Offset="0.70" Color="#151E3A8A" />
+        <GradientStop Offset="1" Color="#00000000" />
+    </RadialGradientBrush>
+</ResourceDictionary>

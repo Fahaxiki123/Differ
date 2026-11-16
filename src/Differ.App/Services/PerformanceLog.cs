@@ -12,8 +12,7 @@ internal static class PerformanceLog
         initialState: true);
     private static int _pendingWrites;
     private static readonly string LogDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "Differ",
+        AppRuntimeProfile.DataRoot,
         "Logs");
     private static readonly string LogPath = Path.Combine(
         LogDirectory,

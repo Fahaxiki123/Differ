@@ -23,7 +23,7 @@ internal static class ComparisonPresentationBuilder
 {
     private const double SpreadsheetColumnPadding = 26;
     private const double SpreadsheetTextUnitWidth = 7.2;
-    private const double MaximumSpreadsheetColumnWidth = 360;
+    private const double MaximumSpreadsheetColumnWidth = 312;
 
     public static ComparisonPresentation Build(
         DiffDocument document,
@@ -192,6 +192,11 @@ internal static class ComparisonPresentationBuilder
                         cell.Kind,
                         oldDetailsText,
                         newDetailsText);
+                var isContentReplacement = cell.Kind == DiffKind.Modified
+                    && ((cell.ChangeFlags & (SpreadsheetCellChange.Value | SpreadsheetCellChange.Formula)) != 0
+                        || (cell.ChangeFlags == SpreadsheetCellChange.None
+                            && (!string.Equals(oldText, newText, StringComparison.Ordinal)
+                                || !string.Equals(oldDetailsText, newDetailsText, StringComparison.Ordinal))));
                 var baseCell = new SpreadsheetCellViewModel(
                     cell.OldAddress ?? string.Empty,
                     oldText,
@@ -199,7 +204,10 @@ internal static class ComparisonPresentationBuilder
                     BuildCellToolTip(cell.OldAddress, oldText, cell.OldDetails),
                     cell.Kind,
                     inlineDiff.OldSegments,
-                    detailsInlineDiff.OldSegments);
+                    detailsInlineDiff.OldSegments)
+                {
+                    IsContentReplacement = isContentReplacement
+                };
                 baseCells.Add(baseCell);
                 // Most large worksheets are unchanged context. Sharing is
                 // safe only when the full immutable presentation is equal;
@@ -215,7 +223,10 @@ internal static class ComparisonPresentationBuilder
                     BuildCellToolTip(cell.NewAddress, newText, cell.NewDetails),
                     cell.Kind,
                     inlineDiff.NewSegments,
-                    detailsInlineDiff.NewSegments));
+                    detailsInlineDiff.NewSegments)
+                {
+                    IsContentReplacement = isContentReplacement
+                });
             }
 
             rows.Add(new SpreadsheetRowViewModel(

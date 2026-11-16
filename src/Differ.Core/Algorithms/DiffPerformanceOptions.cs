@@ -38,6 +38,10 @@ public static class DiffPerformanceOptions
 
     public const int MaximumTextLines = 1_000_000;
 
+    public const int MaximumMergeHistoryCharacters = 8_000_000;
+
+    public const int MaximumMergeHistoryEntries = 100;
+
     public const int MaximumTabularRows = 100_000;
 
     public const int MaximumTabularColumns = 16_384;

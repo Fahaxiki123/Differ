@@ -819,16 +819,8 @@ public sealed partial class DiffWindowViewModel : ObservableObject, IDisposable
         return extension.ToLowerInvariant() is ".docx" or ".doc" or ".rtf";
     }
 
-    private static string GetFileKindGlyph(string extension)
-    {
-        return extension.ToLowerInvariant() switch
-        {
-            ".docx" or ".doc" or ".rtf" => "W",
-            ".xlsx" or ".xlsm" or ".xls" or ".csv" => "X",
-            ".txt" or ".md" or ".json" or ".xml" => "T",
-            _ => "≡"
-        };
-    }
+    private static string GetFileKindGlyph(string extension) =>
+        extension.Length is > 1 and <= 6 ? extension[1..].ToUpperInvariant() : "≡";
 
     private static string FormatDifferencePosition(
         int selectedIndex,

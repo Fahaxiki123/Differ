@@ -1,10 +1,12 @@
 # 项目目录维护
 
-用户要求：每次任务结束，`E:\Differ` 只留下正式工程、必要输入和当前交付，不遗留无意义的重复产物。
+每次任务结束，当前开发仓库只保留正式工程、必要输入和当前交付。
+
+本机只维护当前这一套开发仓库。如需发布隔离开发预览，验证后替换项目外的单一固定副本。现用 SVN 安装与绑定独立保留。历史预览与验证材料的位置见 [项目状态](PROJECT_STATUS.md)和[归档索引](ARCHIVE_INDEX.md)。
 
 ## 固定保留
 
-- `src`、`tests`、`scripts`、`docs`、`installer`、解决方案/包版本/开发规范等原始文件。
+- `src`、`tests`、`samples`、`scripts`、`docs`、`installer`、解决方案/包版本/开发规范等原始文件。Gallery 项目的 `bin/obj` 按同一项目白名单清理。
 - `测试用例` 原件与 `.svn` 工作副本管理数据。
 - `artifacts/publish/Differ-win-x64`：唯一正式软件入口。
 - `artifacts/installers`：最新安装器、校验值、说明。

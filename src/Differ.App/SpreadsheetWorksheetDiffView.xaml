@@ -22,24 +22,18 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="DataGridCell">
-                            <Grid SnapsToDevicePixels="True" ClipToBounds="True">
-                                <Border Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        Padding="{TemplateBinding Padding}">
-                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                </Border>
-                                <!-- A fixed overlay preserves grid geometry and the cell's diff background. -->
-                                <Border x:Name="SelectionOutline"
-                                        BorderBrush="{DynamicResource SelectionBorderBrush}"
-                                        BorderThickness="2" Opacity="0"
-                                        IsHitTestVisible="False" />
-                            </Grid>
+                            <controls:SpreadsheetCellFrame x:Name="CellFrame" SnapsToDevicePixels="True" ClipToBounds="True"
+                                                           Background="{TemplateBinding Background}"
+                                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                                           BorderThickness="{TemplateBinding BorderThickness}"
+                                                           Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </controls:SpreadsheetCellFrame>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="SelectionOutline" Property="Opacity" Value="1" />
+                                    <Setter TargetName="CellFrame" Property="SelectionBrush" Value="{DynamicResource Dui.Focus}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -78,17 +72,17 @@
                 <Setter Property="Height" Value="{StaticResource Ui.SpreadsheetHeaderHeight}" />
                 <Setter Property="Padding" Value="{StaticResource Ui.CellPadding}" />
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
-                <Setter Property="Background" Value="{DynamicResource GutterBackgroundBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource GutterTextBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource DataGrid.GridLine}" />
-                <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI" />
+                <Setter Property="Background" Value="{DynamicResource Dui.Surface.Tabs}" />
+                <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource Dui.Border.Subtle}" />
+                <Setter Property="FontFamily" Value="{StaticResource Dui.Metrics.UiFont}" />
                 <Setter Property="FontSize" Value="{StaticResource Ui.MetadataFontSize}" />
             </Style>
             <DataTemplate x:Key="SpreadsheetColumnHeaderTemplate">
                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding HeaderText}" ToolTip="{Binding MappingToolTip}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="{DynamicResource GutterTextBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Dui.Text.Secondary}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding HasDifferences}" Value="True">
                                     <Setter Property="Foreground" Value="{DynamicResource Diff.Inline.Modified.Brush}" />
@@ -99,7 +93,7 @@
                     </TextBlock.Style>
                 </TextBlock>
             </DataTemplate>
-            <ContextMenu x:Key="SpreadsheetCellContextMenu">
+            <ContextMenu x:Key="SpreadsheetCellContextMenu" Style="{StaticResource Dui.ContextMenu}">
                 <MenuItem Click="CopyBaseSide_Click" Header="{x:Static resources:Strings.CopyBaseSide}" />
                 <MenuItem Click="CopyMineSide_Click" Header="{x:Static resources:Strings.CopyMineSide}" />
                 <Separator />
@@ -109,9 +103,9 @@
                 <MenuItem Click="CopyMineRow_Click" Header="{x:Static resources:Strings.CopyMineRow}" />
             </ContextMenu>
             <DataTemplate x:Key="BaseRowNumberTemplate">
-                <Grid Background="{DynamicResource GutterBackgroundBrush}" ToolTip="{Binding KindLabel}">
+                <Grid Background="{DynamicResource Dui.Surface.PaneHeader}" ToolTip="{Binding KindLabel}">
                     <Border x:Name="StateMarker" Width="3" HorizontalAlignment="Left" Background="Transparent" />
-                    <TextBlock Margin="7,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource GutterTextBrush}" FontFamily="Cascadia Mono, Consolas" FontSize="{StaticResource Ui.MetadataFontSize}" Text="{Binding BaseRowNumberText}" />
+                    <TextBlock Margin="7,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource Dui.Text.Secondary}" FontFamily="Cascadia Mono, Consolas" FontSize="{StaticResource Ui.MetadataFontSize}" Text="{Binding BaseRowNumberText}" />
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DiffKind.Added}"><Setter TargetName="StateMarker" Property="Background" Value="{DynamicResource Diff.Row.Added.Border}" /></DataTrigger>
@@ -123,9 +117,9 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
             <DataTemplate x:Key="MineRowNumberTemplate">
-                <Grid Background="{DynamicResource GutterBackgroundBrush}" ToolTip="{Binding KindLabel}">
+                <Grid Background="{DynamicResource Dui.Surface.PaneHeader}" ToolTip="{Binding KindLabel}">
                     <Border x:Name="StateMarker" Width="3" HorizontalAlignment="Left" Background="Transparent" />
-                    <TextBlock Margin="7,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource GutterTextBrush}" FontFamily="Cascadia Mono, Consolas" FontSize="{StaticResource Ui.MetadataFontSize}" Text="{Binding MineRowNumberText}" />
+                    <TextBlock Margin="7,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource Dui.Text.Secondary}" FontFamily="Cascadia Mono, Consolas" FontSize="{StaticResource Ui.MetadataFontSize}" Text="{Binding MineRowNumberText}" />
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:DiffKind.Added}"><Setter TargetName="StateMarker" Property="Background" Value="{DynamicResource Diff.Row.Added.Border}" /></DataTrigger>
@@ -140,130 +134,98 @@
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource PanelBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="{StaticResource Ui.DetailSplitterRowHeight}" />
-            <RowDefinition Height="104" MinHeight="{StaticResource Ui.DetailHeaderHeight}" />
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-            <ContentControl x:Name="BaseHeaderHost" Grid.Row="0" Grid.Column="0" />
-            <ContentControl x:Name="MineHeaderHost" Grid.Row="0" Grid.Column="2" />
-            <DataGrid x:Name="BaseSpreadsheetGrid" Grid.Row="1" Grid.Column="0"
-                      AutoGenerateColumns="False" CanUserResizeColumns="False"
-                      CanUserResizeRows="False" CanUserSortColumns="False"
-                      CellStyle="{StaticResource SpreadsheetCellStyle}"
-                      ClipboardCopyMode="None"
-                      ColumnHeaderStyle="{StaticResource SpreadsheetColumnHeaderStyle}"
-                      ContextMenu="{StaticResource SpreadsheetCellContextMenu}"
-                      ContextMenuOpening="SpreadsheetGrid_ContextMenuOpening"
-                      EnableColumnVirtualization="True" EnableRowVirtualization="True"
-                      FrozenColumnCount="{Binding FrozenColumnCount}" GridLinesVisibility="None" HeadersVisibility="Column"
-                      ItemsSource="{Binding ScrollableRows}" Loaded="SpreadsheetGrid_Loaded"
-                      PreviewKeyDown="SpreadsheetGrid_PreviewKeyDown"
-                      RowStyle="{StaticResource SpreadsheetRowStyle}"
-                      SelectedCellsChanged="SpreadsheetGrid_SelectedCellsChanged"
-                      SelectionMode="Single" SelectionUnit="Cell"
-                      ScrollViewer.CanContentScroll="True"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.IsDeferredScrollingEnabled="False"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.VirtualizationMode="Recycling">
-                <DataGrid.Columns><DataGridTemplateColumn Width="50" CellTemplate="{StaticResource BaseRowNumberTemplate}" Header="" /></DataGrid.Columns>
-            </DataGrid>
-            <Border Grid.Column="1" Grid.RowSpan="2" Background="{DynamicResource PaneSeparatorBrush}" />
-            <DataGrid x:Name="MineSpreadsheetGrid" Grid.Row="1" Grid.Column="2"
-                      AutoGenerateColumns="False" CanUserResizeColumns="False"
-                      CanUserResizeRows="False" CanUserSortColumns="False"
-                      CellStyle="{StaticResource SpreadsheetCellStyle}"
-                      ClipboardCopyMode="None"
-                      ColumnHeaderStyle="{StaticResource SpreadsheetColumnHeaderStyle}"
-                      ContextMenu="{StaticResource SpreadsheetCellContextMenu}"
-                      ContextMenuOpening="SpreadsheetGrid_ContextMenuOpening"
-                      EnableColumnVirtualization="True" EnableRowVirtualization="True"
-                      FrozenColumnCount="{Binding FrozenColumnCount}" GridLinesVisibility="None" HeadersVisibility="Column"
-                      ItemsSource="{Binding ScrollableRows}" Loaded="SpreadsheetGrid_Loaded"
-                      PreviewKeyDown="SpreadsheetGrid_PreviewKeyDown"
-                      RowStyle="{StaticResource SpreadsheetRowStyle}"
-                      SelectedCellsChanged="SpreadsheetGrid_SelectedCellsChanged"
-                      SelectionMode="Single" SelectionUnit="Cell"
-                      ScrollViewer.CanContentScroll="True"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.IsDeferredScrollingEnabled="False"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.VirtualizationMode="Recycling">
-                <DataGrid.Columns><DataGridTemplateColumn Width="50" CellTemplate="{StaticResource MineRowNumberTemplate}" Header="" /></DataGrid.Columns>
-            </DataGrid>
-        </Grid>
-        <GridSplitter x:Name="DetailSplitter" Grid.Row="1"
-                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                      Background="Transparent" Visibility="Visible"
-                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext">
-            <GridSplitter.Template>
-                <ControlTemplate TargetType="GridSplitter">
-                    <Grid Background="{TemplateBinding Background}">
-                        <Border x:Name="Divider" Height="1" VerticalAlignment="Center"
-                                Background="{DynamicResource PaneHeaderBorderBrush}" />
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Divider" Property="Background" Value="{DynamicResource AccentBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </GridSplitter.Template>
-        </GridSplitter>
-        <Grid Grid.Row="2" Background="{DynamicResource DetailBackgroundBrush}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource Ui.DetailHeaderRowHeight}" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <ToggleButton x:Name="DetailsToggle" Grid.Row="0"
-                          Style="{StaticResource DetailToggleStyle}" IsChecked="True"
-                          HorizontalContentAlignment="Stretch"
-                          AutomationProperties.Name="{x:Static resources:Strings.SelectedContentDetails}">
-                <DockPanel LastChildFill="True">
-                    <TextBlock DockPanel.Dock="Left" Margin="0,0,16,0" VerticalAlignment="Center"
-                               Foreground="{DynamicResource MutedInkBrush}"
-                               Text="{x:Static resources:Strings.SelectedContentDetails}" />
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Foreground="{DynamicResource MutedInkBrush}" Text="{x:Static resources:Strings.BaseSide}" />
-                        <TextBlock Margin="6,0,12,0" Foreground="{DynamicResource MutedInkBrush}"
-                                   FontFamily="Cascadia Mono, Consolas" Text="{Binding SelectedCell.BaseAddress}" />
-                        <TextBlock Margin="0,0,12,0" Foreground="{DynamicResource MutedInkBrush}" Text="↔" />
-                        <TextBlock Foreground="{DynamicResource MutedInkBrush}" Text="{x:Static resources:Strings.MineSide}" />
-                        <TextBlock Margin="6,0,0,0" Foreground="{DynamicResource MutedInkBrush}"
-                                   FontFamily="Cascadia Mono, Consolas" Text="{Binding SelectedCell.MineAddress}" />
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" /><ColumnDefinition Width="1" /><ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <ContentControl x:Name="BaseHeaderHost" Grid.Row="0" Grid.Column="0" />
+        <ContentControl x:Name="MineHeaderHost" Grid.Row="0" Grid.Column="2" />
+        <DataGrid x:Name="BaseSpreadsheetGrid" Grid.Row="1" Grid.Column="0"
+                  AutomationProperties.Name="{x:Static resources:Strings.BaseSide}"
+                  AutoGenerateColumns="False" CanUserResizeColumns="False"
+                  CanUserResizeRows="False" CanUserSortColumns="False"
+                  CellStyle="{StaticResource SpreadsheetCellStyle}"
+                  ClipboardCopyMode="None"
+                  ColumnHeaderStyle="{StaticResource SpreadsheetColumnHeaderStyle}"
+                  ContextMenu="{StaticResource SpreadsheetCellContextMenu}"
+                  ContextMenuOpening="SpreadsheetGrid_ContextMenuOpening"
+                  EnableColumnVirtualization="True" EnableRowVirtualization="True"
+                  FrozenColumnCount="{Binding FrozenColumnCount}" GridLinesVisibility="None" HeadersVisibility="Column"
+                  ItemsSource="{Binding ScrollableRows}" Loaded="SpreadsheetGrid_Loaded"
+                  PreviewKeyDown="SpreadsheetGrid_PreviewKeyDown"
+                  RowStyle="{StaticResource SpreadsheetRowStyle}" RowHeight="{StaticResource Ui.SpreadsheetRowHeight}"
+                  SelectedCellsChanged="SpreadsheetGrid_SelectedCellsChanged"
+                  SelectionMode="Single" SelectionUnit="Cell"
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  ScrollViewer.IsDeferredScrollingEnabled="False"
+                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.CacheLength="0"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
+            <DataGrid.Columns><DataGridTemplateColumn Width="50" CellTemplate="{StaticResource BaseRowNumberTemplate}" Header="" /></DataGrid.Columns>
+        </DataGrid>
+        <Border Grid.Column="1" Grid.RowSpan="2" Background="{DynamicResource Dui.Border.Subtle}" />
+        <DataGrid x:Name="MineSpreadsheetGrid" Grid.Row="1" Grid.Column="2"
+                  AutomationProperties.Name="{x:Static resources:Strings.MineSide}"
+                  AutoGenerateColumns="False" CanUserResizeColumns="False"
+                  CanUserResizeRows="False" CanUserSortColumns="False"
+                  CellStyle="{StaticResource SpreadsheetCellStyle}"
+                  ClipboardCopyMode="None"
+                  ColumnHeaderStyle="{StaticResource SpreadsheetColumnHeaderStyle}"
+                  ContextMenu="{StaticResource SpreadsheetCellContextMenu}"
+                  ContextMenuOpening="SpreadsheetGrid_ContextMenuOpening"
+                  EnableColumnVirtualization="True" EnableRowVirtualization="True"
+                  FrozenColumnCount="{Binding FrozenColumnCount}" GridLinesVisibility="None" HeadersVisibility="Column"
+                  ItemsSource="{Binding ScrollableRows}" Loaded="SpreadsheetGrid_Loaded"
+                  PreviewKeyDown="SpreadsheetGrid_PreviewKeyDown"
+                  RowStyle="{StaticResource SpreadsheetRowStyle}" RowHeight="{StaticResource Ui.SpreadsheetRowHeight}"
+                  SelectedCellsChanged="SpreadsheetGrid_SelectedCellsChanged"
+                  SelectionMode="Single" SelectionUnit="Cell"
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  ScrollViewer.IsDeferredScrollingEnabled="False"
+                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.CacheLength="0"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
+            <DataGrid.Columns><DataGridTemplateColumn Width="50" CellTemplate="{StaticResource MineRowNumberTemplate}" Header="" /></DataGrid.Columns>
+        </DataGrid>
+        <controls:SpreadsheetDragSurface x:Name="DragSurface" Grid.RowSpan="2" Grid.ColumnSpan="3"
+                                         IsHitTestVisible="False" Focusable="False" />
+        <controls:SpreadsheetScrollRail x:Name="VerticalRail" Grid.Row="1" Grid.Column="3"
+                                        Visibility="Hidden" HorizontalAlignment="Right" UseLayoutRounding="False"
+                                        AutomationProperties.Name="{x:Static resources:Strings.OverviewLabel}"
+                                        FocusVisualStyle="{StaticResource Dui.KeyboardFocus}"
+                                        ReadingScale="{Binding DataContext.Preferences.ReadingScale, RelativeSource={RelativeSource AncestorType=Window}, FallbackValue=1}" />
+        <Popup x:Name="RailPreviewPopup" Placement="Left" PlacementTarget="{Binding ElementName=VerticalRail}"
+               HorizontalOffset="-5" AllowsTransparency="True" StaysOpen="True" IsHitTestVisible="False" Focusable="False">
+            <Grid Width="380" Margin="8">
+                <Border Background="{DynamicResource Diff.Overview.PreviewBrush}" CornerRadius="{StaticResource Ui.PopupCornerRadius}"
+                        Effect="{StaticResource FloatingPanelShadow}" />
+                <Border Background="{DynamicResource Diff.Overview.PreviewBrush}" BorderBrush="{DynamicResource Diff.Overview.PreviewBorderBrush}"
+                        Padding="{StaticResource Ui.PopupPadding}" CornerRadius="{StaticResource Ui.PopupCornerRadius}" BorderThickness="1">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,8">
+                            <TextBlock x:Name="RailPreviewKind" DockPanel.Dock="Right" Foreground="{DynamicResource MutedInkBrush}" />
+                            <TextBlock x:Name="RailPreviewAddress" FontWeight="SemiBold" Foreground="{DynamicResource InkBrush}" />
+                        </DockPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="14" /><ColumnDefinition /></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="{x:Static resources:Strings.OverviewBase}" FontWeight="SemiBold" Foreground="{DynamicResource BaseSideAccentBrush}" />
+                                <TextBlock x:Name="RailBasePreview" Margin="0,3,0,0" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                           MaxHeight="70" Foreground="{DynamicResource InkBrush}" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="1" Background="{DynamicResource Diff.Overview.PreviewBorderBrush}" />
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="{x:Static resources:Strings.OverviewMine}" FontWeight="SemiBold" Foreground="{DynamicResource MineSideAccentBrush}" />
+                                <TextBlock x:Name="RailMinePreview" Margin="0,3,0,0" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                           MaxHeight="70" Foreground="{DynamicResource InkBrush}" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
-                </DockPanel>
-            </ToggleButton>
-            <Grid x:Name="DetailsContent" Grid.Row="1" Visibility="Visible">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="1" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" Padding="{StaticResource Ui.DetailContentPadding}">
-                    <controls:SelectableDiffTextBox
-                        DiffKind="{Binding SelectedCell.Kind}"
-                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="{StaticResource Ui.SpreadsheetFontSize}"
-                        Foreground="{DynamicResource InkBrush}"
-                        AutomationProperties.Name="{x:Static resources:Strings.FullBaseContent}"
-                        Segments="{Binding SelectedCell.BaseSegments}" />
-                </Border>
-                <Border Grid.Column="1" Background="{DynamicResource PaneHeaderBorderBrush}" />
-                <Border Grid.Column="2" Padding="{StaticResource Ui.DetailContentPadding}">
-                    <controls:SelectableDiffTextBox
-                        DiffKind="{Binding SelectedCell.Kind}"
-                        FontFamily="Cascadia Mono, Consolas, Microsoft YaHei UI" FontSize="{StaticResource Ui.SpreadsheetFontSize}"
-                        Foreground="{DynamicResource InkBrush}"
-                        AutomationProperties.Name="{x:Static resources:Strings.FullCurrentContent}"
-                        Segments="{Binding SelectedCell.MineSegments}" />
                 </Border>
             </Grid>
-        </Grid>
+        </Popup>
     </Grid>
 </UserControl>

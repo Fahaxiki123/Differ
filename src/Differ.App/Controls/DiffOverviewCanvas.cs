@@ -188,37 +188,32 @@ public sealed class DiffOverviewCanvas : FrameworkElement
         var viewportY = TopPadding + start * ContentHeight;
         var viewportHeight = Math.Clamp((end - start) * ContentHeight, Math.Min(6, ContentHeight), ContentHeight);
         drawingContext.DrawRoundedRectangle(ViewportBrush, null,
-            new Rect(3, Math.Min(viewportY, TopPadding + ContentHeight - viewportHeight), Math.Max(0, ActualWidth - 6), viewportHeight), 3, 3);
+            new Rect(1, Math.Min(viewportY, TopPadding + ContentHeight - viewportHeight), Math.Max(0, ActualWidth - 2), viewportHeight), 2, 2);
         drawingContext.DrawRoundedRectangle(ViewportBorderBrush, null,
-            new Rect(Math.Max(0, ActualWidth - 5), Math.Min(viewportY, TopPadding + ContentHeight - viewportHeight), 2, viewportHeight), 1, 1);
+            new Rect(Math.Max(0, ActualWidth - 2), Math.Min(viewportY, TopPadding + ContentHeight - viewportHeight), 1.5, viewportHeight), 1, 1);
 
         var pitch = ContentHeight / _buckets.Length;
         for (var index = 0; index < _buckets.Length; index++)
         {
             var bucket = _buckets[index];
             var y = TopPadding + (index + 0.5) * pitch;
-            var distance = _hoverBucketIndex < 0 ? double.PositiveInfinity : Math.Abs(index - _hoverBucketIndex);
-            var emphasis = Math.Pow(Math.Max(0, 1 - distance / 5d), 2);
-            var indent = Math.Min(3, LeadingWhitespace(bucket.Row.NewValue.Length > 0 ? bucket.Row.NewValue : bucket.Row.OldValue) * 0.3);
-            var width = Math.Min(Math.Max(5, bucket.Row.OverviewWidth * 0.4) * (1 + emphasis * 0.25), Math.Max(0, ActualWidth - 18 - indent));
-            var isDifference = bucket.Row.Kind != DiffKind.Unchanged;
-            var thickness = Math.Min(Math.Max(1, pitch - 1), (isDifference ? 1.5 : 1) + emphasis * 0.5);
             if (index == _pressedBucketIndex)
             {
                 drawingContext.DrawRoundedRectangle(HoverBrush, null,
-                    new Rect(3, y - Math.Max(3, pitch / 2), Math.Max(0, ActualWidth - 6), Math.Max(6, pitch)), 3, 3);
+                    new Rect(1, y - Math.Max(3, pitch / 2), Math.Max(0, ActualWidth - 2), Math.Max(6, pitch)), 2, 2);
             }
 
-            // Keep the content silhouette quieter than the separate difference marker.
-            drawingContext.PushOpacity(isDifference ? 0.55 + emphasis * 0.15 : 1);
-            drawingContext.DrawRoundedRectangle(GetBrush(bucket.Row.Kind), null,
-                new Rect(12 + indent, y - thickness / 2, width, thickness), thickness / 2, thickness / 2);
-            drawingContext.Pop();
-            if (isDifference)
+            if (bucket.Row.Kind == DiffKind.Unchanged)
             {
-                drawingContext.DrawRoundedRectangle(GetBrush(bucket.Row.Kind), null,
-                    new Rect(5, y - 1, 3, 2), 1, 1);
+                continue;
             }
+
+            var distance = _hoverBucketIndex < 0 ? double.PositiveInfinity : Math.Abs(index - _hoverBucketIndex);
+            var emphasis = Math.Pow(Math.Max(0, 1 - distance / 5d), 2);
+            var width = Math.Min(6 + emphasis * 2, ActualWidth);
+            var thickness = Math.Min(Math.Max(1.5, pitch - 0.5), 2 + emphasis * 0.5);
+            drawingContext.DrawRoundedRectangle(GetBrush(bucket.Row.Kind), null,
+                new Rect((ActualWidth - width) / 2, y - thickness / 2, width, thickness), 1, 1);
         }
     }
 
@@ -303,16 +298,6 @@ public sealed class DiffOverviewCanvas : FrameworkElement
         _hoverBucketIndex = -1;
         PreviewChanged?.Invoke(this, new OverviewPreviewEventArgs(null, string.Empty, string.Empty, 0, 0, 0));
         InvalidateVisual();
-    }
-
-    private static int LeadingWhitespace(string value)
-    {
-        var count = 0;
-        while (count < Math.Min(value.Length, 16) && char.IsWhiteSpace(value[count]))
-        {
-            count++;
-        }
-        return count;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

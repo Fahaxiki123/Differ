@@ -18,11 +18,12 @@ internal sealed class ReadingLayoutBinding : IDisposable
     private readonly FrameworkElement _content;
     private readonly UserPreferencesService _preferences;
     private readonly bool _spreadsheet;
+    private readonly bool _autoCollapsedHeight;
     private bool _applying;
 
     internal ReadingLayoutBinding(RowDefinition details, RowDefinition splitterRow,
         GridSplitter splitter, ToggleButton toggle, FrameworkElement content,
-        UserPreferencesService preferences, bool spreadsheet)
+        UserPreferencesService preferences, bool spreadsheet, bool autoCollapsedHeight = false)
     {
         _details = details;
         _splitterRow = splitterRow;
@@ -31,6 +32,7 @@ internal sealed class ReadingLayoutBinding : IDisposable
         _content = content;
         _preferences = preferences;
         _spreadsheet = spreadsheet;
+        _autoCollapsedHeight = autoCollapsedHeight;
         _headerHeight = toggle.TryFindResource("Ui.DetailHeaderHeight") is double headerHeight ? headerHeight : 28;
         _splitterHeight = toggle.TryFindResource("Ui.DetailSplitterHeight") is double splitterHeight ? splitterHeight : 6;
         ApplyPreferences();
@@ -41,7 +43,7 @@ internal sealed class ReadingLayoutBinding : IDisposable
     }
 
     public static ReadingLayoutBinding? Attach(UserControl view, int detailRowIndex, bool spreadsheet,
-        GridSplitter splitter, ToggleButton toggle, FrameworkElement content)
+        GridSplitter splitter, ToggleButton toggle, FrameworkElement content, bool autoCollapsedHeight = false)
     {
         if (view.Content is not Grid grid || grid.RowDefinitions.Count <= detailRowIndex
             || Window.GetWindow(view)?.DataContext is not ComparisonWorkspaceViewModel workspace)
@@ -51,7 +53,7 @@ internal sealed class ReadingLayoutBinding : IDisposable
 
         return new ReadingLayoutBinding(grid.RowDefinitions[detailRowIndex],
             grid.RowDefinitions[detailRowIndex - 1], splitter, toggle, content,
-            workspace.Preferences, spreadsheet);
+            workspace.Preferences, spreadsheet, autoCollapsedHeight);
     }
 
     public void Dispose()
@@ -97,7 +99,9 @@ internal sealed class ReadingLayoutBinding : IDisposable
             _splitter.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
             _splitterRow.Height = new GridLength(expanded ? _splitterHeight : 0);
             _details.MinHeight = expanded ? 72 : _headerHeight;
-            _details.Height = new GridLength(expanded ? height : _headerHeight);
+            _details.Height = expanded ? new GridLength(height)
+                : _autoCollapsedHeight ? GridLength.Auto
+                : new GridLength(_headerHeight);
         }
         finally
         {

@@ -49,9 +49,12 @@ public sealed class CodeNavigationFeedbackTests
             capture.Position = 0;
             var bitmap = new FormatConvertedBitmap(BitmapFrame.Create(capture, BitmapCreateOptions.None, BitmapCacheOption.OnLoad), PixelFormats.Bgra32, null, 0);
             var scale = double.Parse(fixture.Script("window.devicePixelRatio"), System.Globalization.CultureInfo.InvariantCulture);
-            var accent = ((SolidColorBrush)fixture.Browser.FindResource("Sample.AccentBrush")).Color;
-            foreach (var side in geometry.RootElement.EnumerateArray())
+            Assert.Equal(2, geometry.RootElement.GetArrayLength());
+            for (var sideIndex = 0; sideIndex < 2; sideIndex++)
             {
+                var side = geometry.RootElement[sideIndex];
+                var markerKey = sideIndex == 0 ? "Diff.Row.Deleted.Border" : "Diff.Row.Added.Border";
+                var modifiedMarker = ((SolidColorBrush)fixture.Browser.FindResource(markerKey)).Color;
                 Assert.Equal(6, side.GetArrayLength());
                 for (var index = 0; index < 6; index++)
                 {
@@ -71,24 +74,25 @@ public sealed class CodeNavigationFeedbackTests
                     var right = (int)Math.Ceiling((x + 5) * scale) - 1;
                     if (start)
                     {
-                        AssertRoundedCorner(bitmap, left, (int)Math.Floor(y * scale), accent);
-                        AssertRoundedCorner(bitmap, right, (int)Math.Floor(y * scale), accent);
+                        AssertRoundedCorner(bitmap, left, (int)Math.Floor(y * scale), modifiedMarker);
+                        AssertRoundedCorner(bitmap, right, (int)Math.Floor(y * scale), modifiedMarker);
                     }
                     if (end)
                     {
-                        AssertRoundedCorner(bitmap, left, (int)Math.Ceiling((y + height) * scale) - 1, accent);
-                        AssertRoundedCorner(bitmap, right, (int)Math.Ceiling((y + height) * scale) - 1, accent);
+                        AssertRoundedCorner(bitmap, left, (int)Math.Ceiling((y + height) * scale) - 1, modifiedMarker);
+                        AssertRoundedCorner(bitmap, right, (int)Math.Ceiling((y + height) * scale) - 1, modifiedMarker);
                     }
-                    AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor((y + height / 2) * scale), accent);
+                    AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor((y + height / 2) * scale), modifiedMarker);
                     if (index >= 4)
                     {
                         var previous = side[index - 1];
                         Assert.InRange(Math.Abs(y - previous.GetProperty("y").GetDouble() - previous.GetProperty("height").GetDouble()), 0, 0.1);
-                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale), accent);
-                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale) - 1, accent);
+                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale), modifiedMarker);
+                        AssertAccentPixel(bitmap, (int)Math.Floor((x + 2.5) * scale), (int)Math.Floor(y * scale) - 1, modifiedMarker);
                     }
                 }
             }
+            var accent = ((SolidColorBrush)fixture.Browser.FindResource("Dui.Focus")).Color;
             fixture.Owner.MoveEditorDifference(1);
             fixture.WaitForNavigation();
             PumpUntil(() => fixture.Script("!foldSync") == "true");
@@ -169,7 +173,7 @@ public sealed class CodeNavigationFeedbackTests
             capture.Position = 0;
             var bitmap = new FormatConvertedBitmap(BitmapFrame.Create(capture, BitmapCreateOptions.None, BitmapCacheOption.OnLoad), PixelFormats.Bgra32, null, 0);
             var scale = double.Parse(fixture.Script("window.devicePixelRatio"), System.Globalization.CultureInfo.InvariantCulture);
-            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Sample.AccentBrush")).Color;
+            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Dui.Focus")).Color;
             foreach (var rail in geometry.RootElement.EnumerateArray())
             {
                 foreach (var offset in RailPixelSampleOffsets)
@@ -247,7 +251,7 @@ public sealed class CodeNavigationFeedbackTests
             {
                 Assert.True(item.GetProperty("width").GetDouble() > 100);
                 Assert.True(item.GetProperty("height").GetDouble() >= 20);
-                Assert.NotEqual("0px", item.GetProperty("border").GetString());
+                Assert.Equal("1px", item.GetProperty("border").GetString());
             });
             var caption = JsonSerializer.Deserialize<string>(fixture.Script("document.getElementById('current-location').textContent"));
             Assert.Equal("第 1 / 1 块 · 修改 · BASE 第 1 行 ↔ 结果 第 1 行", caption);
@@ -258,11 +262,11 @@ public sealed class CodeNavigationFeedbackTests
             capture.Position = 0;
             var bitmap = new FormatConvertedBitmap(BitmapFrame.Create(capture, BitmapCreateOptions.None, BitmapCacheOption.OnLoad), PixelFormats.Bgra32, null, 0);
             var scale = double.Parse(fixture.Script("window.devicePixelRatio"), System.Globalization.CultureInfo.InvariantCulture);
-            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Sample.AccentBrush")).Color;
+            var expected = ((SolidColorBrush)fixture.Browser.FindResource("Dui.Focus")).Color;
             foreach (var frame in geometry.RootElement.EnumerateArray())
             {
                 var pixels = new byte[4];
-                var x = (int)Math.Floor((frame.GetProperty("x").GetDouble() + 1) * scale);
+                var x = (int)Math.Floor((frame.GetProperty("x").GetDouble() + 0.5) * scale);
                 var y = (int)Math.Floor((frame.GetProperty("y").GetDouble() + 12) * scale);
                 bitmap.CopyPixels(new Int32Rect(x, y, 1, 1), pixels, 4, 0);
                 Assert.InRange(Math.Abs(pixels[0] - expected.B), 0, 8);
@@ -346,6 +350,116 @@ public sealed class CodeNavigationFeedbackTests
         });
     }
 
+    [Fact]
+    public void DifferenceRailUsesTheBodyScrollGeometryAndNavigatesBothEditors()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var before = Enumerable.Range(1, 160).Select(i => $"local item{i} = {i}").ToArray();
+            before[19] = "local longValue = \"" + new string('x', 260) + "\"";
+            before[42] = "local item43 = 430";
+            var after = before.ToList();
+            after[42] = "local item43 = 987";
+            after[119] = "local item120 = 555";
+            after.RemoveAt(98);
+            after.Insert(12, "local inserted = 1");
+            using var fixture = new Fixture(string.Join('\n', before), string.Join('\n', after));
+
+            const string geometry = """
+                (() => {
+                    const rail = document.getElementById('difference-rail');
+                    const band = document.getElementById('rail-viewport');
+                    const railBounds = rail.getBoundingClientRect();
+                    const bandBounds = band.getBoundingClientRect();
+                    const body = right.getDomNode().getBoundingClientRect();
+                    const layout = right.getLayoutInfo();
+                    const horizontal = right.getScrollWidth() > layout.contentWidth ? layout.horizontalScrollbarHeight : 0;
+                    const scrollHeight = right.getScrollHeight();
+                    const viewportHeight = layout.height - horizontal;
+                    const extent = Math.max(viewportHeight, scrollHeight - horizontal);
+                    return document.querySelectorAll('#difference-rail[role="scrollbar"]').length === 1
+                        && [left, right].every(pane => pane.getOption(monaco.editor.EditorOption.scrollbar).verticalScrollbarSize === 0
+                            && [...pane.getDomNode().querySelectorAll('.scrollbar.vertical')].every(bar => bar.getBoundingClientRect().width < 1))
+                        && Math.abs(railBounds.width - 16) <= 1
+                        && Math.abs(railBounds.top - body.top) <= 1
+                        && Math.abs(railBounds.height - viewportHeight) <= 1
+                        && Math.abs(bandBounds.top - railBounds.top - right.getScrollTop() * railBounds.height / extent) <= 1.5
+                        && Math.abs(bandBounds.height - viewportHeight * railBounds.height / extent) <= 1.5
+                        && Math.abs(Number(rail.getAttribute('aria-valuenow')) - right.getScrollTop()) <= 1
+                        && Math.abs(Number(rail.getAttribute('aria-valuemax')) - Math.max(0, scrollHeight - layout.height)) <= 1;
+                })()
+                """;
+
+            PumpUntil(() => fixture.Script(geometry) == "true");
+            fixture.Script("right.setScrollLeft(180)");
+            PumpUntil(() => fixture.Script("right.getScrollLeft()>=170&&left.getScrollLeft()===right.getScrollLeft()") == "true");
+            fixture.Script("right.setScrollLeft(0);right.setScrollTop(280)");
+            PumpUntil(() => fixture.Script("right.getScrollTop()===280&&left.getScrollTop()===280") == "true");
+            PumpUntil(() => fixture.Script(geometry) == "true");
+            fixture.Script("document.getElementById('difference-rail').dispatchEvent(new WheelEvent('wheel', { deltaY: 48, cancelable: true }))");
+            PumpUntil(() => fixture.Script("right.getScrollTop()===328&&left.getScrollTop()===328") == "true");
+
+            PumpUntil(() => fixture.Script("railMarks.some(mark => mark.index === 1)") == "true");
+            fixture.Script("""
+                (() => {
+                    const rail = document.getElementById('difference-rail');
+                    const bounds = rail.getBoundingClientRect();
+                    const marker = railMarks.find(mark => mark.index === 1);
+                    window.testRailPointer = (kind, y, buttons) => rail.dispatchEvent(new PointerEvent(kind, {
+                        pointerId: 41, pointerType: 'mouse', isPrimary: true, bubbles: true,
+                        cancelable: true, button: 0, buttons, clientX: bounds.left + 8, clientY: y
+                    }));
+                    window.testRailMarkerY = bounds.top + marker.y;
+                    testRailPointer('pointermove', testRailMarkerY, 0);
+                })()
+                """);
+            PumpUntil(() => fixture.Script("""
+                (() => {
+                    const preview = document.getElementById('rail-preview');
+                    return !preview.hidden && preview.textContent.includes('local item43 = 430')
+                        && preview.textContent.includes('local item43 = 987');
+                })()
+                """) == "true");
+            fixture.Script("testRailPointer('pointerdown', testRailMarkerY, 1);testRailPointer('pointerup', testRailMarkerY, 0)");
+            fixture.WaitForNavigation(1);
+            PumpUntil(() => fixture.Owner.CurrentHunk == 1);
+
+            fixture.Script("""
+                (() => {
+                    const band = document.getElementById('rail-viewport').getBoundingClientRect();
+                    const y = band.top + band.height / 2;
+                    window.testRailStart = right.getScrollTop();
+                    window.testRailEndY = y + 65;
+                    testRailPointer('pointerdown', y, 1);
+                    testRailPointer('pointermove', y + 28, 1);
+                })()
+                """);
+            PumpUntil(() => fixture.Script("right.getScrollTop()>testRailStart&&left.getScrollTop()===right.getScrollTop()") == "true");
+            fixture.Script("window.testRailIntermediate=right.getScrollTop();testRailPointer('pointermove',testRailEndY,1)");
+            PumpUntil(() => fixture.Script("right.getScrollTop()>testRailIntermediate&&left.getScrollTop()===right.getScrollTop()") == "true");
+            fixture.Script("testRailPointer('pointerup',testRailEndY,0)");
+            Assert.Equal(1, fixture.Owner.CurrentHunk);
+            Assert.False(fixture.Owner.IsEditorDirty);
+            fixture.Script("right.setScrollTop(right.getScrollHeight())");
+            PumpUntil(() => fixture.Script("""
+                (() => {
+                    const rail = document.getElementById('difference-rail').getBoundingClientRect();
+                    const band = document.getElementById('rail-viewport').getBoundingClientRect();
+                    return Math.abs(rail.bottom - band.bottom) <= 1 && left.getScrollTop() === right.getScrollTop();
+                })()
+                """) == "true");
+
+            var unfoldedHeight = fixture.Script("right.getScrollHeight()");
+            fixture.Owner.DisplayMode = DiffDisplayMode.Context;
+            PumpUntil(() => fixture.Script("right.getScrollHeight()") != unfoldedHeight);
+            PumpUntil(() => fixture.Script(geometry) == "true");
+            fixture.Resize(720, 460);
+            fixture.SetReadingScale(1.5);
+            PumpUntil(() => fixture.Script("right.getOption(monaco.editor.EditorOption.lineHeight)===36") == "true");
+            PumpUntil(() => fixture.Script(geometry) == "true");
+        });
+    }
+
     [Theory]
     [InlineData("", "新增第一行\n新增第二行")]
     [InlineData("删除第一行\n删除第二行", "")]
@@ -359,10 +473,11 @@ public sealed class CodeNavigationFeedbackTests
             Assert.Contains("文件开头无对应行", JsonSerializer.Deserialize<string>(fixture.Script("document.getElementById('current-location').textContent")), StringComparison.Ordinal);
             Assert.Equal("true", fixture.Script("feedbackFrames.every(frame=>!frame.hidden&&frame.getBoundingClientRect().height>=48)"));
             Assert.Equal("true", fixture.Script("feedbackRails.length===2&&feedbackRails.every((rail,side)=>!rail.hidden&&Math.abs(rail.getBoundingClientRect().height-(feedbackFrames[side].getBoundingClientRect().height-2))<1&&Math.abs(rail.getBoundingClientRect().top-(feedbackFrames[side].getBoundingClientRect().top+1))<1)"));
-            Assert.Equal("true", fixture.Script("document.getElementById('adopt-current').disabled"));
+            Assert.Equal("true", fixture.Script("getComputedStyle(document.querySelector('.missing-zone')).backgroundImage.startsWith('repeating-linear-gradient')"));
+            Assert.Equal("true", fixture.Script("document.getElementById('adopt-current').hidden&&document.getElementById('adopt-current').disabled"));
             Wait(fixture.Owner.SetEditModeAsync(true));
-            PumpUntil(() => fixture.Script("!document.getElementById('adopt-current').disabled") == "true");
-            using var arrow = JsonDocument.Parse(fixture.Script("(()=>{const button=document.getElementById('adopt-current'),rect=button.getBoundingClientRect();return {hidden:button.hidden,x:rect.x,width:rect.width,height:rect.height,middle:window.innerWidth/2}})()"));
+            PumpUntil(() => fixture.Script("!document.getElementById('adopt-current').hidden") == "true");
+            using var arrow = JsonDocument.Parse(fixture.Script("(()=>{const button=document.getElementById('adopt-current'),rect=button.getBoundingClientRect();return {hidden:button.hidden,x:rect.x,width:rect.width,height:rect.height,middle:right.getDomNode().getBoundingClientRect().left}})()"));
             Assert.False(arrow.RootElement.GetProperty("hidden").GetBoolean());
             Assert.InRange(Math.Abs(arrow.RootElement.GetProperty("x").GetDouble() + arrow.RootElement.GetProperty("width").GetDouble() / 2 - arrow.RootElement.GetProperty("middle").GetDouble()), 0, 1);
             Assert.InRange(arrow.RootElement.GetProperty("width").GetDouble(), 16, 24);
@@ -407,6 +522,85 @@ public sealed class CodeNavigationFeedbackTests
             Assert.Equal("1", fixture.Script("activeHunk"));
             Assert.Equal("2", fixture.Script("feedbackFrames[1].dataset.block").Trim('"'));
             Assert.Equal(initialScroll, fixture.Script("right.getScrollTop()"));
+        });
+    }
+
+    [Fact]
+    public void ThemeSwapRefreshesSameBackgroundEditorWithoutReplacingModelOrUndoHistory()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var before = Enumerable.Range(1, 120).Select(i => $"local item{i} = {i}").ToArray();
+            var after = before.ToArray();
+            after[10] = "local item11 = 777";
+            using var fixture = new Fixture(string.Join('\n', before), string.Join('\n', after));
+            Wait(fixture.Owner.SetEditModeAsync(true));
+            fixture.Script("right.executeEdits('test',[{range:new monaco.Range(2,1,2,1),text:'-- edited\\n'}])");
+            PumpUntil(() => fixture.Owner.IsEditorDirty && fixture.Owner.CanEditorUndo && fixture.Owner.EditorResultsCurrent);
+            fixture.SetReadingScale(1.3);
+            PumpUntil(() => fixture.Script("right.getOption(monaco.editor.EditorOption.lineHeight)>24&&railMarks.length>0&&!railFrame") == "true");
+            fixture.Script("right.setSelection(new monaco.Range(45,2,45,6));right.revealLineInCenter(45);window.themeTestModel=modified;");
+            PumpUntil(() => fixture.Script("!railFrame") == "true");
+            fixture.Script("""
+                window.themeProbe = {definitions: 0, optionUpdates: 0, railMarks};
+                const originalDefineTheme = monaco.editor.defineTheme;
+                monaco.editor.defineTheme = function (...args) {
+                    window.themeProbe.definitions++;
+                    return originalDefineTheme.apply(this, args);
+                };
+                for (const editor of [left, right]) {
+                    const originalUpdateOptions = editor.updateOptions;
+                    editor.updateOptions = function (...args) {
+                        window.themeProbe.optionUpdates++;
+                        return originalUpdateOptions.apply(this, args);
+                    };
+                }
+                """);
+            const string state = "[modified.getValue(),modified.getAlternativeVersionId(),right.getSelection(),right.getScrollTop()]";
+            var priorState = fixture.Script(state);
+            var priorVersion = fixture.Owner.EditorSession!.Version;
+            var priorBackground = fixture.Script("document.documentElement.style.getPropertyValue('--background')");
+            var priorRail = fixture.Script("railCanvas.toDataURL()");
+            const string tokenClasses = "[...right.getDomNode().querySelectorAll('.view-line span span')].map(s=>s.className).join(' ')";
+            fixture.Script("window.themeProbe.tokenNode=right.getDomNode().querySelector('.view-line span span[class*=mtk]:not(.mtk1)');window.themeProbe.tokenColor=getComputedStyle(window.themeProbe.tokenNode).color;");
+            var priorTokenClasses = fixture.Script(tokenClasses);
+            Assert.Contains("mtk", priorTokenClasses);
+            Assert.Equal("\"#FFFFFF\"", priorBackground);
+            fixture.ApplyThemeWithFixedContentBrush(AppTheme.Dark);
+
+            PumpUntil(() => fixture.Script("document.body.classList.contains('dark')&&!railFrame") == "true");
+            // One rule list for both themes keeps each token's class, so Monaco reuses the rendered line.
+            Assert.Equal(priorTokenClasses, fixture.Script(tokenClasses));
+            Assert.Equal("true", fixture.Script("window.themeProbe.tokenNode.isConnected"));
+            Assert.Equal("true", fixture.Script("right.getDomNode().classList.contains('vs-dark')"));
+            Assert.Equal("true", fixture.Script("getComputedStyle(window.themeProbe.tokenNode).color!==window.themeProbe.tokenColor"));
+            Assert.Equal("\"#F5F5F7\"", fixture.Script("document.documentElement.style.getPropertyValue('--focus')"));
+            Assert.Equal(priorBackground, fixture.Script("document.documentElement.style.getPropertyValue('--background')"));
+            Assert.NotEqual(priorRail, fixture.Script("railCanvas.toDataURL()"));
+            Assert.Equal("true", fixture.Script("window.themeProbe.railMarks===railMarks"));
+            Assert.Equal("[1,0]", fixture.Script("[window.themeProbe.definitions,window.themeProbe.optionUpdates]"));
+            fixture.ApplyThemeWithFixedContentBrush(AppTheme.Light);
+            PumpUntil(() => fixture.Script("!document.body.classList.contains('dark')&&!railFrame") == "true");
+            fixture.ApplyThemeWithFixedContentBrush(AppTheme.Dark);
+            PumpUntil(() => fixture.Script("document.body.classList.contains('dark')&&!railFrame") == "true");
+            Assert.Equal("[1,0]", fixture.Script("[window.themeProbe.definitions,window.themeProbe.optionUpdates]"));
+            Assert.Equal("true", fixture.Script("window.themeTestModel===modified"));
+            Assert.Equal(priorVersion, fixture.Owner.EditorSession.Version);
+            Assert.Equal(priorState, fixture.Script(state));
+            Assert.True(fixture.Owner.IsEditorDirty);
+            Assert.True(fixture.Owner.CanEditorUndo);
+
+            // A previously opened tab remains attached to the persistent host while collapsed.
+            fixture.SetEditorVisibility(Visibility.Collapsed);
+            fixture.ApplyThemeWithFixedContentBrush(AppTheme.Light);
+            Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+            PumpUntil(() => fixture.Script("!document.body.classList.contains('dark')") == "true");
+            fixture.SetEditorVisibility(Visibility.Visible);
+            Assert.Equal("true", fixture.Script("window.themeTestModel===modified"));
+            Assert.Equal(priorState, fixture.Script(state));
+            Assert.True(fixture.Owner.IsEditorDirty);
+            fixture.Owner.UndoEditor();
+            PumpUntil(() => fixture.Owner.EditorResultsCurrent && fixture.Owner.EditorSession.Text == string.Join('\n', after));
         });
     }
 
@@ -456,6 +650,17 @@ public sealed class CodeNavigationFeedbackTests
         public DiffWindowViewModel Owner { get; }
         public WebView2 Browser { get; }
         public string Script(string script) => Wait(Browser.ExecuteScriptAsync(script));
+        public void ApplyThemeWithFixedContentBrush(AppTheme theme)
+        {
+            _window.Resources["Dui.Surface.Content"] = _window.FindResource("Dui.Surface.Content");
+            using var themes = ThemeTestSupport.CreateService(_window.Resources, new FakeSystemThemeMonitor(AppTheme.Light));
+            themes.Apply(theme);
+        }
+
+        public void SetEditorVisibility(Visibility visibility) => _view.Visibility = visibility;
+
+        public void SetReadingScale(double scale) => _view.ReadingScale = scale;
+
         public void Resize(double width, double height) { _window.Width = width; _window.Height = height; _window.UpdateLayout(); }
         public void WaitForNavigation(int index = 0) => PumpUntil(() => Script($"activeHunk==={index}&&feedbackFrames.length===2&&feedbackFrames.every(frame=>!frame.hidden&&frame.dataset.block==='{index + 1}')") == "true");
         public void Dispose()

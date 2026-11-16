@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="TooLarge" xml:space="preserve"><value>合并内容超出文本资源限制，请拆分文件后重试。</value></data>
+  <data name="CoarseMerge" xml:space="preserve"><value>较大的重写区域已保守分组；重叠修改需要整体检查后解决。</value></data>
+  <data name="UnsupportedFormat" xml:space="preserve"><value>三方合并仅支持代码和普通文本；Office、CSV 表格及二进制文件不能合并写回。</value></data>
+  <data name="MissingInput" xml:space="preserve"><value>合并输入文件不存在或不可读取，请重新选择三个输入文件。</value></data>
+  <data name="Unresolved" xml:space="preserve"><value>仍有未解决冲突。请逐项选择来源或确认手工编辑，再保存结果。</value></data>
+  <data name="ProtectedTarget" xml:space="preserve"><value>结果不能覆盖三个输入文件、其链接别名或 Differ 会话文件，请选择独立结果文件。</value></data>
+  <data name="InvalidPath" xml:space="preserve"><value>合并路径无效，或路径包含链接、特殊设备名、不存在的父目录。</value></data>
+  <data name="ExternalChange" xml:space="preserve"><value>结果文件已被其他程序修改或替换。本次未覆盖，内存结果仍保留，请检查后另存。</value></data>
+  <data name="MixedNewlines" xml:space="preserve"><value>我的文件使用混合换行，合并结果无法安全保留该格式。本次未保存，请先统一原文件的换行格式后重新打开。</value></data>
+  <data name="Saving" xml:space="preserve"><value>正在保存结果，请稍候。</value></data>
+</root>
