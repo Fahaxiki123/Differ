@@ -2,23 +2,19 @@
 
 面向 Windows 的文件差异查看工具，支持代码、文本、Word、Excel 和三方文本合并，可直接打开本地文件或从 TortoiseSVN 调用。
 
-## 最新开发版：0.21.18
+## 最新开发版：0.21.19 Preview
 
-更新日期：2026-11-13。
+更新日期：2026-11-16。
 
-**[下载 0.21.18 Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)** · [版本说明与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.18) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
+**[下载 0.21.19 Preview Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.19/Differ-0.21.19-win-x64-Setup.exe)** · [版本说明与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.19) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.19) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
 
-0.21.18 开发预览安装包已发布，约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名；已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。程序测试、安装包校验及未验证范围见[安装包交付记录](docs/RELEASE-0.21.18.md)。默认 `main` 已同步 0.21.18 源码，日常开发在 `codex/ui-system-phase1` 继续。0.21.18 安装包仍为预发布，稳定安装包见[历史版本](https://github.com/Fahaxiki123/Differ/releases)。
+安装包约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名。已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。
 
 ### 本次更新
 
-- **主题切换**：修复右上角窗口按钮区域的矩形接缝，以及语法文字残留旧主题颜色的问题；支持连续和快速反向切换。
-- **窗口交互**：完善最小化、最大化、还原和关闭按钮的按住、拖出、取消与恢复行为，保留 Windows 11 贴靠菜单及未保存关闭保护。
-- **精确查找**：正确定位 BASE 或右侧的实际命中范围，长行结果自动进入可见区域，连续查找保持输入焦点。
-- **另存提示**：显示实际保存目标，区分原始比较来源，并说明 F5 刷新读取的文件。
-- **比较状态**：修复差异概览更新时的异步状态问题，主题切换保留文档内容、选区和撤销历史。
-
-713 项自动测试全部通过；本机实测覆盖双向主题切换、窗口按钮、贴靠菜单、保存与关闭保护、窄窗和 150% 阅读缩放。构建保留既有依赖审计告警，测试条件及未验证范围见完整版本说明。
+- Word、十六进制、原生回退文本和三方合并接入 680 ms「晨光与月雾」。
+- Excel 和 CSV 表格对比接入同套过渡。拖动预览随主题换色，松手后双栏继续对齐在目标位置。
+- 实机复测各对比视图的双向换色，覆盖 Monaco 代码和 Excel。Release 全量回归 713 项通过、2 项标题栏专项测试跳过。
 
 ## 使用方式
 
