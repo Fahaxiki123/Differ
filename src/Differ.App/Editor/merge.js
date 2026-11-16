@@ -100,6 +100,7 @@ require(['vs/editor/editor.main'], function () {
         event.preventDefault(); setScale(readingScale + (event.deltaY < 0 ? .1 : -.1));
     }, { passive: false, capture: true });
     el('splitter').addEventListener('pointerdown', event => {
+        invalidateMergeThemeMotion();
         el('splitter').setPointerCapture(event.pointerId);
         const move = e => { const rect = el('workspace').getBoundingClientRect(); const height = Math.max(110, Math.min(rect.height - 180, e.clientY - rect.top)); el('sources').style.height = height + 'px'; };
         const end = () => { el('splitter').removeEventListener('pointermove', move); el('splitter').removeEventListener('pointerup', end); };
@@ -108,6 +109,7 @@ require(['vs/editor/editor.main'], function () {
     el('splitter').addEventListener('keydown', event => {
         if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
         event.preventDefault();
+        invalidateMergeThemeMotion();
         const current = el('sources').getBoundingClientRect().height;
         el('sources').style.height = Math.max(110, Math.min(el('workspace').clientHeight - 180, current + (event.key === 'ArrowDown' ? 20 : -20))) + 'px';
     });
@@ -126,7 +128,10 @@ function handleResultMouseUp(event) {
 }
 
 function setScale(value) {
-    readingScale = Math.max(.7, Math.min(2, Math.round(value * 10) / 10));
+    const scale = Math.max(.7, Math.min(2, Math.round(value * 10) / 10));
+    if (scale === readingScale) return;
+    invalidateMergeThemeMotion();
+    readingScale = scale;
     for (const editor of Object.values(editors)) editor.updateOptions({ fontSize: 15 * readingScale, lineHeight: 24 * readingScale });
     el('zoom').textContent = Math.round(readingScale * 100) + '%';
 }
@@ -158,6 +163,7 @@ function isEditorVisible(side) {
 
 function setShowBase(value, persist = false) {
     if (persist && locked) return;
+    if (!!value !== showBase) invalidateMergeThemeMotion();
     const reference = isEditorVisible(activeSource) ? activeSource : 'mine';
     const anchor = editors[reference] ? { scrollTop: editors[reference].getScrollTop(), scrollLeft: editors[reference].getScrollLeft() } : null;
     const baseWasActive = activeSource === 'base';
@@ -204,6 +210,13 @@ function renderWarnings() {
 }
 
 function requestCommand(command, index = -1, resultPosition = null) {
+    if (command === 'theme') {
+        if (!state || !window.innerWidth || !window.innerHeight) return;
+        const button = el('theme').getBoundingClientRect();
+        post({ type: 'themeToggle', x: (button.left + button.width / 2) / window.innerWidth,
+            y: (button.top + button.height / 2) / window.innerHeight });
+        return;
+    }
     if (!state || locked || queuedCommand || rejectedDraft) return;
     if (decisionCommands.has(command)) index = state.selected;
     queuedCommand = { command, index };
@@ -240,6 +253,7 @@ function pump() {
 window.chrome.webview.addEventListener('message', event => {
     const message = event.data;
     if (message.type === 'load') {
+        stopMergeThemeMotion();
         labels = message.labels;
         for (const node of document.querySelectorAll('[data-label]')) node.textContent = t(node.dataset.label);
         for (const side of ['mine', 'base', 'theirs']) {
@@ -285,14 +299,11 @@ window.chrome.webview.addEventListener('message', event => {
             renderWarnings();
         }
     } else if (message.type === 'theme') {
-        for (const [key, value] of Object.entries(message.palette)) document.documentElement.style.setProperty('--' + key, value);
-        document.documentElement.style.colorScheme = message.dark ? 'dark' : 'light';
-        monaco.editor.defineTheme('differ-merge', { base: message.dark ? 'vs-dark' : 'vs', inherit: true, rules: [], colors: {
-            'editor.background': message.palette.background, 'editor.foreground': message.palette.ink,
-            'editorLineNumber.foreground': message.palette.muted, 'editorGutter.background': message.palette.background,
-            'editor.selectionBackground': message.palette.selection, 'editorCursor.foreground': message.palette.accent,
-            'editorWidget.background': message.palette.header, 'editorWidget.border': message.palette.border
-        } }); monaco.editor.setTheme('differ-merge');
+        applyMergeTheme(message);
+    } else if (message.type === 'themeTransitionStart') {
+        startMergeThemeMotion(message);
+    } else if (message.type === 'themeMistStop') {
+        stopMergeThemeMotion(message.completePalette !== false);
     } else if (message.type === 'flush') {
         locked = true; el('showBase').disabled = true; editors.result.updateOptions({ readOnly: true }); flushRequests.push(message.id); pump();
     } else if (message.type === 'resume') {

@@ -16,6 +16,108 @@ namespace Differ.App.Tests;
 public sealed class TextMergeRuntimeTests
 {
     private static readonly int[] InteractionConflictIndexes = [2, 8, 14];
+
+    [Fact]
+    public void MergeBrowserThemeReversesFromItsVisiblePaletteWithoutResettingEditors()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var oldContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext());
+            try
+            {
+                var longValue = new string('长', 200);
+                var lines = Enumerable.Range(0, 180).Select(i => $"const entry{i} = {{ count: {i}, name: \"{longValue}\" }};");
+                var basis = string.Join('\n', lines) + "\n";
+                using var fixture = new InteractionFixture(basis,
+                    basis.Replace("count: 1,", "count: 101,", StringComparison.Ordinal),
+                    basis.Replace("count: 1,", "count: 201,", StringComparison.Ordinal));
+                var browser = fixture.Browser;
+                Script(browser, """
+                    window.readMergePalette = () => Object.fromEntries(
+                        [...mergeThemeRoot.style].filter(name => name.startsWith('--'))
+                            .map(name => [name.substring(2), mergeThemeRoot.style.getPropertyValue(name)]));
+                    window.testDarkPalette = readMergePalette();
+                    for (const model of Object.values(models)) monaco.editor.setModelLanguage(model, 'javascript');
+                    """);
+                fixture.Theme.Apply(AppTheme.Light);
+                fixture.Window.SendTheme();
+                PumpUntil(() => Script(browser, "mergeThemeRoot.style.colorScheme==='light'") == "true");
+                Script(browser, "window.testLightPalette = readMergePalette()");
+                fixture.Theme.Apply(AppTheme.Dark);
+                fixture.Window.SendTheme();
+                PumpUntil(() => Script(browser, "mergeThemeRoot.style.colorScheme==='dark'") == "true");
+                ToggleBase(browser, true);
+                Script(browser, """
+                    editors.result.setSelection(new monaco.Selection(14, 3, 14, 9));
+                    editors.result.setScrollPosition({scrollTop: 192, scrollLeft: 90});
+                    editors.mine.setScrollTop(144);
+                    window.readMergeToken = () => {
+                        const token = [...document.querySelectorAll('#result .view-line span')].find(span =>
+                            [...span.classList].some(name => /^mtk\d+$/.test(name) && name !== 'mtk1'));
+                        return token && [[...token.classList].find(name => /^mtk\d+$/.test(name)), getComputedStyle(token).color];
+                    };
+                    window.readMergeView = () => JSON.stringify(Object.values(editors).map(editor =>
+                        [editor.getScrollTop(), editor.getScrollLeft(), editor.getSelection()]));
+                    """);
+                Settle(browser);
+                PumpUntil(() => Script(browser, "!!readMergeToken()") == "true");
+                Script(browser, """
+                    window.testMergeModels = Object.values(models);
+                    window.testMergeVersions = testMergeModels.map(model => model.getAlternativeVersionId());
+                    window.testMergeView = readMergeView();
+                    window.testMergeToken = readMergeToken();
+                    window.testMergeMist = {x: .8, y: .04, width: 1, height: 1};
+                    """);
+                var version = fixture.Session.Version;
+                var text = fixture.Session.ResultText;
+
+                Assert.Equal("true", Script(browser, """
+                    (() => {
+                        applyMergeTheme({dark: false, palette: testLightPalette, mist: {...testMergeMist, transitionId: 301}});
+                        const prepared = mergeMistCanvas.hidden && readMergePalette().background === testDarkPalette.background;
+                        startMergeThemeMotion({id: 300, startedAt: Date.now() - 340});
+                        const staleStartIgnored = mergeMistCanvas.hidden;
+                        startMergeThemeMotion({id: 301, startedAt: Date.now() - 340});
+                        editors.result.render(true);
+                        const midway = readMergePalette().background;
+                        const token = readMergeToken();
+                        const rgba = parseMergeThemeColor(midway);
+                        const mixed = rgba && rgba.join() !== parseMergeThemeColor(testDarkPalette.background).join() &&
+                            rgba.join() !== parseMergeThemeColor(testLightPalette.background).join();
+                        const alpha = mergeMistCanvas.getContext('2d').getImageData(
+                            Math.floor(mergeMistCanvas.width * testMergeMist.x),
+                            Math.floor(mergeMistCanvas.height * testMergeMist.y), 1, 1).data[3];
+                        const displayed = !mergeMistCanvas.hidden && alpha > 0 && token?.[0] === testMergeToken[0] && token[1] !== testMergeToken[1];
+                        stopMergeThemeMotion(false);
+                        applyMergeTheme({dark: true, palette: testDarkPalette, mist: {...testMergeMist, transitionId: 302}});
+                        const reversed = mergeMistCanvas.hidden && readMergePalette().background === midway &&
+                            readMergeToken()?.[1] === token?.[1];
+                        startMergeThemeMotion({id: 302, startedAt: Date.now() - 340});
+                        stopMergeThemeMotion();
+                        return prepared && staleStartIgnored && mixed && displayed && reversed &&
+                            readMergePalette().background === testDarkPalette.background &&
+                            !document.querySelector('.differ-merge-token-colors');
+                    })()
+                    """));
+
+                Script(browser, """
+                    applyMergeTheme({dark: false, palette: testLightPalette, mist: {...testMergeMist, transitionId: 303}});
+                    startMergeThemeMotion({id: 303, startedAt: Date.now() - 560});
+                    """);
+                PumpUntil(() => Script(browser, "mergeThemeMotion===null") == "true");
+                Assert.Equal("true", Script(browser, """
+                    mergeMistCanvas.hidden && !document.querySelector('.differ-merge-token-colors') &&
+                    readMergePalette().background === testLightPalette.background && readMergeView() === testMergeView &&
+                    Object.values(models).every((model, i) => model === testMergeModels[i] && model.getAlternativeVersionId() === testMergeVersions[i])
+                    """));
+                Assert.Equal(version, fixture.Session.Version);
+                Assert.Equal(text, fixture.Session.ResultText);
+            }
+            finally { SynchronizationContext.SetSynchronizationContext(oldContext); }
+        });
+    }
+
     [Fact]
     public void RealEditorResolvesConflictsFlushesEditsUndoesAndSavesOnlyOutput()
     {
@@ -299,6 +401,7 @@ public sealed class TextMergeRuntimeTests
         public TextMergeSession Session { get; }
         public MergeWindow Window { get; }
         public WebView2 Browser { get; }
+        public ThemeService Theme => _theme;
         public void Dispose() { Window.CloseForTest(); _theme.Dispose(); Directory.Delete(_directory, true); }
     }
 

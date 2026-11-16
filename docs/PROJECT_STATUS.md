@@ -5,8 +5,9 @@
 ## 从哪里继续
 
 - 从当前仓库的 `codex/ui-system-phase1` 分支继续开发。GitHub 默认分支 `main` 已合入 **0.21.18** 源码。主题、窗口按钮和前台验收见 [0.21.18 交付记录](UI-0.21.18.md)，接手时的失败见 [接手前审查](UI-0.21.18-review.md)。
-- 历史隔离预览由仓库根目录的 `打开开发版.cmd` 启动，依赖项目外的已发布预览文件。新检出后按 [构建说明](BUILDING.md) 准备开发环境。
-- 最新安装包：**0.21.18 Preview 已发布**，[Windows x64 下载](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)，[Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)。标签对应源码 `735fea2218b8adfa25e3d1d597aada69002481a2`，不抢占稳定 Latest；完整包身份与验证范围见 [安装包发布记录](RELEASE-0.21.18.md)。
+- **0.21.19** 的双栏代码、工作表、Word、十六进制、原生文本与三方合并均已接入 680 ms 晨光与月雾。各视图已在隔离预览实测双向换色，三方合并额外核对了展开基础面板与未保存结果。实机证据见 `D:\项目归档\Differ\2026-11-16-all-views-theme\GUI-VALIDATION.md`，Excel 滑块回归证据见 `D:\项目归档\Differ\2026-11-16-excel-theme`。
+- 本机 Windows x64 自包含安装包固定输出在 `artifacts/installers/Differ-Setup.exe`，同名 SHA-256 文件随包生成。升级沿用现有安装路径与 SVN 绑定。全视图主题版的构建与包体验证记录位于 `D:\项目归档\Differ\2026-11-16-all-views-theme`。
+- 历史 **0.21.18 Preview** 的 [Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)以源码 `735fea2218b8adfa25e3d1d597aada69002481a2` 构建，完整包身份与验证范围见 [安装包发布记录](RELEASE-0.21.18.md)。
 - 日常 SVN 使用本机现有安装。当前仓库的分支同步只更新源码，安装与 Diff/Merge 绑定独立保留。
 - 证据：UI 修复为 `D:\项目归档\Differ\2026-11-13-caption-finish`，安装包发布为 `D:\项目归档\Differ\2026-11-13-release-0.21.18`。历史整理材料在 `D:\项目归档\Differ\2026-11-12-consolidation`，精确查找/另存记录在 `2026-11-12-find-save`；旧样板源码和历史安装包保留，不从历史启动器运行。
 

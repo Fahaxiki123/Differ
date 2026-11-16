@@ -253,6 +253,20 @@ public sealed class SpreadsheetSelectionVisualTests
                 Assert.False(firstFrame[1].AsSpan().SequenceEqual(secondFrame[1]), "MINE body did not repaint while held.");
                 Assert.Equal(headerPositions, headers.Select(header => header.TranslatePoint(new Point(), window).Y));
 
+                var horizontalOffset = surface.RenderedHorizontalOffset;
+                theme.PrepareToggle();
+                theme.RenderTransitionFrame(ThemeService.TransitionDurationMilliseconds / 2);
+                FlushLayout(window);
+                var transitionFrame = CapturePanePixels(view, surface);
+                Assert.False(secondFrame[0].AsSpan().SequenceEqual(transitionFrame[0]), "BASE drag preview kept the old theme.");
+                Assert.False(secondFrame[1].AsSpan().SequenceEqual(transitionFrame[1]), "MINE drag preview kept the old theme.");
+                Assert.True(surface.IsActive);
+                Assert.Equal(finalOffset, surface.RenderedStartIndex);
+                Assert.Equal(horizontalOffset, surface.RenderedHorizontalOffset);
+                AssertOffsetsMatch(initialOffset, baseScroll.ContentVerticalOffset);
+                AssertOffsetsMatch(initialOffset, mineScroll.ContentVerticalOffset);
+                theme.CompleteTransition();
+
                 rail.EndViewportDrag();
                 FlushLayout(window);
                 FlushLayout(window);

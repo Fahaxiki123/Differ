@@ -63,6 +63,7 @@ public partial class DiffWindow : Window
     private int _hoveredCaptionHit;
     private int _pressedCaptionHit;
     private CodeEditorView? _mistEditor;
+    private bool _themeTransitionActive;
     private AppTheme _mistTheme;
     private long _themeTransitionId;
     private Point _themeOrigin;
@@ -173,7 +174,7 @@ public partial class DiffWindow : Window
 
     private void QueueNativeCaptionTheme()
     {
-        if (_mistEditor is not null)
+        if (_themeTransitionActive)
         {
             if (!Equals(GetValue(NativeCaptionThemeProperty), _mistTheme.ToString()))
             {
@@ -703,8 +704,9 @@ public partial class DiffWindow : Window
     {
         StopThemeMist(false);
         var nextTheme = _themeService.CurrentTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+        var pane = FindVisiblePaneTarget(ComparisonContentHost);
         if (!SystemParameters.ClientAreaAnimation || SystemParameters.HighContrast || !IsActive ||
-            FindVisiblePaneTarget(ComparisonContentHost) is not CodeEditorView editor)
+            pane is not (CodeEditorView or SpreadsheetWorksheetDiffView or WordDiffView or TextDiffView))
         {
             _themeService.Toggle();
             return;
@@ -713,25 +715,45 @@ public partial class DiffWindow : Window
         var origin = ThemeToggleButton.TranslatePoint(
             new Point(ThemeToggleButton.ActualWidth / 2, ThemeToggleButton.ActualHeight / 2), ComparisonRoot);
         var area = ComparisonRoot.RenderSize;
-        var dark = nextTheme == AppTheme.Dark;
-        var id = ++_themeTransitionId;
-        if (editor.PrepareThemeMist(ComparisonRoot, origin, area, dark, 0, id))
+        if (pane is not CodeEditorView editor)
         {
-            _mistEditor = editor;
-            _mistTheme = nextTheme;
-            _themeOrigin = origin;
-            _themeArea = area;
-            editor.ThemeMistInvalidated += OnThemeMistInvalidated;
-            editor.ThemeTransitionReady += OnThemeTransitionReady;
-            editor.ThemeTransitionFrame += OnEditorThemeFrame;
-            _lastThemeElapsed = -1;
-            _lastBrowserThemeElapsed = -1;
-            _themePreparationTimeout.Interval = TimeSpan.FromMilliseconds(500);
-            _themePreparationTimeout.Start();
+            StartNativeThemeTransition(nextTheme, origin, area);
+            return;
         }
 
-        if (_mistEditor is not null) _themeService.PrepareToggle();
-        else _themeService.Toggle();
+        var dark = nextTheme == AppTheme.Dark;
+        var id = ++_themeTransitionId;
+        if (!editor.PrepareThemeMist(ComparisonRoot, origin, area, dark, 0, id))
+        {
+            _themeService.Toggle();
+            return;
+        }
+
+        _mistEditor = editor;
+        PrepareThemeTransition(nextTheme, origin, area);
+        editor.ThemeMistInvalidated += OnThemeMistInvalidated;
+        editor.ThemeTransitionReady += OnThemeTransitionReady;
+        editor.ThemeTransitionFrame += OnEditorThemeFrame;
+        _lastBrowserThemeElapsed = -1;
+        _themePreparationTimeout.Interval = TimeSpan.FromMilliseconds(500);
+        _themePreparationTimeout.Start();
+        _themeService.PrepareToggle();
+    }
+
+    private void StartNativeThemeTransition(AppTheme nextTheme, Point origin, Size area)
+    {
+        PrepareThemeTransition(nextTheme, origin, area);
+        _themeService.PrepareToggle();
+        StartThemeClock(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    }
+
+    private void PrepareThemeTransition(AppTheme nextTheme, Point origin, Size area)
+    {
+        _themeTransitionActive = true;
+        _mistTheme = nextTheme;
+        _themeOrigin = origin;
+        _themeArea = area;
+        _lastThemeElapsed = -1;
     }
 
     private void OnThemeTransitionReady(long id)
@@ -740,20 +762,25 @@ public partial class DiffWindow : Window
         editor.ThemeTransitionReady -= OnThemeTransitionReady;
         _themePreparationTimeout.Stop();
         var startedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        if (StartThemeClock(startedAt)) editor.StartPreparedTheme(id, startedAt);
+    }
+
+    private bool StartThemeClock(long startedAt)
+    {
         _themeClockTimestamp = Stopwatch.GetTimestamp();
         _themeClockInitialElapsed = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
         if (!ThemeMist.Start(_themeOrigin, _themeArea, _mistTheme == AppTheme.Dark,
             _themeClockInitialElapsed, automaticClock: false))
         {
             StopThemeMist();
-            return;
+            return false;
         }
         _themeClockRunning = true;
         CompositionTarget.Rendering += OnThemeClockRendering;
         RenderThemeClockFrame(_themeClockInitialElapsed);
         _themePreparationTimeout.Interval = TimeSpan.FromMilliseconds(1100);
         _themePreparationTimeout.Start();
-        editor.StartPreparedTheme(id, startedAt);
+        return true;
     }
 
     private void OnThemeClockRendering(object? sender, EventArgs e) =>
@@ -761,7 +788,7 @@ public partial class DiffWindow : Window
 
     private void RenderThemeClockFrame(double elapsed)
     {
-        if (!_themeClockRunning || _mistEditor is null || !double.IsFinite(elapsed)) return;
+        if (!_themeClockRunning || !double.IsFinite(elapsed)) return;
         elapsed = Math.Clamp(elapsed, 0, ThemeService.TransitionDurationMilliseconds);
         if (elapsed < _lastThemeElapsed) return;
         _lastThemeElapsed = elapsed;
@@ -791,19 +818,25 @@ public partial class DiffWindow : Window
     private void StopThemeMist(bool completePalette)
     {
         StopThemeClock();
-        if (_mistEditor is not { } editor) return;
+        if (!_themeTransitionActive) return;
+        _themeTransitionActive = false;
+        var editor = _mistEditor;
         _mistEditor = null;
         _themePreparationTimeout.Stop();
-        editor.ThemeMistInvalidated -= OnThemeMistInvalidated;
-        editor.ThemeTransitionReady -= OnThemeTransitionReady;
-        editor.ThemeTransitionFrame -= OnEditorThemeFrame;
+        if (editor is not null)
+        {
+            editor.ThemeMistInvalidated -= OnThemeMistInvalidated;
+            editor.ThemeTransitionReady -= OnThemeTransitionReady;
+            editor.ThemeTransitionFrame -= OnEditorThemeFrame;
+        }
+
         ThemeMist.Stop();
         if (completePalette)
         {
             _lastThemeElapsed = ThemeService.TransitionDurationMilliseconds;
             _themeService.CompleteTransition();
         }
-        editor.StopThemeMist(completePalette);
+        editor?.StopThemeMist(completePalette);
         QueueNativeCaptionTheme();
     }
 

@@ -1,31 +1,40 @@
 using System.ComponentModel;
-using System.Globalization;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Differ.App.Presentation.Theme;
 using Differ.App.Resources;
 using Differ.App.Services;
 using Differ.App.ViewModels;
 using Microsoft.Web.WebView2.Core;
-using Microsoft.Win32;
 
 namespace Differ.App;
 
 public partial class MergeWindow : Window
 {
     private const string Origin = "https://differ.editor.local";
+    private static readonly DependencyProperty ThemeRevisionProperty = DependencyProperty.Register(
+        "ThemeRevision", typeof(object), typeof(MergeWindow),
+        new PropertyMetadata(null, (owner, _) => ((MergeWindow)owner).QueueThemeUpdate()));
     private readonly TextMergeViewModel _viewModel;
     private readonly IThemeService _themeService;
     private readonly UserPreferencesService? _preferences;
-    private readonly DispatcherTimer _themeTimer;
+    private readonly DispatcherTimer _themePreparationTimeout = new(DispatcherPriority.Background);
     private bool _initialized;
     private bool _closed;
     private bool _closing;
     private bool _allowClose;
     private bool _busy;
     private AppTheme _lastTheme;
+    private ThemeTransition? _themeTransition;
+    private DispatcherOperation? _pendingThemeUpdate;
+    private long _themeTransitionId;
+    private long? _themeClockTimestamp;
+    private double _lastBrowserThemeElapsed;
     private TaskCompletionSource? _flush;
     private string? _flushId;
     private bool _showBase;
@@ -41,13 +50,24 @@ public partial class MergeWindow : Window
         InitializeComponent();
         DataContext = viewModel;
         _lastTheme = themeService.CurrentTheme;
-        _themeTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background,
-            (_, _) => { if (_lastTheme != _themeService.CurrentTheme) SendTheme(); }, Dispatcher);
+        _themePreparationTimeout.Tick += (_, _) => StopThemeTransition();
+        SetResourceReference(ThemeRevisionProperty, ThemeService.ThemeRevisionKey);
+        ThemeMist.Stopped += (_, _) => StopThemeTransition();
+        Deactivated += (_, _) => StopThemeTransition();
+        DpiChanged += (_, _) => StopThemeTransition();
+        StateChanged += (_, _) => StopThemeTransition();
+        SystemParameters.StaticPropertyChanged += OnSystemParametersChanged;
     }
 
     public bool CompletionSucceeded { get; private set; }
     internal bool IsEditorReady { get; private set; }
     internal TextMergeViewModel ViewModel => _viewModel;
+
+    protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+    {
+        base.OnRenderSizeChanged(sizeInfo);
+        StopThemeTransition();
+    }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -98,7 +118,7 @@ public partial class MergeWindow : Window
             core.Navigate(Origin + "/merge.html");
         }
         catch (Exception exception) when (exception is WebView2RuntimeNotFoundException or InvalidOperationException
-            or IOException or System.Runtime.InteropServices.COMException)
+            or IOException or COMException)
         {
             ShowFailure(MergeStrings.StartupFailed + Environment.NewLine + exception.GetType().Name);
         }
@@ -139,6 +159,24 @@ public partial class MergeWindow : Window
                     StartupStatus.Visibility = Visibility.Collapsed;
                     Browser.Visibility = Visibility.Visible;
                     break;
+                case "themeToggle":
+                    if (!_busy && !_closing && message.TryGetProperty("x", out var x) && x.TryGetDouble(out var originX)
+                        && message.TryGetProperty("y", out var y) && y.TryGetDouble(out var originY))
+                    {
+                        ToggleTheme(originX, originY);
+                    }
+                    break;
+                case "themeTransitionReady":
+                    if (IsCurrentThemeTransition(message)) StartThemeClock();
+                    break;
+                case "themeTransitionFrame":
+                    if (IsCurrentThemeTransition(message) && message.TryGetProperty("elapsed", out var elapsed)
+                        && elapsed.TryGetDouble(out var milliseconds)) OnBrowserThemeFrame(milliseconds);
+                    break;
+                case "themeTransitionUnavailable":
+                case "themeTransitionInvalidated":
+                    if (IsCurrentThemeTransition(message)) StopThemeTransition();
+                    break;
                 case "change":
                     acknowledgement = message.GetProperty("sequence").GetInt64();
                     var accepted = !_busy && _viewModel.UpdateResult(message.GetProperty("text").GetString()!, message.GetProperty("version").GetInt64());
@@ -166,7 +204,7 @@ public partial class MergeWindow : Window
         }
         catch (Exception exception) when (exception is JsonException or InvalidOperationException or ArgumentException
             or IOException or UnauthorizedAccessException or TimeoutException or OperationCanceledException
-            or System.Runtime.InteropServices.COMException)
+            or COMException)
         {
             PublishState(false, acknowledgement, exception.Message);
         }
@@ -201,7 +239,6 @@ public partial class MergeWindow : Window
             case "select": _viewModel.Select(index); PublishState(true); return;
             case "selectResult": PublishState(_viewModel.SelectResultOffset(offset), revealResult: false); return;
             case "toggleAdvance": _viewModel.AutoAdvance = !_viewModel.AutoAdvance; PublishState(false); return;
-            case "theme": _themeService.Toggle(); SendTheme(); PublishState(false); return;
             case "save": await SaveResultAsync(false); return;
 
             case "finish": await SaveResultAsync(true); return;
@@ -274,6 +311,7 @@ public partial class MergeWindow : Window
 
     private async void OnClosing(object? sender, CancelEventArgs e)
     {
+        StopThemeTransition();
         if (_allowClose) return;
         e.Cancel = true;
         if (_closing || _busy) return;
@@ -298,7 +336,7 @@ public partial class MergeWindow : Window
             Close();
         }
         catch (Exception exception) when (exception is TimeoutException or InvalidOperationException or IOException
-            or System.Runtime.InteropServices.COMException or OperationCanceledException)
+            or COMException or OperationCanceledException)
         {
             if (IsEditorReady) PublishState(false, error: MergeStrings.SyncFailed);
             else StartupStatus.Text = MergeStrings.SyncFailed;
@@ -313,7 +351,10 @@ public partial class MergeWindow : Window
     private void OnClosed(object? sender, EventArgs e)
     {
         _closed = true;
-        _themeTimer.Stop();
+        StopThemeTransition();
+        SystemParameters.StaticPropertyChanged -= OnSystemParametersChanged;
+        _pendingThemeUpdate?.Abort();
+        _pendingThemeUpdate = null;
         _flush?.TrySetCanceled();
         Browser.Dispose();
     }
@@ -365,15 +406,125 @@ public partial class MergeWindow : Window
         });
     }
 
-    internal void SendTheme()
+    private void ToggleTheme(double x, double y)
+    {
+        StopThemeTransition(completePalette: false);
+        var viewport = Browser.RenderSize;
+        var area = MergeRoot.RenderSize;
+        if (!IsEditorReady || !IsActive || !Browser.IsVisible || !SystemParameters.ClientAreaAnimation
+            || SystemParameters.HighContrast || !double.IsFinite(x) || x is < 0 or > 1
+            || !double.IsFinite(y) || y is < 0 or > 1 || viewport.Width <= 0 || viewport.Height <= 0
+            || area.Width <= 0 || area.Height <= 0)
+        {
+            _themeService.Toggle();
+            SendTheme();
+            return;
+        }
+
+        var id = ++_themeTransitionId;
+        var origin = Browser.TranslatePoint(new Point(x * viewport.Width, y * viewport.Height), MergeRoot);
+        _themeTransition = new ThemeTransition(id, origin, area);
+        _lastBrowserThemeElapsed = -1;
+        _themeService.PrepareToggle();
+        if (TrySendTheme(new { x, y, width = area.Width / viewport.Width, height = area.Height / viewport.Height, transitionId = id }))
+        {
+            _themePreparationTimeout.Interval = TimeSpan.FromMilliseconds(500);
+            _themePreparationTimeout.Start();
+        }
+        else
+        {
+            StopThemeTransition();
+        }
+    }
+
+    private bool IsCurrentThemeTransition(JsonElement message) =>
+        _themeTransition is { } transition && message.TryGetProperty("id", out var id)
+        && id.TryGetInt64(out var value) && value == transition.Id;
+
+    private void StartThemeClock()
+    {
+        if (_themeTransition is not { } transition || _themeClockTimestamp is not null) return;
+        _themePreparationTimeout.Stop();
+        if (!ThemeMist.Start(transition.Origin, transition.Area, _lastTheme == AppTheme.Dark, 0, automaticClock: false))
+        {
+            StopThemeTransition();
+            return;
+        }
+
+        var startedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        _themeClockTimestamp = Stopwatch.GetTimestamp();
+        if (!TrySendThemeMessage(new { type = "themeTransitionStart", id = transition.Id, startedAt }))
+        {
+            StopThemeTransition();
+            return;
+        }
+
+        CompositionTarget.Rendering += OnThemeRendering;
+        _themePreparationTimeout.Interval = TimeSpan.FromMilliseconds(1100);
+        _themePreparationTimeout.Start();
+    }
+
+    private void OnThemeRendering(object? sender, EventArgs e)
+    {
+        if (_themeClockTimestamp is not { } timestamp) return;
+        var elapsed = Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds;
+        _themeService.RenderTransitionFrame(elapsed);
+        ThemeMist.RenderFrame(elapsed);
+    }
+
+    private void OnBrowserThemeFrame(double elapsed)
+    {
+        if (_themeClockTimestamp is null || !double.IsFinite(elapsed) || elapsed < 0
+            || elapsed > ThemeService.TransitionDurationMilliseconds || elapsed < _lastBrowserThemeElapsed) return;
+        _lastBrowserThemeElapsed = elapsed;
+        if (elapsed >= ThemeService.TransitionDurationMilliseconds) StopThemeTransition();
+    }
+
+    private void StopThemeTransition(bool completePalette = true)
+    {
+        if (_themeTransition is null) return;
+        _themeTransition = null;
+        _themeClockTimestamp = null;
+        _themePreparationTimeout.Stop();
+        CompositionTarget.Rendering -= OnThemeRendering;
+        ThemeMist.Stop();
+        if (completePalette) _themeService.CompleteTransition();
+        TrySendThemeMessage(new { type = "themeMistStop", completePalette });
+    }
+
+    private void OnSystemParametersChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not (nameof(SystemParameters.ClientAreaAnimation) or nameof(SystemParameters.HighContrast))) return;
+        if (Dispatcher.CheckAccess()) StopThemeTransition();
+        else Dispatcher.InvokeAsync(() => StopThemeTransition());
+    }
+
+    private void QueueThemeUpdate()
+    {
+        if (_closed || !IsEditorReady || _pendingThemeUpdate is not null) return;
+        // ThemeService publishes the new dictionary before updating CurrentTheme.
+        _pendingThemeUpdate = Dispatcher.InvokeAsync(() =>
+        {
+            _pendingThemeUpdate = null;
+            if (_lastTheme == _themeService.CurrentTheme) return;
+            StopThemeTransition();
+            SendTheme();
+        }, DispatcherPriority.Render);
+    }
+
+    internal void SendTheme() => TrySendTheme();
+
+    private bool TrySendTheme(object? mist = null)
     {
         _lastTheme = _themeService.CurrentTheme;
-        string Colour(string key) => TryFindResource(key) is SolidColorBrush brush
-            ? string.Create(CultureInfo.InvariantCulture, $"#{brush.Color.R:X2}{brush.Color.G:X2}{brush.Color.B:X2}") : "transparent";
-        Send(new
+        var target = TryFindResource(ThemeService.TargetThemeKey) as ResourceDictionary;
+        string Colour(string key) => (target?[key] ?? TryFindResource(key)) is SolidColorBrush brush
+            ? EditorThemeAdapter.ToCssHex(brush) : "transparent";
+        return TrySendThemeMessage(new
         {
             type = "theme",
             dark = _lastTheme == AppTheme.Dark,
+            mist,
             palette = new
             {
                 background = Colour("Sample.SurfaceBrush"),
@@ -395,6 +546,20 @@ public partial class MergeWindow : Window
         });
     }
 
+    private bool TrySendThemeMessage(object message)
+    {
+        if (!IsEditorReady || _closed) return false;
+        try
+        {
+            Send(message);
+            return true;
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or COMException)
+        {
+            return false;
+        }
+    }
+
     private void Send(object message)
     {
         if (IsEditorReady && !_closed) Browser.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(message));
@@ -403,8 +568,11 @@ public partial class MergeWindow : Window
     private void ShowFailure(string message)
     {
         IsEditorReady = false;
+        StopThemeTransition();
         StartupStatus.Text = message;
         StartupStatus.Visibility = Visibility.Visible;
         _flush?.TrySetException(new InvalidOperationException(MergeStrings.SyncFailed));
     }
+
+    private sealed record ThemeTransition(long Id, Point Origin, Size Area);
 }

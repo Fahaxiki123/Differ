@@ -18,6 +18,15 @@ footer{height:24px;flex:none;display:flex;align-items:center;gap:12px;padding:0 
 @media(max-width:1000px){#toolbar strong{display:none}#toolbar{gap:3px}.tools{gap:0}#sources{position:relative;padding-top:32px}.source{display:none;width:100%}.source.active{display:flex}#sourceTabs{display:flex;position:absolute;top:0;left:0;right:0;height:32px;background:var(--toolbar);border-bottom:1px solid var(--border);padding:2px 8px;gap:6px}#sourceTabs button.active{background:var(--background);color:var(--accent);font-weight:600}#counter{min-width:112px}.resultHeader button{padding-left:8px;padding-right:8px}#selectionStatus{min-width:112px}#resolveBar{gap:3px}#resolveBar button{padding:3px 8px}}
 
 .hide-base .source[data-pane=base],.hide-base #sourceTabs [data-source=base]{display:none}
+#theme-mist { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1000; pointer-events: none; }
+.theme-color-transition .monaco-editor,
+.theme-color-transition .monaco-editor .monaco-editor-background,
+.theme-color-transition .monaco-editor .margin { background-color: var(--background) !important; }
+.theme-color-transition .monaco-editor .line-numbers { color: var(--muted) !important; }
+.theme-color-transition .monaco-editor .active-line-number { color: var(--accent) !important; }
+.theme-color-transition .monaco-editor .selected-text { background-color: var(--selection) !important; }
+.theme-color-transition .monaco-editor .cursor { background-color: var(--accent) !important; border-color: var(--accent) !important; }
+.theme-color-transition .monaco-editor .find-widget { background-color: var(--header) !important; border-color: var(--border) !important; }
 #showBase[aria-pressed=true]{background:var(--selection);border-color:var(--accent);color:var(--accent)}
 /* Conflict decisions and navigation keep one stable row at the result boundary. */
 #toolbar .tools{margin-left:auto}

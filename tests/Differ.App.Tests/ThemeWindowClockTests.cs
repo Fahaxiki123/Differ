@@ -113,10 +113,48 @@ public sealed class ThemeWindowClockTests
         });
     }
 
+    [Fact]
+    public void NativeClockAdvancesAndReversesWithoutAnEditor()
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            using var fixture = new Fixture();
+            var initial = fixture.Colour;
+            fixture.BeginNative();
+            var target = fixture.TargetColour;
+            Assert.True(fixture.ClockRunning);
+            Assert.Equal(initial, fixture.Colour);
+
+            fixture.Render(340);
+            var displayed = fixture.Colour;
+            Assert.NotEqual(initial, displayed);
+            Assert.NotEqual(target, displayed);
+            Assert.True(fixture.FogOpacity > 0);
+
+            fixture.Stop(completePalette: false);
+            fixture.AssertStopped();
+            fixture.BeginNative();
+            Assert.Equal(displayed, fixture.Colour);
+            Assert.Equal(initial, fixture.TargetColour);
+
+            fixture.Render(680);
+            fixture.AssertStopped();
+            Assert.Equal(initial, fixture.Colour);
+
+            fixture.BeginNative();
+            fixture.Render(200);
+            fixture.Window.Close();
+            fixture.AssertStopped();
+            Assert.Equal(target, fixture.Colour);
+        });
+    }
+
     private sealed class Fixture : IDisposable
     {
         private const BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
         private static readonly MethodInfo ReadyMethod = RequireWindowMethod("OnThemeTransitionReady", [typeof(long)]);
+        private static readonly MethodInfo StartNativeMethod =
+            RequireWindowMethod("StartNativeThemeTransition", [typeof(AppTheme), typeof(Point), typeof(Size)]);
         private static readonly MethodInfo RenderMethod = RequireWindowMethod("RenderThemeClockFrame", [typeof(double)]);
         private static readonly MethodInfo ReportMethod = RequireWindowMethod("OnEditorThemeFrame", [typeof(long), typeof(double)]);
         private static readonly MethodInfo StopMethod = RequireWindowMethod("StopThemeMist", [typeof(bool)]);
@@ -174,6 +212,7 @@ public sealed class ThemeWindowClockTests
             // The unloaded editor intentionally emits no browser messages. This fixture tests the host after ready,
             // not WebView2 startup or the final desktop composition of the two independent rendering surfaces.
             Write("_mistEditor", _editor);
+            Write("_themeTransitionActive", true);
             Write("_themeTransitionId", id);
             Write("_mistTheme", target);
             Write("_themeOrigin", new Point(root.ActualWidth - 78, 58));
@@ -185,6 +224,14 @@ public sealed class ThemeWindowClockTests
             ReadyMethod.Invoke(Window, [id]);
         }
 
+        public void BeginNative()
+        {
+            var root = Assert.IsAssignableFrom<FrameworkElement>(Window.FindName("ComparisonRoot"));
+            var target = _themes.CurrentTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+            StartNativeMethod.Invoke(Window, [target, new Point(root.ActualWidth - 78, 58), root.RenderSize]);
+            Assert.Null(Read("_mistEditor"));
+        }
+
         public void Render(double elapsed) => RenderMethod.Invoke(Window, [elapsed]);
         public void Report(long id, double elapsed) => ReportMethod.Invoke(Window, [id, elapsed]);
         public void Stop(bool completePalette) => StopMethod.Invoke(Window, [completePalette]);
@@ -192,6 +239,7 @@ public sealed class ThemeWindowClockTests
         public void AssertStopped()
         {
             Assert.False(ClockRunning);
+            Assert.False(Assert.IsType<bool>(Read("_themeTransitionActive")));
             Assert.Null(Read("_mistEditor"));
             Assert.Equal(0, FogOpacity);
         }

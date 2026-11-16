@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
+using Differ.App.Services;
 using Differ.App.ViewModels;
 using Differ.Core.Algorithms;
 using Differ.Core.Models;
@@ -19,6 +20,9 @@ public sealed class SpreadsheetDragSurface : FrameworkElement
     private const int MaximumCachedTextCount = 512;
     private const int MaximumTextLength = 512;
     private const double CellPadding = 8;
+    private static readonly DependencyProperty ThemeRevisionProperty = DependencyProperty.Register(
+        "ThemeRevision", typeof(object), typeof(SpreadsheetDragSurface),
+        new PropertyMetadata(null, (source, _) => ((SpreadsheetDragSurface)source).RefreshPalette()));
     private static readonly DiffKind[] Kinds = Enum.GetValues<DiffKind>();
     private static readonly SearchValues<char> LineEndings = SearchValues.Create("\r\n\f\u0085\u2028\u2029");
     private static readonly Typeface CellTypeface = new(new FontFamily("Cascadia Mono, Consolas, Microsoft YaHei UI"),
@@ -43,6 +47,7 @@ public sealed class SpreadsheetDragSurface : FrameworkElement
         IsHitTestVisible = false;
         Focusable = false;
         AddVisualChild(_drawing);
+        SetResourceReference(ThemeRevisionProperty, ThemeService.ThemeRevisionKey);
     }
 
     protected override int VisualChildrenCount => 1;
@@ -103,15 +108,26 @@ public sealed class SpreadsheetDragSurface : FrameworkElement
             return;
         }
 
-        _plainText.Clear();
-        var palette = ReadPalette();
-        using (var context = _drawing.RenderOpen())
-        {
-            DrawPane(context, worksheet, _basePane, start, horizontal, palette, isBaseSide: true);
-            DrawPane(context, worksheet, _minePane, start, horizontal, palette, isBaseSide: false);
-        }
+        RenderViewport(worksheet, start, horizontal);
         RenderedStartIndex = start;
         RenderedHorizontalOffset = horizontal;
+    }
+
+    private void RefreshPalette()
+    {
+        if (_worksheet is { } worksheet && RenderedStartIndex >= 0)
+        {
+            RenderViewport(worksheet, RenderedStartIndex, RenderedHorizontalOffset);
+        }
+    }
+
+    private void RenderViewport(WorksheetTabViewModel worksheet, int start, double horizontal)
+    {
+        _plainText.Clear();
+        var palette = ReadPalette();
+        using var context = _drawing.RenderOpen();
+        DrawPane(context, worksheet, _basePane, start, horizontal, palette, isBaseSide: true);
+        DrawPane(context, worksheet, _minePane, start, horizontal, palette, isBaseSide: false);
     }
 
     internal void End()
