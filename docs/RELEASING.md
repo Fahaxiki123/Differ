@@ -1,6 +1,8 @@
 # GitHub 版本下载与发布
 
-GitHub Releases 保存每个可下载版本，本机 `artifacts/publish/Differ-win-x64` 仍只保留一份当前程序。仓库维持私有，只有已有仓库权限的人可以访问安装包；发布不改变可见性，也不邀请其他人。
+GitHub Releases 保存每个可下载版本，本机 `artifacts/publish/Differ-win-x64` 仍只保留一份当前程序。发布流程保持仓库现有可见性，不修改访问权限或邀请其他人。
+
+截至 2026-11-18，已核对的最新预览版是 [0.21.19 Preview](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.19)，稳定版是 [0.18.2](https://github.com/Fahaxiki123/Differ/releases/tag/v0.18.2)。最新预览版从 [全部发布](https://github.com/Fahaxiki123/Differ/releases) 查看；[Latest](https://github.com/Fahaxiki123/Differ/releases/latest) 只表示最新稳定版。安装包与同版本源码的入口统一维护在 [README](../README.md#下载)。下文 0.20.0 是发布流程示例，不代表当前最新版本。
 
 稳定基线是远端提交 `2cccc08a07838509e5980ccd1750ee8e9d446941` 的 **0.18.2**。若使用该提交重新构建的安装包，说明中必须写明“按稳定源码重建”，不能声称是历史原始二进制。新三方合并及交互 **0.20.0** 未经用户验收，属于 **Preview**，不得设为 Latest。后续测试版同样默认 Preview；只有用户明确认可版本并要求推广，才发布独立稳定版本，不在原测试版上替换附件。
 
@@ -68,7 +70,13 @@ pwsh -NoProfile -File scripts/publish-github-release.ps1 `
   -AssetDirectory E:\Differ-Releases\0.20.0 -Publish
 ```
 
-`-NotesFile` 可省略；若提供，必须指向版本包内同一份 `RELEASE-NOTES.txt`。`-ExpectedPrivate` 默认 `true`，实际可见性不同会停止，脚本从不修改可见性。`-Publish` 和 `-DryRun` 不能同时使用。
+`-NotesFile` 可省略；若提供，必须指向版本包内同一份 `RELEASE-NOTES.txt`。`-ExpectedPrivate` 默认 `true`，实际可见性不同会停止，脚本从不修改可见性；当前公开仓库应在上述命令中显式传入 `-ExpectedPrivate:$false`。`-Publish` 和 `-DryRun` 不能同时使用。
+
+## 发布后的说明与下载入口
+
+发布完成后，在同一次文档更新中核对 README、PROJECT_STATUS 和实际 Release：版本号、通道、安装包名、校验文件及源码标签必须相互对应。默认分支尚未包含最新预览源码时，应明确写出分支差异并链接发布标签，不单独提高工程版本号。旧验收和发布记录保留原版本，标明历史范围。
+
+长期入口使用 `/releases`（含 Preview）和 `/releases/latest`（稳定版）；带版本号的直链必须同时标注具体版本和核对日期，不能把指向固定旧标签的链接命名为“最新版本”。已发布的历史标签和附件保持原样。
 
 ## 认证、重试与历史保留
 

@@ -1,16 +1,21 @@
 # 当前项目状态
 
-更新日期：2026-11-16。
+发布信息核对日期：2026-11-18。下方历史验收记录保留各自版本和原验证范围；本次文档更新不代表重新运行测试。
 
 ## 从哪里继续
 
-- 从当前仓库的 `codex/ui-system-phase1` 分支继续开发。GitHub 默认分支 `main` 已合入 **0.21.18** 源码。主题、窗口按钮和前台验收见 [0.21.18 交付记录](UI-0.21.18.md)，接手时的失败见 [接手前审查](UI-0.21.18-review.md)。
+- 从 `codex/ui-system-phase1` 分支继续开发；该分支与 `v0.21.19` 标签已包含 **0.21.19** 源码。GitHub 默认分支 `main` 的应用版本仍为 **0.21.18**，不能用默认分支构建结果代表 0.21.19 下载包。复现发布版应检出对应标签。
 - 历史隔离预览由仓库根目录的 `打开开发版.cmd` 启动，依赖项目外的已发布预览文件。新检出后按 [构建说明](BUILDING.md) 准备开发环境。
-- 最新安装包：**0.21.18 Preview 已发布**，[Windows x64 下载](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)，[Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)。标签对应源码 `735fea2218b8adfa25e3d1d597aada69002481a2`，不抢占稳定 Latest；完整包身份与验证范围见 [安装包发布记录](RELEASE-0.21.18.md)。
+- 已核对最新预览版：**0.21.19 Preview**，[Windows x64 下载](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.19/Differ-0.21.19-win-x64-Setup.exe)、[SHA-256](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.19/Differ-0.21.19-win-x64-Setup.exe.sha256)、[Release](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.19)、[对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.19)。源码提交为 `5cd60fd9b864a08f1172d894a8316b7e009fe8e6`。
+- 已核对稳定版为 **0.18.2**。长期入口分别为 [全部发布（含 Preview）](https://github.com/Fahaxiki123/Differ/releases) 和 [最新稳定版](https://github.com/Fahaxiki123/Differ/releases/latest)；Preview 不替换稳定 Latest。
 - 日常 SVN 使用本机现有安装。当前仓库的分支同步只更新源码，安装与 Diff/Merge 绑定独立保留。
 - 证据：UI 修复为 `D:\项目归档\Differ\2026-11-13-caption-finish`，安装包发布为 `D:\项目归档\Differ\2026-11-13-release-0.21.18`。历史整理材料在 `D:\项目归档\Differ\2026-11-12-consolidation`，精确查找/另存记录在 `2026-11-12-find-save`；旧样板源码和历史安装包保留，不从历史启动器运行。
 
-## UI 做到了哪里
+## 0.21.19 Preview 发布范围
+
+0.21.19 将 680 ms 主题过渡扩展至 Word、Excel/CSV、原生只读文本、十六进制及三方合并视图。该版本 Release 记录为 713 项自动回归通过、0 失败、2 跳过；安装包核验覆盖 593 个运行文件。具体已验证操作及 Windows 10、干净机、安装升级卸载、混合 DPI 和长期稳定性等未验证范围，以 [0.21.19 Release](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.19) 为准。
+
+## 0.21.18 UI 基线与后续边界（历史记录）
 
 公共标题栏文件标签、独立工具栏、文本编辑操作栏、Excel 紧凑对照栏、双侧拖动绘制、16 DIP 导航轨和主题雾光已在主工程实现。当前不是空壳，但也未完成全部页面的视觉迁移和用户验收。
 
@@ -32,7 +37,7 @@
 
 旧样板独有源码保存在 `history\Differ-installed-UIReview\recovered`，其中 `Differ.App.ViewModels\DiffWindowViewModel.cs` 和 `Editor\editor.js` 是上述查找及目标提示的参考。不要用反编译旧工程整体覆盖主仓库。
 
-## 当前验证与交付门禁
+## 0.21.18 验证与交付记录（历史）
 
 安装包发布已完成：正式 Release 构建和格式通过，本轮常规回归 711 通过、0 失败、2 项显式前台/取证测试未启用；不是 713 项全部运行。非执行校验覆盖 598 个归档条目和 592 个运行文件，文件大小/SHA-256、源码身份与离线依赖通过。正式程序只执行只读 `--integration-status` 并返回预期未绑定状态；未运行安装器或卸载程序。远端 Preview 为 Draft=false，四件附件验证通过。发布后 `final-protection.json` 确认现用安装全部 592 个文件、全局及高级绑定、卸载项和开发预览未变；清理 23 个目标后 Check 为 Clean=true、Targets=0、Unclassified=0。详见 [安装包发布记录](RELEASE-0.21.18.md)。
 

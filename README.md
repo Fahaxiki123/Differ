@@ -2,15 +2,22 @@
 
 面向 Windows 的文件差异查看工具，支持代码、文本、Word、Excel 和三方文本合并，可直接打开本地文件或从 TortoiseSVN 调用。
 
-## 最新开发版：0.21.19 Preview
+## 下载
 
-更新日期：2026-11-16。
+**[查看最新发布（含 Preview）](https://github.com/Fahaxiki123/Differ/releases)** · **[获取最新稳定版](https://github.com/Fahaxiki123/Differ/releases/latest)**
 
-**[下载 0.21.19 Preview Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.19/Differ-0.21.19-win-x64-Setup.exe)** · [版本说明与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.19) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.19) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
+以下版本于 **2026-11-18** 核对。预览版与稳定版分开发布；GitHub 的 `Latest` 入口只指向稳定版，不代表版本号最高的 Preview。
 
-安装包约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名。已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。
+| 发布通道 | 已核对版本 | Windows x64 安装包 | 说明与校验 | 对应源码 |
+| --- | --- | --- | --- | --- |
+| 最新预览版 | **0.21.19 Preview** | [下载安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.19/Differ-0.21.19-win-x64-Setup.exe) | [版本说明](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.19) · [SHA-256](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.19/Differ-0.21.19-win-x64-Setup.exe.sha256) | [v0.21.19](https://github.com/Fahaxiki123/Differ/tree/v0.21.19) |
+| 稳定版 | **0.18.2** | [下载安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.18.2/Differ-0.18.2-win-x64-Setup.exe) | [版本说明与校验](https://github.com/Fahaxiki123/Differ/releases/tag/v0.18.2) | [v0.18.2](https://github.com/Fahaxiki123/Differ/tree/v0.18.2) |
 
-### 本次更新
+本页功能说明以 **0.21.19 Preview** 为准，稳定版不包含后续新增的三方合并等功能。安装包请使用同一行的版本说明、校验文件和源码；后续新版本从上方长期入口获取。
+
+0.21.19 Preview 安装包约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名。已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。
+
+### 0.21.19 Preview 更新（2026-11-16）
 
 - Word、十六进制、原生回退文本和三方合并接入 680 ms「晨光与月雾」。
 - Excel 和 CSV 表格对比接入同套过渡。拖动预览随主题换色，松手后双栏继续对齐在目标位置。
@@ -135,6 +142,8 @@ pwsh -NoProfile -File .\scripts\publish.ps1
 ## 开发验证
 
 从GitHub克隆后的依赖、源码边界与构建步骤见 [干净源码构建说明](docs/BUILDING.md)。默认测试不需要原始业务文档。
+
+截至 2026-11-18，默认分支 `main` 的应用版本为 **0.21.18**；已发布的 **0.21.19** 位于 `v0.21.19` 标签及 `codex/ui-system-phase1` 开发分支。复现下载版时请从上表进入同版本源码，或在干净检出中执行 `git switch --detach v0.21.19` 后构建。默认分支与下载版的版本不能混用；最新开发状态见 [项目状态](docs/PROJECT_STATUS.md)。
 
 ```powershell
 dotnet restore
