@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Differ.App.Resources;
@@ -97,7 +98,12 @@ public sealed class WordParagraphHost : ContentControl
     {
         if (Math.Abs(FirstLineIndent) > 0.01 || _selectingCharacters)
         {
-            _rich ??= new WordParagraphPresenter();
+            if (_rich is null)
+            {
+                _rich = new WordParagraphPresenter();
+                // RichTextBox's default style overrides the foreground inherited from the host.
+                _rich.SetBinding(ForegroundProperty, new Binding(nameof(Foreground)) { Source = this, Mode = BindingMode.OneWay });
+            }
             _rich.LineHeight = LineHeight;
             _rich.TextAlignment = TextAlignment;
             _rich.FirstLineIndent = FirstLineIndent;

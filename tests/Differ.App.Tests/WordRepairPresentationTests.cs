@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Differ.App.Controls;
 using Differ.App.Services;
@@ -31,6 +32,57 @@ public sealed class WordRepairPresentationTests
             Assert.IsType<WordParagraphPresenter>(host.Content);
             host.FirstLineIndent = 0;
             Assert.IsType<WordInlineDiffTextBlock>(host.Content);
+        });
+    }
+
+    [Theory]
+    [InlineData(0d, WordDiffSide.Mine, "Diff.Inline.WordAdded.Brush")]
+    [InlineData(24d, WordDiffSide.Mine, "Diff.Inline.WordAdded.Brush")]
+    [InlineData(-24d, WordDiffSide.Base, "Diff.Inline.Deleted.Brush")]
+    public void RichParagraphKeepsBodyAndDiffColorsAcrossThemeChanges(
+        double firstLineIndent, WordDiffSide side, string highlightKey)
+    {
+        ThemeTestSupport.RunSta(() =>
+        {
+            var host = new WordParagraphHost
+            {
+                DiffKind = DiffKind.Modified,
+                Side = side,
+                FirstLineIndent = firstLineIndent,
+                Segments = [new InlineDiffSegment("正文", false), new InlineDiffSegment("改动", true)]
+            };
+            host.SetResourceReference(WordParagraphHost.ForegroundProperty, "InkBrush");
+            var window = CreateParagraphWindow(host);
+            using var themes = ThemeTestSupport.CreateService(window.Resources, new FakeSystemThemeMonitor(AppTheme.Dark));
+            try
+            {
+                themes.InitializeFromSystem();
+                window.Show();
+                Pump();
+                if (firstLineIndent == 0)
+                {
+                    Assert.IsType<WordInlineDiffTextBlock>(host.Content);
+                    host.EnableCharacterSelection();
+                    Pump();
+                }
+
+                var rich = Assert.IsType<WordParagraphPresenter>(host.Content);
+                var paragraph = Assert.IsType<Paragraph>(rich.Document.Blocks.FirstBlock);
+                var body = Assert.IsType<Run>(paragraph.Inlines.FirstInline);
+                var changed = Assert.IsType<Run>(paragraph.Inlines.LastInline);
+                rich.Selection.Select(body.ContentStart, body.ContentEnd);
+                foreach (var theme in new[] { AppTheme.Dark, AppTheme.Light, AppTheme.Dark })
+                {
+                    themes.Apply(theme);
+                    Pump();
+                    Assert.Equal(ThemeTestSupport.ResolveColour(window.Resources, "InkBrush"),
+                        Assert.IsType<SolidColorBrush>(body.Foreground).Color);
+                    Assert.Equal(ThemeTestSupport.ResolveColour(window.Resources, highlightKey),
+                        Assert.IsType<SolidColorBrush>(changed.Foreground).Color);
+                    Assert.Equal("正文", rich.Selection.Text);
+                }
+            }
+            finally { window.Close(); }
         });
     }
 
@@ -161,17 +213,7 @@ public sealed class WordRepairPresentationTests
                 FirstLineIndent = row.BaseParagraphFirstLine,
                 Segments = [new InlineDiffSegment("这是用于检查首行与后续行位置的中文长段落，正文应该在窄窗口中自然换行并保留正确的缩进。", false)]
             };
-            var window = new Window
-            {
-                Width = 320,
-                Height = 250,
-                Content = presenter,
-                ShowInTaskbar = false,
-                ShowActivated = false,
-                Left = -20_000,
-                Top = -20_000,
-                WindowStartupLocation = WindowStartupLocation.Manual
-            };
+            var window = CreateParagraphWindow(presenter);
             try
             {
                 window.Show();
@@ -201,6 +243,18 @@ public sealed class WordRepairPresentationTests
         Assert.Equal(48, row.BaseTextLeftInset);
         Assert.Equal(0, row.BaseParagraphFirstLine);
     }
+
+    private static Window CreateParagraphWindow(UIElement paragraph) => new()
+    {
+        Width = 320,
+        Height = 250,
+        Content = paragraph,
+        ShowInTaskbar = false,
+        ShowActivated = false,
+        Left = -20_000,
+        Top = -20_000,
+        WindowStartupLocation = WindowStartupLocation.Manual
+    };
 
     private static void Pump()
     {

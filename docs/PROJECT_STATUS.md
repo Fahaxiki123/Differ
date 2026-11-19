@@ -1,10 +1,12 @@
 # 当前项目状态
 
-更新日期：2026-11-16。
+更新日期：2026-11-19。
 
 ## 从哪里继续
 
 - 从当前仓库的 `codex/ui-system-phase1` 分支继续开发。GitHub 默认分支 `main` 已合入 **0.21.18** 源码。主题、窗口按钮和前台验收见 [0.21.18 交付记录](UI-0.21.18.md)，接手时的失败见 [接手前审查](UI-0.21.18-review.md)。
+- **0.21.20** 修复 Word 选字和首行／悬挂缩进段落在暗色下显示黑字的问题。用同一对 DOCX 在离屏比较窗口验证了选区、亮暗往返和红绿高亮，保留原换色动画。对照截图及取色记录：`D:\项目归档\Differ\2026-11-19-word-foreground\screens`。
+- 本机 SVN 安装版已从 **0.21.19 原地升级到 0.21.20**；安装目录、TortoiseSVN 绑定和用户偏好均未变。安装包位于 `artifacts/installers/Differ-Setup.exe`，核验记录：`D:\项目归档\Differ\2026-11-19-word-foreground\local-upgrade\upgrade-verification.json`。此次未发布 GitHub Release。
 - **0.21.19** 的双栏代码、工作表、Word、十六进制、原生文本与三方合并均已接入 680 ms 晨光与月雾。各视图已在隔离预览实测双向换色，三方合并额外核对了展开基础面板与未保存结果。实机证据见 `D:\项目归档\Differ\2026-11-16-all-views-theme\GUI-VALIDATION.md`，Excel 滑块回归证据见 `D:\项目归档\Differ\2026-11-16-excel-theme`。
 - 本机 Windows x64 自包含安装包固定输出在 `artifacts/installers/Differ-Setup.exe`，同名 SHA-256 文件随包生成。升级沿用现有安装路径与 SVN 绑定。全视图主题版的构建与包体验证记录位于 `D:\项目归档\Differ\2026-11-16-all-views-theme`。
 - 历史 **0.21.18 Preview** 的 [Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)以源码 `735fea2218b8adfa25e3d1d597aada69002481a2` 构建，完整包身份与验证范围见 [安装包发布记录](RELEASE-0.21.18.md)。
