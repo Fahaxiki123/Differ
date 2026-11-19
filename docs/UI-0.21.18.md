@@ -6,7 +6,7 @@
 
 2026-11-13，用户完成初步试用，反馈暂未发现问题，并要求将当前开发版本提交到GitHub。在确认仓库已为公开状态后，用户明确授权将源码提交 `2951bf5` 推送到 `Fahaxiki123/Differ` 的 `codex/ui-system-phase1` 分支。
 
-随后用户明确要求安装包发布。**0.21.18 Preview 安装包现已发布**：[Windows x64 下载](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)、[Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)。源码标签固定于 `735fea2218b8adfa25e3d1d597aada69002481a2`，包内核验、本轮 711 通过 / 2 项未启用及现用安装保护结果见 [安装包发布记录](RELEASE-0.21.18.md)。下文 713 项和前台画面仍对应此前完整 UI 验收，不与本轮常规验证计数混用。
+随后用户明确要求安装包发布。0.21.18 Preview 安装包已于当时发布；该旧版附件现已下架，下载请使用[最新正式版](https://github.com/Fahaxiki123/Differ/releases/latest)。源码标签固定于 `735fea2218b8adfa25e3d1d597aada69002481a2`，包内核验、本轮 711 通过 / 2 项未启用及现用安装保护结果见 [安装包发布记录](RELEASE-0.21.18.md)。下文 713 项和前台画面仍对应此前完整 UI 验收，不与本轮常规验证计数混用。
 
 ## 修复内容
 

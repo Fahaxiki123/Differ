@@ -2,23 +2,19 @@
 
 面向 Windows 的文件差异查看工具，支持代码、文本、Word、Excel 和三方文本合并，可直接打开本地文件或从 TortoiseSVN 调用。
 
-## 最新开发版：0.21.18
+## 下载
 
-更新日期：2026-11-13。
+**[下载 Differ 0.21.20 正式版 · Windows x64](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.20/Differ-0.21.20-win-x64-Setup.exe)**
 
-**[下载 0.21.18 Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe)** · [版本说明与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.18) · [历史版本](https://github.com/Fahaxiki123/Differ/releases)
+[发布说明](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.20) · [SHA-256 校验文件](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.20/Differ-0.21.20-win-x64-Setup.exe.sha256) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.20) · [最新稳定版入口](https://github.com/Fahaxiki123/Differ/releases/latest)
 
-0.21.18 开发预览安装包已发布，约 265 MiB，内含 .NET 10.0.12 和 WebView2 离线运行组件。安装包未数字签名；已有安装会在原目录升级，“设为 TortoiseSVN 差异查看器”默认不勾选。程序测试、安装包校验及未验证范围见[安装包交付记录](docs/RELEASE-0.21.18.md)。默认 `main` 已同步 0.21.18 源码，日常开发在 `codex/ui-system-phase1` 继续。0.21.18 安装包仍为预发布，稳定安装包见[历史版本](https://github.com/Fahaxiki123/Differ/releases)。
+安装包内含 .NET 10 和 WebView2 离线运行组件，无需 Office，未数字签名。已有安装会在原目录升级；如果已经绑定 TortoiseSVN，无需再次勾选“设为 TortoiseSVN 差异查看器”。
 
-### 本次更新
+### 0.21.20 更新（2026-11-19）
 
-- **主题切换**：修复右上角窗口按钮区域的矩形接缝，以及语法文字残留旧主题颜色的问题；支持连续和快速反向切换。
-- **窗口交互**：完善最小化、最大化、还原和关闭按钮的按住、拖出、取消与恢复行为，保留 Windows 11 贴靠菜单及未保存关闭保护。
-- **精确查找**：正确定位 BASE 或右侧的实际命中范围，长行结果自动进入可见区域，连续查找保持输入焦点。
-- **另存提示**：显示实际保存目标，区分原始比较来源，并说明 F5 刷新读取的文件。
-- **比较状态**：修复差异概览更新时的异步状态问题，主题切换保留文档内容、选区和撤销历史。
-
-713 项自动测试全部通过；本机实测覆盖双向主题切换、窗口按钮、贴靠菜单、保存与关闭保护、窄窗和 150% 阅读缩放。构建保留既有依赖审计告警，测试条件及未验证范围见完整版本说明。
+- 修复 Word 对比中普通文字在暗色下变黑的问题：进入“选择段落字符”时，以及有首行或悬挂缩进的段落，现在都使用当前主题的正文颜色。
+- 选字后切换亮暗主题，选区会保留；删除词仍为红色，新增词仍为绿色。原有换色动画不变。
+- 已在保留现有 SVN 绑定的情况下从 0.21.19 原地升级，并从 TortoiseSVN 打开 Word 差异实测了选字和亮暗切换。
 
 ## 使用方式
 
@@ -139,6 +135,8 @@ pwsh -NoProfile -File .\scripts\publish.ps1
 ## 开发验证
 
 从GitHub克隆后的依赖、源码边界与构建步骤见 [干净源码构建说明](docs/BUILDING.md)。默认测试不需要原始业务文档。
+
+复现正式安装包，请从 [v0.21.20 源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.20) 构建，或在干净检出中执行 `git switch --detach v0.21.20` 后运行：
 
 ```powershell
 dotnet restore

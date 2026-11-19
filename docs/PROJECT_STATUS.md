@@ -1,19 +1,22 @@
 # 当前项目状态
 
-更新日期：2026-11-19。
+更新日期：2026-11-19。下方历史记录保留各自版本及当时的验证范围。
 
 ## 从哪里继续
 
-- 从当前仓库的 `codex/ui-system-phase1` 分支继续开发。GitHub 默认分支 `main` 已合入 **0.21.18** 源码。主题、窗口按钮和前台验收见 [0.21.18 交付记录](UI-0.21.18.md)，接手时的失败见 [接手前审查](UI-0.21.18-review.md)。
-- **0.21.20** 修复 Word 选字和首行／悬挂缩进段落在暗色下显示黑字的问题。用同一对 DOCX 在离屏比较窗口验证了选区、亮暗往返和红绿高亮，保留原换色动画。对照截图及取色记录：`D:\项目归档\Differ\2026-11-19-word-foreground\screens`。
-- 本机 SVN 安装版已从 **0.21.19 原地升级到 0.21.20**；安装目录、TortoiseSVN 绑定和用户偏好均未变。安装包位于 `artifacts/installers/Differ-Setup.exe`，核验记录：`D:\项目归档\Differ\2026-11-19-word-foreground\local-upgrade\upgrade-verification.json`。此次未发布 GitHub Release。
-- **0.21.19** 的双栏代码、工作表、Word、十六进制、原生文本与三方合并均已接入 680 ms 晨光与月雾。各视图已在隔离预览实测双向换色，三方合并额外核对了展开基础面板与未保存结果。实机证据见 `D:\项目归档\Differ\2026-11-16-all-views-theme\GUI-VALIDATION.md`，Excel 滑块回归证据见 `D:\项目归档\Differ\2026-11-16-excel-theme`。
-- 本机 Windows x64 自包含安装包固定输出在 `artifacts/installers/Differ-Setup.exe`，同名 SHA-256 文件随包生成。升级沿用现有安装路径与 SVN 绑定。全视图主题版的构建与包体验证记录位于 `D:\项目归档\Differ\2026-11-16-all-views-theme`。
-- 历史 **0.21.18 Preview** 的 [Release 与校验值](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18)以源码 `735fea2218b8adfa25e3d1d597aada69002481a2` 构建，完整包身份与验证范围见 [安装包发布记录](RELEASE-0.21.18.md)。
+- 当前正式版 **0.21.20** 是 GitHub [Latest](https://github.com/Fahaxiki123/Differ/releases/latest)。[Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.20/Differ-0.21.20-win-x64-Setup.exe) · [SHA-256](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.20/Differ-0.21.20-win-x64-Setup.exe.sha256) · [版本说明](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.20) · [对应源码](https://github.com/Fahaxiki123/Differ/tree/v0.21.20)。
+- 默认分支 `main` 包含 0.21.20 修复。日常开发继续使用 `codex/ui-system-phase1`；复现发布包请检出 `v0.21.20`，不要只凭分支名判断版本。隔离开发预览由仓库根目录的 `打开开发版.cmd` 启动，依赖项目外的预览文件。新检出按 [构建说明](BUILDING.md) 准备环境。
+- Word 选字或显示首行／悬挂缩进段落时，普通字随亮暗主题换色；红绿差异词仍使用各自的颜色，保留原换色动画。三条回归用例在修复前均失败、修复后均通过。工作区 Release 全量复跑 716 通过、0 失败、2 条前台专项未启用。
+- 本机从 0.21.19 原地升级到 0.21.20 后，安装目录、TortoiseSVN 绑定与偏好不变。用户已从 SVN 入口打开 Word 差异，确认选字、亮暗切换正常。安装包固定输出在 `artifacts/installers/Differ-Setup.exe`；本机升级核验和界面对照记录在 `D:\项目归档\Differ\2026-11-19-word-foreground`。
+
 - 日常 SVN 使用本机现有安装。当前仓库的分支同步只更新源码，安装与 Diff/Merge 绑定独立保留。
 - 证据：UI 修复为 `D:\项目归档\Differ\2026-11-13-caption-finish`，安装包发布为 `D:\项目归档\Differ\2026-11-13-release-0.21.18`。历史整理材料在 `D:\项目归档\Differ\2026-11-12-consolidation`，精确查找/另存记录在 `2026-11-12-find-save`；旧样板源码和历史安装包保留，不从历史启动器运行。
 
-## UI 做到了哪里
+## 0.21.19 Preview 发布范围（历史记录）
+
+0.21.19 将 680 ms 主题过渡扩展至 Word、Excel/CSV、原生只读文本、十六进制及三方合并视图。该版本 Release 记录为 713 项自动回归通过、0 失败、2 跳过；安装包核验覆盖 593 个运行文件。当时未覆盖 Windows 10、干净机、完整安装升级卸载、混合 DPI 和长期稳定性。实机记录见 `D:\项目归档\Differ\2026-11-16-all-views-theme\GUI-VALIDATION.md`，Excel 滑块回归记录见 `D:\项目归档\Differ\2026-11-16-excel-theme`。
+
+## 0.21.18 UI 基线与后续边界（历史记录）
 
 公共标题栏文件标签、独立工具栏、文本编辑操作栏、Excel 紧凑对照栏、双侧拖动绘制、16 DIP 导航轨和主题雾光已在主工程实现。当前不是空壳，但也未完成全部页面的视觉迁移和用户验收。
 
@@ -35,7 +38,7 @@
 
 旧样板独有源码保存在 `history\Differ-installed-UIReview\recovered`，其中 `Differ.App.ViewModels\DiffWindowViewModel.cs` 和 `Editor\editor.js` 是上述查找及目标提示的参考。不要用反编译旧工程整体覆盖主仓库。
 
-## 当前验证与交付门禁
+## 0.21.18 验证与交付记录（历史）
 
 安装包发布已完成：正式 Release 构建和格式通过，本轮常规回归 711 通过、0 失败、2 项显式前台/取证测试未启用；不是 713 项全部运行。非执行校验覆盖 598 个归档条目和 592 个运行文件，文件大小/SHA-256、源码身份与离线依赖通过。正式程序只执行只读 `--integration-status` 并返回预期未绑定状态；未运行安装器或卸载程序。远端 Preview 为 Draft=false，四件附件验证通过。发布后 `final-protection.json` 确认现用安装全部 592 个文件、全局及高级绑定、卸载项和开发预览未变；清理 23 个目标后 Check 为 Clean=true、Targets=0、Unclassified=0。详见 [安装包发布记录](RELEASE-0.21.18.md)。
 

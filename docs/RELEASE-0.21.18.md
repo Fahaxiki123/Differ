@@ -2,7 +2,7 @@
 
 2026-11-13。用户在完成开发版初步试用后，明确要求构建安装包、发布到 GitHub，并在首页提供最新下载入口，同时保留现用 SVN 安装与绑定。现已发布 **0.21.18 Preview**，不替换稳定通道的 Latest，不删除历史版本。
 
-[下载 Windows x64 安装包](https://github.com/Fahaxiki123/Differ/releases/download/v0.21.18/Differ-0.21.18-win-x64-Setup.exe) · [Release、校验值与说明](https://github.com/Fahaxiki123/Differ/releases/tag/v0.21.18) · [源码标签](https://github.com/Fahaxiki123/Differ/tree/v0.21.18)
+2026-11-19 更新：0.21.18 的 Release 和附件已下架，[源码标签](https://github.com/Fahaxiki123/Differ/tree/v0.21.18) 仍保留。安装包请到 [最新正式版](https://github.com/Fahaxiki123/Differ/releases/latest) 下载。
 
 ## 产物身份
 

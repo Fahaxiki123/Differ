@@ -7,7 +7,20 @@
 - 文本编辑器运行和实际浏览器回归测试需要 Microsoft Edge WebView2 Runtime。
 - 首次 NuGet 还原需要访问 NuGet；版本集中锁定在 Directory.Packages.props。
 
-在仓库根目录执行：
+## 选择与安装包一致的源码
+
+安装包版本、Release 标签和源码版本必须一致。最新下载入口见 [README](../README.md#下载)。要复现 0.21.20 正式版，请在干净检出中选择发布时的标签，而不是使用一个可能已继续开发的分支：
+
+```powershell
+git fetch origin --tags
+git switch --detach v0.21.20
+```
+
+继续开发使用 `codex/ui-system-phase1` 分支。不要只修改工程版本号来把旧源码标成新版本；具体分支状态见 [项目状态](PROJECT_STATUS.md)。
+
+## 构建与验证
+
+在选定版本的仓库根目录执行：
 
 ```powershell
 dotnet restore Differ.sln
